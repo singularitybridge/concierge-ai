@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import axios from 'axios';
 import http from 'http';
 
-// Custom fetch with IPv4-only agent
-async function fetchWithIPv4(url: string, options: RequestInit = {}) {
-  const agent = new http.Agent({ family: 4 });
-  return fetch(url, {
-    ...options,
-    // @ts-ignore - Next.js fetch supports agent
-    agent
-  });
-}
+// HTTP agent configured for IPv4 only
+const httpAgent = new http.Agent({
+  family: 4,  // Force IPv4
+  keepAlive: true
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -54,26 +51,26 @@ export async function POST(req: NextRequest) {
       console.log('🌐 Calling agent API:', agentApiUrl);
       console.log('📤 Request payload:', { userInput: userMessage });
 
-      const agentResponse = await fetchWithIPv4(agentApiUrl, {
-        method: 'POST',
+      const agentResponse = await axios.post(agentApiUrl, {
+        userInput: userMessage
+      }, {
+        httpAgent: httpAgent,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${process.env.AI_AGENT_API_KEY || ''}`
         },
-        body: JSON.stringify({
-          userInput: userMessage
-        })
+        timeout: 30000,
+        validateStatus: (status) => status < 500 // Don't throw on 4xx
       });
 
       console.log('📡 Agent response status:', agentResponse.status);
 
-      if (!agentResponse.ok) {
-        const errorText = await agentResponse.text();
-        console.error('❌ Agent API error:', agentResponse.status, errorText);
-        throw new Error(`Agent API error: ${agentResponse.status} - ${errorText}`);
+      if (agentResponse.status >= 400) {
+        console.error('❌ Agent API error:', agentResponse.status, agentResponse.data);
+        throw new Error(`Agent API error: ${agentResponse.status} - ${JSON.stringify(agentResponse.data)}`);
       }
 
-      const agentData = await agentResponse.json();
+      const agentData = agentResponse.data;
 
       console.log('📦 Raw agent response:', JSON.stringify(agentData, null, 2));
 
