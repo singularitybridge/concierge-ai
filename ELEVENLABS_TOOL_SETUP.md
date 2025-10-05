@@ -1,7 +1,14 @@
 # ElevenLabs Tool Setup - Manual Configuration Required
 
 ## Issue
-The ElevenLabs API does not properly support adding tools programmatically. Tools must be configured through the **ElevenLabs Dashboard**.
+**CONFIRMED**: The ElevenLabs API does **NOT** support adding tools programmatically.
+
+Tested three different API structures - all failed:
+- ✗ `type: "server"` - Invalid tool type
+- ✗ `type: "webhook"` with `response_schema` - Invalid api_schema format
+- ✗ `type: "webhook"` minimal - Invalid api_schema format
+
+**Tools MUST be configured through the ElevenLabs Dashboard.**
 
 ## Current Status
 - ✅ Agent created: `agent_1701k6s0xmc7e4ysqcqq5msf3yvq`

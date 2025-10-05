@@ -8,6 +8,25 @@ const httpAgent = new http.Agent({
   keepAlive: true
 });
 
+// Handle GET requests (health checks)
+export async function GET(req: NextRequest) {
+  console.log('📥 ElevenLabs webhook GET request (health check)');
+  return NextResponse.json({ status: 'ok', method: 'GET' });
+}
+
+// Handle OPTIONS requests (CORS preflight)
+export async function OPTIONS(req: NextRequest) {
+  console.log('📥 ElevenLabs webhook OPTIONS request (CORS preflight)');
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -15,10 +34,10 @@ export async function POST(req: NextRequest) {
     // Debug: Log what ElevenLabs is sending
     console.log('📥 ElevenLabs webhook received:', JSON.stringify(body, null, 2));
 
-    // ElevenLabs sends tool calls in the format:
-    // { tool_name: "...", parameters: {...} }
-    const toolName = body.tool_name;
-    const parameters = body.parameters;
+    // ElevenLabs sends just the parameters directly: { message: "..." }
+    // OR in some formats: { tool_name: "...", parameters: {...} }
+    const toolName = body.tool_name || 'query_integration_expert';
+    const parameters = body.parameters || body;
 
     console.log('🔍 Tool call detection:', { toolName, hasParameters: !!parameters });
 
