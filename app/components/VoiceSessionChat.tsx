@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import { Send, Phone, PhoneOff, Mic, Loader2, Trash2, FileText, Info, X } from 'lucide-react';
 import Vapi from '@vapi-ai/web';
 import { useConversation } from '@elevenlabs/react';
+import { AudioCaptureManager } from '../utils/audioCaptureManager';
+import { AudioPlaybackManager } from '../utils/audioPlaybackManager';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -31,8 +33,8 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [openaiWs, setOpenaiWs] = useState<WebSocket | null>(null);
   const [geminiWs, setGeminiWs] = useState<WebSocket | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const audioQueueRef = useRef<Float32Array[]>([]);
+  const audioCaptureRef = useRef<AudioCaptureManager | null>(null);
+  const audioPlaybackRef = useRef<AudioPlaybackManager | null>(null);
 
   const agentTools = {
     vapi: ['Voice-to-Text (Deepgram)', 'Text-to-Voice (11Labs/PlayHT)', 'Function Calling', 'Custom Tools'],
@@ -151,78 +153,128 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
       return;
     }
 
-    const url = `wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17`;
-    const ws = new WebSocket(url, {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'OpenAI-Beta': 'realtime=v1'
+    try {
+      // Initialize audio managers
+      if (!audioCaptureRef.current) {
+        audioCaptureRef.current = new AudioCaptureManager();
       }
-    } as any);
+      if (!audioPlaybackRef.current) {
+        audioPlaybackRef.current = new AudioPlaybackManager();
+        await audioPlaybackRef.current.initialize();
+      }
 
-    ws.onopen = () => {
-      console.log('OpenAI Realtime connected');
-      setIsCallActive(true);
-      setIsVapiLoading(false);
+      // WebSocket connection with API key in subprotocol
+      const url = `wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17`;
+      const ws = new WebSocket(url, [
+        'realtime',
+        `openai-insecure-api-key.${apiKey}`,
+        'openai-beta.realtime-v1'
+      ]);
 
-      // Configure session
-      ws.send(JSON.stringify({
-        type: 'session.update',
-        session: {
-          modalities: ['text', 'audio'],
-          instructions: 'You are a helpful AI assistant.',
-          voice: 'alloy',
-          input_audio_format: 'pcm16',
-          output_audio_format: 'pcm16',
-          turn_detection: {
-            type: 'server_vad'
+      ws.onopen = async () => {
+        console.log('OpenAI Realtime connected');
+
+        // Configure session
+        ws.send(JSON.stringify({
+          type: 'session.update',
+          session: {
+            modalities: ['text', 'audio'],
+            instructions: agentPrompts.openai || 'You are a helpful AI assistant.',
+            voice: 'alloy',
+            input_audio_format: 'pcm16',
+            output_audio_format: 'pcm16',
+            input_audio_transcription: {
+              model: 'whisper-1'
+            },
+            turn_detection: {
+              type: 'server_vad',
+              threshold: 0.5,
+              prefix_padding_ms: 300,
+              silence_duration_ms: 200
+            }
           }
-        }
-      }));
-    };
+        }));
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log('OpenAI event:', data.type);
+        // Start audio capture and send to WebSocket
+        try {
+          await audioCaptureRef.current!.startCapture((pcm16Data, base64Audio) => {
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({
+                type: 'input_audio_buffer.append',
+                audio: base64Audio
+              }));
+            }
+          });
 
-      if (data.type === 'conversation.item.created' && data.item.role === 'assistant') {
-        const content = data.item.content?.[0]?.transcript || '';
-        if (content) {
-          setMessages(prev => [...prev, {
-            role: 'assistant',
-            content,
-            timestamp: Date.now()
-          }]);
+          setIsCallActive(true);
+          setIsVapiLoading(false);
+        } catch (error) {
+          console.error('Failed to start audio capture:', error);
+          ws.close();
+          setIsVapiLoading(false);
         }
-      } else if (data.type === 'response.audio_transcript.delta') {
-        setMessages(prev => {
-          const lastMsg = prev[prev.length - 1];
-          if (lastMsg && lastMsg.role === 'assistant') {
-            return [...prev.slice(0, -1), {
-              ...lastMsg,
-              content: lastMsg.content + data.delta
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        // Handle audio responses
+        if (data.type === 'response.audio.delta' && data.delta) {
+          audioPlaybackRef.current?.addBase64AudioChunk(data.delta);
+        }
+
+        // Handle text transcripts
+        if (data.type === 'conversation.item.created' && data.item.role === 'assistant') {
+          const content = data.item.content?.[0]?.transcript || '';
+          if (content) {
+            setMessages(prev => [...prev, {
+              role: 'assistant',
+              content,
+              timestamp: Date.now()
+            }]);
+          }
+        } else if (data.type === 'response.audio_transcript.delta') {
+          setMessages(prev => {
+            const lastMsg = prev[prev.length - 1];
+            if (lastMsg && lastMsg.role === 'assistant') {
+              return [...prev.slice(0, -1), {
+                ...lastMsg,
+                content: lastMsg.content + data.delta
+              }];
+            }
+            return [...prev, {
+              role: 'assistant',
+              content: data.delta,
+              timestamp: Date.now()
             }];
-          }
-          return [...prev, {
-            role: 'assistant',
-            content: data.delta,
-            timestamp: Date.now()
-          }];
-        });
-      }
-    };
+          });
+        } else if (data.type === 'input_audio_buffer.speech_started') {
+          console.log('User started speaking');
+        } else if (data.type === 'input_audio_buffer.speech_stopped') {
+          console.log('User stopped speaking');
+        }
+      };
 
-    ws.onerror = (error) => {
-      console.error('OpenAI WebSocket error:', error);
+      ws.onerror = (error) => {
+        console.error('OpenAI WebSocket error:', error);
+        setIsVapiLoading(false);
+      };
+
+      ws.onclose = async () => {
+        console.log('OpenAI WebSocket closed');
+        setIsCallActive(false);
+        setIsVapiLoading(false);
+
+        // Cleanup audio
+        await audioCaptureRef.current?.stopCapture();
+        await audioPlaybackRef.current?.stop();
+      };
+
+      setOpenaiWs(ws);
+    } catch (error) {
+      console.error('Failed to start OpenAI Realtime call:', error);
       setIsVapiLoading(false);
-    };
-
-    ws.onclose = () => {
-      console.log('OpenAI WebSocket closed');
-      setIsCallActive(false);
-      setIsVapiLoading(false);
-    };
-
-    setOpenaiWs(ws);
+    }
   };
 
   const startGeminiLiveCall = async () => {
@@ -233,57 +285,120 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
       return;
     }
 
-    // Gemini Live uses bidirectional streaming via their API
-    const ws = new WebSocket(`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${apiKey}`);
+    try {
+      // Initialize audio managers
+      if (!audioCaptureRef.current) {
+        audioCaptureRef.current = new AudioCaptureManager();
+      }
+      if (!audioPlaybackRef.current) {
+        audioPlaybackRef.current = new AudioPlaybackManager();
+        await audioPlaybackRef.current.initialize();
+      }
 
-    ws.onopen = () => {
-      console.log('Gemini Live connected');
-      setIsCallActive(true);
-      setIsVapiLoading(false);
+      // Gemini Live WebSocket endpoint
+      const ws = new WebSocket(
+        `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${apiKey}`
+      );
 
-      // Send initial setup message
-      ws.send(JSON.stringify({
-        setup: {
-          model: 'models/gemini-2.0-flash-exp',
-          generation_config: {
-            response_modalities: ['AUDIO'],
+      ws.onopen = async () => {
+        console.log('Gemini Live connected');
+
+        // Send initial setup message
+        ws.send(JSON.stringify({
+          setup: {
+            model: 'models/gemini-2.0-flash-exp',
+            generation_config: {
+              response_modalities: ['AUDIO', 'TEXT'],
+              speech_config: {
+                voice_config: {
+                  prebuilt_voice_config: {
+                    voice_name: 'Aoede'
+                  }
+                }
+              }
+            }
+          }
+        }));
+
+        // Start audio capture and send to WebSocket
+        try {
+          await audioCaptureRef.current!.startCapture((pcm16Data, base64Audio) => {
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({
+                realtimeInput: {
+                  mediaChunks: [{
+                    data: base64Audio,
+                    mime_type: 'audio/pcm'
+                  }]
+                }
+              }));
+            }
+          });
+
+          setIsCallActive(true);
+          setIsVapiLoading(false);
+        } catch (error) {
+          console.error('Failed to start audio capture:', error);
+          ws.close();
+          setIsVapiLoading(false);
+        }
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        // Handle audio responses
+        if (data.serverContent?.modelTurn?.parts) {
+          const parts = data.serverContent.modelTurn.parts;
+
+          for (const part of parts) {
+            // Handle inline audio data
+            if (part.inlineData?.data) {
+              audioPlaybackRef.current?.addBase64AudioChunk(part.inlineData.data);
+            }
+
+            // Handle text transcripts
+            if (part.text) {
+              setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: part.text,
+                timestamp: Date.now()
+              }]);
+            }
           }
         }
-      }));
-    };
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log('Gemini event:', data);
-
-      if (data.serverContent?.modelTurn?.parts) {
-        const text = data.serverContent.modelTurn.parts
-          .filter((p: any) => p.text)
-          .map((p: any) => p.text)
-          .join('');
-
-        if (text) {
-          setMessages(prev => [...prev, {
-            role: 'assistant',
-            content: text,
-            timestamp: Date.now()
-          }]);
+        // Handle setup completion
+        if (data.setupComplete) {
+          console.log('Gemini setup complete');
         }
-      }
-    };
 
-    ws.onerror = (error) => {
-      console.error('Gemini WebSocket error:', error);
+        // Handle errors
+        if (data.error) {
+          console.error('Gemini error:', data.error);
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error('Gemini WebSocket error:', error);
+        setIsVapiLoading(false);
+      };
+
+      ws.onclose = async () => {
+        console.log('Gemini WebSocket closed');
+        setIsCallActive(false);
+        setIsVapiLoading(false);
+
+        // Cleanup audio
+        await audioCaptureRef.current?.stopCapture();
+        await audioPlaybackRef.current?.stop();
+      };
+
+      setGeminiWs(ws);
+    } catch (error) {
+      console.error('Failed to start Gemini Live call:', error);
       setIsVapiLoading(false);
-    };
-
-    ws.onclose = () => {
-      console.log('Gemini WebSocket closed');
-      setIsCallActive(false);
-      setIsVapiLoading(false);
-    };
-
-    setGeminiWs(ws);
+    }
   };
 
   const startCall = async () => {
@@ -306,7 +421,7 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
     }
   };
 
-  const endCall = () => {
+  const endCall = async () => {
     if (provider === 'vapi' && vapi) {
       vapi.stop();
     } else if (provider === 'elevenlabs') {
@@ -314,9 +429,11 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
     } else if (provider === 'openai' && openaiWs) {
       openaiWs.close();
       setOpenaiWs(null);
+      // Cleanup will happen in WebSocket onclose handler
     } else if (provider === 'gemini' && geminiWs) {
       geminiWs.close();
       setGeminiWs(null);
+      // Cleanup will happen in WebSocket onclose handler
     }
   };
 
