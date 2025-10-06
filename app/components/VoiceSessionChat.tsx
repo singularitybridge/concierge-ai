@@ -11,7 +11,7 @@ interface Message {
   timestamp: number;
 }
 
-type VoiceProvider = 'vapi' | 'elevenlabs';
+type VoiceProvider = 'vapi' | 'elevenlabs' | 'openai' | 'gemini';
 
 interface VoiceSessionChatProps {
   agentId: string;
@@ -27,12 +27,18 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
   const [isCallActive, setIsCallActive] = useState(false);
   const [isVapiLoading, setIsVapiLoading] = useState(false);
   const [showPromptModal, setShowPromptModal] = useState(false);
-  const [agentPrompts, setAgentPrompts] = useState<{ vapi?: string; elevenlabs?: string }>({});
+  const [agentPrompts, setAgentPrompts] = useState<{ vapi?: string; elevenlabs?: string; openai?: string; gemini?: string }>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [openaiWs, setOpenaiWs] = useState<WebSocket | null>(null);
+  const [geminiWs, setGeminiWs] = useState<WebSocket | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioQueueRef = useRef<Float32Array[]>([]);
 
   const agentTools = {
     vapi: ['Voice-to-Text (Deepgram)', 'Text-to-Voice (11Labs/PlayHT)', 'Function Calling', 'Custom Tools'],
-    elevenlabs: ['Voice-to-Voice AI', 'Conversational AI', 'Real-time Processing', 'Context Awareness']
+    elevenlabs: ['Voice-to-Voice AI', 'Conversational AI', 'Real-time Processing', 'Context Awareness'],
+    openai: ['GPT-4o Realtime', 'Voice-to-Voice', 'Function Calling', 'Low Latency'],
+    gemini: ['Gemini 2.0 Live', 'Multimodal AI', 'Real-time Streaming', 'Context Awareness']
   };
 
   // ElevenLabs conversation
@@ -137,6 +143,149 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [provider]);
 
+  const startOpenAIRealtimeCall = async () => {
+    const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+    if (!apiKey) {
+      console.error('OpenAI API key not found');
+      setIsVapiLoading(false);
+      return;
+    }
+
+    const url = `wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17`;
+    const ws = new WebSocket(url, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'OpenAI-Beta': 'realtime=v1'
+      }
+    } as any);
+
+    ws.onopen = () => {
+      console.log('OpenAI Realtime connected');
+      setIsCallActive(true);
+      setIsVapiLoading(false);
+
+      // Configure session
+      ws.send(JSON.stringify({
+        type: 'session.update',
+        session: {
+          modalities: ['text', 'audio'],
+          instructions: 'You are a helpful AI assistant.',
+          voice: 'alloy',
+          input_audio_format: 'pcm16',
+          output_audio_format: 'pcm16',
+          turn_detection: {
+            type: 'server_vad'
+          }
+        }
+      }));
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log('OpenAI event:', data.type);
+
+      if (data.type === 'conversation.item.created' && data.item.role === 'assistant') {
+        const content = data.item.content?.[0]?.transcript || '';
+        if (content) {
+          setMessages(prev => [...prev, {
+            role: 'assistant',
+            content,
+            timestamp: Date.now()
+          }]);
+        }
+      } else if (data.type === 'response.audio_transcript.delta') {
+        setMessages(prev => {
+          const lastMsg = prev[prev.length - 1];
+          if (lastMsg && lastMsg.role === 'assistant') {
+            return [...prev.slice(0, -1), {
+              ...lastMsg,
+              content: lastMsg.content + data.delta
+            }];
+          }
+          return [...prev, {
+            role: 'assistant',
+            content: data.delta,
+            timestamp: Date.now()
+          }];
+        });
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error('OpenAI WebSocket error:', error);
+      setIsVapiLoading(false);
+    };
+
+    ws.onclose = () => {
+      console.log('OpenAI WebSocket closed');
+      setIsCallActive(false);
+      setIsVapiLoading(false);
+    };
+
+    setOpenaiWs(ws);
+  };
+
+  const startGeminiLiveCall = async () => {
+    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    if (!apiKey) {
+      console.error('Gemini API key not found');
+      setIsVapiLoading(false);
+      return;
+    }
+
+    // Gemini Live uses bidirectional streaming via their API
+    const ws = new WebSocket(`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${apiKey}`);
+
+    ws.onopen = () => {
+      console.log('Gemini Live connected');
+      setIsCallActive(true);
+      setIsVapiLoading(false);
+
+      // Send initial setup message
+      ws.send(JSON.stringify({
+        setup: {
+          model: 'models/gemini-2.0-flash-exp',
+          generation_config: {
+            response_modalities: ['AUDIO'],
+          }
+        }
+      }));
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log('Gemini event:', data);
+
+      if (data.serverContent?.modelTurn?.parts) {
+        const text = data.serverContent.modelTurn.parts
+          .filter((p: any) => p.text)
+          .map((p: any) => p.text)
+          .join('');
+
+        if (text) {
+          setMessages(prev => [...prev, {
+            role: 'assistant',
+            content: text,
+            timestamp: Date.now()
+          }]);
+        }
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error('Gemini WebSocket error:', error);
+      setIsVapiLoading(false);
+    };
+
+    ws.onclose = () => {
+      console.log('Gemini WebSocket closed');
+      setIsCallActive(false);
+      setIsVapiLoading(false);
+    };
+
+    setGeminiWs(ws);
+  };
+
   const startCall = async () => {
     setIsVapiLoading(true);
     try {
@@ -146,6 +295,10 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
         await elevenLabsConversation.startSession({
           agentId: process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || '',
         });
+      } else if (provider === 'openai') {
+        await startOpenAIRealtimeCall();
+      } else if (provider === 'gemini') {
+        await startGeminiLiveCall();
       }
     } catch (error) {
       console.error('Failed to start call:', error);
@@ -158,6 +311,12 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
       vapi.stop();
     } else if (provider === 'elevenlabs') {
       elevenLabsConversation.endSession();
+    } else if (provider === 'openai' && openaiWs) {
+      openaiWs.close();
+      setOpenaiWs(null);
+    } else if (provider === 'gemini' && geminiWs) {
+      geminiWs.close();
+      setGeminiWs(null);
     }
   };
 
@@ -248,10 +407,10 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
         {!isCallActive && (
           <div className="mb-3">
             <p className="text-xs font-medium text-gray-700 mb-2">Voice Agent</p>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setProvider('vapi')}
-                className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                className={`px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
                   provider === 'vapi'
                     ? 'bg-indigo-50 border-indigo-600 text-indigo-700'
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -261,13 +420,33 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
               </button>
               <button
                 onClick={() => setProvider('elevenlabs')}
-                className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                className={`px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
                   provider === 'elevenlabs'
                     ? 'bg-indigo-50 border-indigo-600 text-indigo-700'
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                 }`}
               >
                 ElevenLabs
+              </button>
+              <button
+                onClick={() => setProvider('openai')}
+                className={`px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                  provider === 'openai'
+                    ? 'bg-indigo-50 border-indigo-600 text-indigo-700'
+                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                OpenAI
+              </button>
+              <button
+                onClick={() => setProvider('gemini')}
+                className={`px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                  provider === 'gemini'
+                    ? 'bg-indigo-50 border-indigo-600 text-indigo-700'
+                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Gemini
               </button>
             </div>
           </div>
@@ -279,7 +458,10 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-semibold text-gray-900">
-                  {provider === 'vapi' ? 'VAPI Agent' : 'ElevenLabs Agent'}
+                  {provider === 'vapi' && 'VAPI Agent'}
+                  {provider === 'elevenlabs' && 'ElevenLabs Agent'}
+                  {provider === 'openai' && 'OpenAI Realtime'}
+                  {provider === 'gemini' && 'Gemini Live'}
                 </h3>
                 <button
                   onClick={() => {
@@ -295,10 +477,10 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
                 </button>
               </div>
               <p className="text-xs text-gray-600 mt-1">
-                {provider === 'vapi'
-                  ? 'Voice AI with function calling'
-                  : 'Real-time conversational AI'
-                }
+                {provider === 'vapi' && 'Voice AI with function calling'}
+                {provider === 'elevenlabs' && 'Real-time conversational AI'}
+                {provider === 'openai' && 'GPT-4o multimodal voice chat'}
+                {provider === 'gemini' && 'Gemini 2.0 Live API streaming'}
               </p>
             </div>
           </div>
