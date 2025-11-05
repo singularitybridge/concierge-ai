@@ -157,12 +157,22 @@ export const clientSideFunctions: Record<string, ClientFunctionHandler> = {
    * End the current voice call
    */
   end_call: async (params, context) => {
-    if (context.endCall) {
-      // End call immediately without waiting
-      setTimeout(() => context.endCall(), 100);
-      return 'Goodbye!';
+    // Click the end call button directly
+    if (typeof document !== 'undefined') {
+      const button = document.getElementById('voice-call-button');
+      if (button) {
+        button.click();
+        return 'Call ended';
+      }
     }
-    return 'Unable to end call - no call active';
+
+    // Fallback to context endCall
+    if (context.endCall) {
+      context.endCall();
+      return 'Call ended';
+    }
+
+    return 'Unable to end call';
   },
 
   /**

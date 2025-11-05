@@ -145,20 +145,6 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
 
           console.log('🔧 Client-side function call:', { functionName, parameters, functionCallId });
 
-          // Special handling for end_call - stop immediately
-          if (functionName === 'end_call') {
-            console.log('🛑 Ending call immediately');
-            if (vapi) {
-              vapi.stop();
-            }
-            setMessages(prev => [...prev, {
-              role: 'assistant',
-              content: '✓ Call ended',
-              timestamp: Date.now()
-            }]);
-            return; // Don't process any further
-          }
-
           try {
             // Execute the function with context
             const result = await executeClientFunction(
@@ -790,6 +776,7 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
 
         {/* Call Button */}
         <button
+          id="voice-call-button"
           onClick={isCallActive ? endCall : startCall}
           disabled={isVapiLoading}
           className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors ${
