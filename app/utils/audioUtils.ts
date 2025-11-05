@@ -1,9 +1,15 @@
 /**
  * Audio Utilities for OpenAI Realtime and Gemini Live APIs
- * Handles PCM16 encoding/decoding at 16kHz sample rate
+ * Handles PCM16 encoding/decoding at provider-specific sample rates
  */
 
-export const SAMPLE_RATE = 16000; // 16kHz for both OpenAI and Gemini
+// OpenAI Realtime API uses 24kHz for both input and output
+export const OPENAI_SAMPLE_RATE = 24000;
+
+// Gemini Live API uses 16kHz for input, 24kHz for output
+export const GEMINI_INPUT_SAMPLE_RATE = 16000;
+export const GEMINI_OUTPUT_SAMPLE_RATE = 24000;
+
 export const CHANNELS = 1; // Mono audio
 export const BIT_DEPTH = 16; // 16-bit PCM
 

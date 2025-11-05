@@ -243,7 +243,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Otherwise, list all files from workspace
+    // Try to list workspace files via Agent Hub API
     try {
       const listResponse = await fetch(`${AGENT_HUB_API_URL}/api/workspace/list?prefix=/&scope=agent&agentId=${resolvedAgentId}`, {
         headers: {
@@ -255,19 +255,29 @@ export async function GET(request: NextRequest) {
 
       if (listResponse.ok) {
         const data = await listResponse.json();
-        const files = data.items || [];
+        // Agent Hub API returns 'paths' not 'items', and without leading slashes
+        const files = (data.paths || data.items || []).map((path: string) =>
+          path.startsWith('/') ? path : `/${path}`
+        ).filter((path: string) => path !== '/');
 
+        console.log(`[Workspace API] Successfully listed ${files.length} files for agent ${resolvedAgentId}`);
         return NextResponse.json({
-          files: files.length > 0 ? files : ['/agent.session.mdx']
+          files: files
         });
+      } else {
+        const errorText = await listResponse.text();
+        console.warn(`[Workspace API] Failed to list files for agent ${resolvedAgentId}: ${listResponse.status} ${errorText}`);
       }
     } catch (err) {
-      console.error('Error listing workspace files:', err);
+      console.error('[Workspace API] Error listing workspace files:', err);
     }
 
-    // Fallback
+    // Fallback to empty array if workspace not accessible
+    // Note: Agent Hub HTTP API may not be available - files can still be managed via MCP
+    console.log(`[Workspace API] Returning empty file list for agent ${resolvedAgentId} (workspace may be managed via MCP)`);
     return NextResponse.json({
-      files: ['/agent.session.mdx']
+      files: [],
+      message: 'Workspace listing via HTTP API unavailable. Files may be managed via MCP protocol.'
     });
 
   } catch (error) {

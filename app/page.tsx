@@ -2,7 +2,7 @@ import WorkspaceFileViewer from './components/WorkspaceFileViewer';
 import VoiceSessionChat from './components/VoiceSessionChat';
 import { Sparkles } from 'lucide-react';
 
-const AGENT_NAME = 'john';
+const AGENT_NAME = 'integration-expert';
 
 export default function Home() {
   return (

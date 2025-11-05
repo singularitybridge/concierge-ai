@@ -4,7 +4,6 @@
  */
 
 import {
-  SAMPLE_RATE,
   CHANNELS,
   floatTo16BitPCM,
   resampleAudio,
@@ -21,19 +20,22 @@ export class AudioCaptureManager {
   private processor: ScriptProcessorNode | null = null;
   private isCapturing: boolean = false;
   private onAudioData: AudioDataCallback | null = null;
+  private targetSampleRate: number = 24000;
 
   /**
    * Start capturing audio from the microphone
    * @param onAudioData Callback function that receives PCM16 audio chunks
+   * @param sampleRate Target sample rate for the audio (default: 24000 for OpenAI)
    * @returns Promise<void>
    */
-  async startCapture(onAudioData: AudioDataCallback): Promise<void> {
+  async startCapture(onAudioData: AudioDataCallback, sampleRate: number = 24000): Promise<void> {
     if (this.isCapturing) {
       console.warn('Audio capture already active');
       return;
     }
 
     this.onAudioData = onAudioData;
+    this.targetSampleRate = sampleRate;
 
     try {
       // Request microphone access
@@ -42,14 +44,14 @@ export class AudioCaptureManager {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
-          sampleRate: SAMPLE_RATE,
+          sampleRate: this.targetSampleRate,
           channelCount: CHANNELS,
         },
       });
 
-      // Create audio context
+      // Create audio context with target sample rate
       this.audioContext = new AudioContext({
-        sampleRate: SAMPLE_RATE,
+        sampleRate: this.targetSampleRate,
       });
 
       // Create media stream source
@@ -82,8 +84,8 @@ export class AudioCaptureManager {
           : inputData[0];
 
         // Resample if needed
-        if (inputBuffer.sampleRate !== SAMPLE_RATE) {
-          audioData = resampleAudio(audioData, inputBuffer.sampleRate, SAMPLE_RATE);
+        if (inputBuffer.sampleRate !== this.targetSampleRate) {
+          audioData = resampleAudio(audioData, inputBuffer.sampleRate, this.targetSampleRate);
         }
 
         // Convert to PCM16

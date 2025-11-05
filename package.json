@@ -3,13 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack -p 4024",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "tunnel:quick": "./scripts/start-quick-tunnel.sh",
+    "tunnel:permanent": "./scripts/start-permanent-tunnel.sh",
+    "tunnel:setup": "./scripts/setup-cloudflare-tunnel.sh",
+    "tunnel:start": "./scripts/start-cloudflare-tunnel.sh",
+    "tunnel:update-vapi": "tsx scripts/update-vapi-with-cloudflare.ts"
   },
   "dependencies": {
     "@elevenlabs/react": "^0.7.1",
+    "@vapi-ai/server-sdk": "^0.4.0",
     "@vapi-ai/web": "^2.4.0",
     "axios": "^1.12.2",
     "lucide-react": "^0.544.0",

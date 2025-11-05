@@ -3,7 +3,7 @@
  * Handles audio playback queue and smooth audio streaming
  */
 
-import { SAMPLE_RATE, CHANNELS, pcm16ToFloat, base64ToInt16Array } from './audioUtils';
+import { CHANNELS, pcm16ToFloat, base64ToInt16Array, resampleAudio } from './audioUtils';
 
 export class AudioPlaybackManager {
   private audioContext: AudioContext | null = null;
@@ -12,19 +12,22 @@ export class AudioPlaybackManager {
   private nextStartTime: number = 0;
   private readonly maxQueueSize: number = 100; // Prevent memory issues
   private gainNode: GainNode | null = null;
+  private sourceSampleRate: number = 24000; // Default to 24kHz (both OpenAI and Gemini output)
 
   /**
    * Initialize the audio playback system
+   * @param sampleRate Source sample rate of incoming audio (default: 24000)
    */
-  async initialize(): Promise<void> {
+  async initialize(sampleRate: number = 24000): Promise<void> {
     if (this.audioContext) {
       console.warn('Audio playback already initialized');
       return;
     }
 
-    this.audioContext = new AudioContext({
-      sampleRate: SAMPLE_RATE,
-    });
+    this.sourceSampleRate = sampleRate;
+
+    // Use browser's default sample rate (typically 44100 or 48000)
+    this.audioContext = new AudioContext();
 
     // Create gain node for volume control
     this.gainNode = this.audioContext.createGain();
@@ -56,7 +59,14 @@ export class AudioPlaybackManager {
     }
 
     // Convert PCM16 to Float32
-    const float32Data = pcm16ToFloat(pcm16Data);
+    let float32Data = pcm16ToFloat(pcm16Data);
+
+    // Resample from source sample rate to audio context sample rate
+    const contextSampleRate = this.audioContext.sampleRate;
+    if (this.sourceSampleRate !== contextSampleRate) {
+      float32Data = resampleAudio(float32Data, this.sourceSampleRate, contextSampleRate);
+    }
+
     this.audioQueue.push(float32Data);
 
     // Start playback if not already playing
@@ -100,11 +110,11 @@ export class AudioPlaybackManager {
     while (this.audioQueue.length > 0) {
       const audioData = this.audioQueue.shift()!;
 
-      // Create audio buffer
+      // Create audio buffer with context's sample rate
       const buffer = this.audioContext.createBuffer(
         CHANNELS,
         audioData.length,
-        SAMPLE_RATE
+        this.audioContext.sampleRate
       );
 
       // Fill buffer with audio data

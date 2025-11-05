@@ -23,6 +23,9 @@ export default function WorkspaceFileViewer({ agentId, agentName = '', sessionId
   // Get API key from environment
   const apiKey = process.env.NEXT_PUBLIC_AGENT_HUB_API_KEY || '';
 
+  // Get embed app URL from environment (for production deployments)
+  const embedAppUrl = process.env.NEXT_PUBLIC_EMBED_APP_URL || 'http://localhost:5173';
+
   // Fetch workspace files list
   const fetchFiles = async () => {
     try {
@@ -31,7 +34,18 @@ export default function WorkspaceFileViewer({ agentId, agentName = '', sessionId
         const data = await response.json();
         setFiles(data.files || []);
         if (data.files && data.files.length > 0 && !selectedFile) {
-          setSelectedFile(data.files[0]);
+          // Generic default file selection - prioritize common entry points
+          const defaultFile =
+            data.files.find((f: string) => f === '/vapi-integration-app/index.mdx') ||
+            data.files.find((f: string) => f === '/README.mdx') ||
+            data.files.find((f: string) => f === '/README.md') ||
+            data.files.find((f: string) => f === '/index.mdx') ||
+            data.files.find((f: string) => f === '/index.html') ||
+            data.files.find((f: string) => f.endsWith('.mdx')) ||
+            data.files.find((f: string) => f.endsWith('.md')) ||
+            data.files.find((f: string) => f.endsWith('.html')) ||
+            data.files[0];
+          setSelectedFile(defaultFile);
         }
       }
     } catch (err) {
@@ -51,9 +65,31 @@ export default function WorkspaceFileViewer({ agentId, agentName = '', sessionId
     return () => clearInterval(interval);
   }, [agentId, sessionId, selectedFile]);
 
+  // Listen for navigation messages from iframe
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      // Verify message is from the expected embed app origin
+      // Extract origin from embedAppUrl for comparison
+      const embedOrigin = new URL(embedAppUrl).origin;
+
+      // Accept messages only from the configured embed app origin
+      if (event.origin !== embedOrigin) {
+        console.warn('Ignoring postMessage from unexpected origin:', event.origin);
+        return;
+      }
+
+      if (event.data.type === 'navigate' && event.data.path) {
+        setSelectedFile(event.data.path);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [embedAppUrl]);
+
   const getFileIcon = (path: string) => {
     if (path.endsWith('.html')) return <FileCode className="w-4 h-4" />;
-    if (path.endsWith('.md')) return <FileText className="w-4 h-4" />;
+    if (path.endsWith('.mdx') || path.endsWith('.md')) return <FileText className="w-4 h-4" />;
     if (path.match(/\.(jpg|png|gif|svg)$/)) return <ImageIcon className="w-4 h-4" />;
     return <File className="w-4 h-4" />;
   };
@@ -90,9 +126,9 @@ export default function WorkspaceFileViewer({ agentId, agentName = '', sessionId
       <div className="flex-1 overflow-hidden bg-white">
         {selectedFile ? (
           <iframe
-            src={`http://localhost:5173/embed/workspace/${createDocumentId(selectedFile)}?apiKey=${apiKey}`}
+            src={`${embedAppUrl}/embed/workspace/${createDocumentId(selectedFile)}?apiKey=${apiKey}`}
             className="w-full h-full border-0"
-            sandbox="allow-scripts allow-forms allow-same-origin"
+            sandbox="allow-scripts allow-forms allow-same-origin allow-top-navigation-by-user-activation allow-popups"
             title={`${agentName} - ${selectedFile}`}
           />
         ) : (

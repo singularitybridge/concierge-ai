@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Phone, PhoneOff, Mic, Loader2, Trash2, FileText, Info, X } from 'lucide-react';
+import { Send, Phone, PhoneOff, Mic, Loader2, Trash2, Settings } from 'lucide-react';
+import Link from 'next/link';
 import Vapi from '@vapi-ai/web';
 import { useConversation } from '@elevenlabs/react';
 import { AudioCaptureManager } from '../utils/audioCaptureManager';
@@ -28,8 +29,6 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
   const [vapi, setVapi] = useState<Vapi | null>(null);
   const [isCallActive, setIsCallActive] = useState(false);
   const [isVapiLoading, setIsVapiLoading] = useState(false);
-  const [showPromptModal, setShowPromptModal] = useState(false);
-  const [agentPrompts, setAgentPrompts] = useState<{ vapi?: string; elevenlabs?: string; openai?: string; gemini?: string }>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [openaiWs, setOpenaiWs] = useState<WebSocket | null>(null);
   const [geminiWs, setGeminiWs] = useState<WebSocket | null>(null);
@@ -154,17 +153,20 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
     }
 
     try {
-      // Initialize audio managers
+      // Initialize audio managers with OpenAI sample rate (24kHz)
       if (!audioCaptureRef.current) {
         audioCaptureRef.current = new AudioCaptureManager();
       }
       if (!audioPlaybackRef.current) {
         audioPlaybackRef.current = new AudioPlaybackManager();
-        await audioPlaybackRef.current.initialize();
+        await audioPlaybackRef.current.initialize(24000); // OpenAI uses 24kHz output
+      } else {
+        // Clear any existing audio queue to prevent overlap
+        audioPlaybackRef.current.clearQueue();
       }
 
       // WebSocket connection with API key in subprotocol
-      const url = `wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17`;
+      const url = `wss://api.openai.com/v1/realtime?model=gpt-4o-mini-realtime-preview`;
       const ws = new WebSocket(url, [
         'realtime',
         `openai-insecure-api-key.${apiKey}`,
@@ -180,7 +182,7 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
           session: {
             modalities: ['text', 'audio'],
             instructions: agentPrompts.openai || 'You are a helpful AI assistant.',
-            voice: 'alloy',
+            voice: 'coral',
             input_audio_format: 'pcm16',
             output_audio_format: 'pcm16',
             input_audio_transcription: {
@@ -195,7 +197,17 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
           }
         }));
 
-        // Start audio capture and send to WebSocket
+        // Trigger initial greeting using response.create with instructions
+        ws.send(JSON.stringify({
+          type: 'response.create',
+          response: {
+            modalities: ['text', 'audio'],
+            instructions: 'Greet the user warmly and introduce yourself briefly in a friendly, conversational tone.',
+            max_output_tokens: 150
+          }
+        }));
+
+        // Start audio capture and send to WebSocket (24kHz for OpenAI)
         try {
           await audioCaptureRef.current!.startCapture((pcm16Data, base64Audio) => {
             if (ws.readyState === WebSocket.OPEN) {
@@ -204,7 +216,7 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
                 audio: base64Audio
               }));
             }
-          });
+          }, 24000); // OpenAI uses 24kHz input
 
           setIsCallActive(true);
           setIsVapiLoading(false);
@@ -218,22 +230,29 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
 
-        // Handle audio responses
+        // Debug logging
+        if (data.type?.startsWith('response.')) {
+          console.log('OpenAI event:', data.type, data);
+        }
+
+        // Handle session confirmation
+        if (data.type === 'session.updated') {
+          console.log('OpenAI session updated:', data.session);
+        }
+
+        // Handle errors
+        if (data.type === 'error') {
+          console.error('OpenAI error:', data.error);
+          return;
+        }
+
+        // Handle audio responses - ONLY play audio from response.audio.delta
         if (data.type === 'response.audio.delta' && data.delta) {
           audioPlaybackRef.current?.addBase64AudioChunk(data.delta);
         }
 
-        // Handle text transcripts
-        if (data.type === 'conversation.item.created' && data.item.role === 'assistant') {
-          const content = data.item.content?.[0]?.transcript || '';
-          if (content) {
-            setMessages(prev => [...prev, {
-              role: 'assistant',
-              content,
-              timestamp: Date.now()
-            }]);
-          }
-        } else if (data.type === 'response.audio_transcript.delta') {
+        // Handle text transcripts - ONLY for display, NOT for audio playback
+        if (data.type === 'response.audio_transcript.delta') {
           setMessages(prev => {
             const lastMsg = prev[prev.length - 1];
             if (lastMsg && lastMsg.role === 'assistant') {
@@ -248,10 +267,24 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
               timestamp: Date.now()
             }];
           });
+        } else if (data.type === 'conversation.item.input_audio_transcription.completed') {
+          // Display user's transcribed speech
+          if (data.transcript) {
+            console.log('User said:', data.transcript);
+            setMessages(prev => [...prev, {
+              role: 'user',
+              content: data.transcript,
+              timestamp: Date.now()
+            }]);
+          }
         } else if (data.type === 'input_audio_buffer.speech_started') {
           console.log('User started speaking');
         } else if (data.type === 'input_audio_buffer.speech_stopped') {
           console.log('User stopped speaking');
+        } else if (data.type === 'conversation.interrupted') {
+          console.log('Conversation interrupted');
+          // Clear audio queue when interrupted
+          audioPlaybackRef.current?.clearQueue();
         }
       };
 
@@ -286,13 +319,16 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
     }
 
     try {
-      // Initialize audio managers
+      // Initialize audio managers with Gemini sample rates (16kHz input, 24kHz output)
       if (!audioCaptureRef.current) {
         audioCaptureRef.current = new AudioCaptureManager();
       }
       if (!audioPlaybackRef.current) {
         audioPlaybackRef.current = new AudioPlaybackManager();
-        await audioPlaybackRef.current.initialize();
+        await audioPlaybackRef.current.initialize(24000); // Gemini uses 24kHz output
+      } else {
+        // Clear any existing audio queue to prevent overlap
+        audioPlaybackRef.current.clearQueue();
       }
 
       // Gemini Live WebSocket endpoint
@@ -304,23 +340,47 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
         console.log('Gemini Live connected');
 
         // Send initial setup message
-        ws.send(JSON.stringify({
+        const setupMessage = {
           setup: {
             model: 'models/gemini-2.0-flash-exp',
-            generation_config: {
-              response_modalities: ['AUDIO', 'TEXT'],
-              speech_config: {
-                voice_config: {
-                  prebuilt_voice_config: {
-                    voice_name: 'Aoede'
+            generationConfig: {
+              responseModalities: ["audio"],
+              speechConfig: {
+                voiceConfig: {
+                  prebuiltVoiceConfig: {
+                    voiceName: 'Aoede'
                   }
                 }
               }
+            },
+            systemInstruction: {
+              parts: [{
+                text: agentPrompts.gemini || 'You are a helpful AI assistant.'
+              }]
             }
           }
-        }));
+        };
 
-        // Start audio capture and send to WebSocket
+        console.log('Sending Gemini setup:', JSON.stringify(setupMessage, null, 2));
+        ws.send(JSON.stringify(setupMessage));
+
+        // Trigger initial greeting from assistant
+        const greetingMessage = {
+          clientContent: {
+            turns: [{
+              role: 'user',
+              parts: [{
+                text: 'Hello! Please greet me warmly and introduce yourself briefly.'
+              }]
+            }],
+            turnComplete: true
+          }
+        };
+
+        console.log('Sending Gemini greeting:', JSON.stringify(greetingMessage, null, 2));
+        ws.send(JSON.stringify(greetingMessage));
+
+        // Start audio capture and send to WebSocket (16kHz for Gemini)
         try {
           await audioCaptureRef.current!.startCapture((pcm16Data, base64Audio) => {
             if (ws.readyState === WebSocket.OPEN) {
@@ -328,12 +388,12 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
                 realtimeInput: {
                   mediaChunks: [{
                     data: base64Audio,
-                    mime_type: 'audio/pcm'
+                    mimeType: 'audio/pcm;rate=16000'
                   }]
                 }
               }));
             }
-          });
+          }, 16000); // Gemini uses 16kHz input
 
           setIsCallActive(true);
           setIsVapiLoading(false);
@@ -344,38 +404,61 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
         }
       };
 
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
+      ws.onmessage = async (event) => {
+        // Handle binary audio data (Blob)
+        if (event.data instanceof Blob) {
+          console.log('Gemini binary audio received, size:', event.data.size);
+          try {
+            const arrayBuffer = await event.data.arrayBuffer();
+            const int16Array = new Int16Array(arrayBuffer);
+            audioPlaybackRef.current?.addAudioChunk(int16Array);
+          } catch (error) {
+            console.error('Failed to process audio blob:', error);
+          }
+          return;
+        }
 
-        // Handle audio responses
-        if (data.serverContent?.modelTurn?.parts) {
-          const parts = data.serverContent.modelTurn.parts;
+        // Handle JSON messages
+        try {
+          const data = JSON.parse(event.data);
 
-          for (const part of parts) {
-            // Handle inline audio data
-            if (part.inlineData?.data) {
-              audioPlaybackRef.current?.addBase64AudioChunk(part.inlineData.data);
-            }
+          // Debug logging
+          console.log('Gemini event:', data);
 
-            // Handle text transcripts
-            if (part.text) {
-              setMessages(prev => [...prev, {
-                role: 'assistant',
-                content: part.text,
-                timestamp: Date.now()
-              }]);
+          // Handle audio responses
+          if (data.serverContent?.modelTurn?.parts) {
+            const parts = data.serverContent.modelTurn.parts;
+
+            for (const part of parts) {
+              // Handle inline audio data - ONLY for audio playback
+              if (part.inlineData?.data) {
+                console.log('Gemini audio chunk received, size:', part.inlineData.data.length);
+                audioPlaybackRef.current?.addBase64AudioChunk(part.inlineData.data);
+              }
+
+              // Handle text transcripts - ONLY for display
+              if (part.text) {
+                console.log('Gemini text:', part.text);
+                setMessages(prev => [...prev, {
+                  role: 'assistant',
+                  content: part.text,
+                  timestamp: Date.now()
+                }]);
+              }
             }
           }
-        }
 
-        // Handle setup completion
-        if (data.setupComplete) {
-          console.log('Gemini setup complete');
-        }
+          // Handle setup completion
+          if (data.setupComplete) {
+            console.log('Gemini setup complete');
+          }
 
-        // Handle errors
-        if (data.error) {
-          console.error('Gemini error:', data.error);
+          // Handle errors
+          if (data.error) {
+            console.error('Gemini error:', data.error);
+          }
+        } catch (error) {
+          console.error('Failed to parse Gemini message:', error);
         }
       };
 
@@ -384,8 +467,8 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
         setIsVapiLoading(false);
       };
 
-      ws.onclose = async () => {
-        console.log('Gemini WebSocket closed');
+      ws.onclose = async (event) => {
+        console.log('Gemini WebSocket closed. Code:', event.code, 'Reason:', event.reason, 'Clean:', event.wasClean);
         setIsCallActive(false);
         setIsVapiLoading(false);
 
@@ -482,26 +565,6 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
     setMessages([]);
   };
 
-  const fetchAgentPrompts = async () => {
-    try {
-      // Fetch VAPI prompt
-      const vapiResponse = await fetch(`/api/vapi-prompt?assistantId=${process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID}`);
-      if (vapiResponse.ok) {
-        const vapiData = await vapiResponse.json();
-        setAgentPrompts(prev => ({ ...prev, vapi: vapiData.prompt }));
-      }
-
-      // Fetch ElevenLabs prompt
-      const elevenLabsResponse = await fetch(`/api/elevenlabs-prompt?agentId=${process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID}`);
-      if (elevenLabsResponse.ok) {
-        const elevenLabsData = await elevenLabsResponse.json();
-        setAgentPrompts(prev => ({ ...prev, elevenlabs: elevenLabsData.prompt }));
-      }
-    } catch (error) {
-      console.error('Error fetching agent prompts:', error);
-    }
-  };
-
   return (
     <div className="h-full flex flex-col bg-white">
       {/* Header */}
@@ -571,7 +634,18 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
 
         {/* Agent Info */}
         <div className="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-          <div className="flex items-start justify-between mb-2">
+          <div className="flex items-start gap-3 mb-2">
+            {/* Avatar */}
+            <div className="flex-shrink-0">
+              <div className="w-20 h-20 rounded-full border-2 border-indigo-200 shadow-md overflow-hidden">
+                <img
+                  src="/avatars/assistant-avatar.jpg"
+                  alt="AI Assistant Avatar"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-semibold text-gray-900">
@@ -580,18 +654,15 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
                   {provider === 'openai' && 'OpenAI Realtime'}
                   {provider === 'gemini' && 'Gemini Live'}
                 </h3>
-                <button
-                  onClick={() => {
-                    setShowPromptModal(true);
-                    if (Object.keys(agentPrompts).length === 0) {
-                      fetchAgentPrompts();
-                    }
-                  }}
-                  className="p-1 text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
-                  aria-label="View prompt"
-                >
-                  <Info className="w-4 h-4" />
-                </button>
+                {provider === 'vapi' && (
+                  <Link
+                    href="/vapi"
+                    className="p-1 text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+                    aria-label="VAPI config"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </Link>
+                )}
               </div>
               <p className="text-xs text-gray-600 mt-1">
                 {provider === 'vapi' && 'Voice AI with function calling'}
@@ -643,36 +714,6 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
           )}
         </button>
       </div>
-
-      {/* Prompt Modal */}
-      {showPromptModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Agent Prompt</h3>
-              <button
-                onClick={() => setShowPromptModal(false)}
-                className="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4">
-              <div className="mb-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">
-                  {provider === 'vapi' ? 'VAPI' : 'ElevenLabs'}
-                </p>
-                <div className="bg-gray-50 p-3 rounded border border-gray-200">
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
-                    {agentPrompts[provider] || 'Loading...'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">

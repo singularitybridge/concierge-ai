@@ -1,0 +1,19 @@
+module.exports = {
+  apps: [
+    {
+      name: 'ai-realtime-chat',
+      script: 'npm',
+      args: 'run dev',
+      cwd: '/Users/avi/dev/avio/sb-projects/ai-realtime-chat',
+      env: {
+        NODE_ENV: 'development',
+        PORT: 4024
+      },
+      watch: false,
+      max_memory_restart: '500M',
+      error_file: './logs/pm2-error.log',
+      out_file: './logs/pm2-out.log',
+      time: true
+    }
+  ]
+};
