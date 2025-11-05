@@ -624,41 +624,78 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
         setConferenceId(confId);
       }
 
-      console.log('📞 Adding phone to conference:', { phoneNumber, conferenceId: confId });
+      console.log('📞 Adding phone to conference:', { phoneNumber, conferenceId: confId, provider });
 
-      // Call API to initiate outbound call
-      const response = await fetch('/api/vapi/call-phone', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          phoneNumber: phoneNumber.trim(),
-          conferenceId: confId
-        })
-      });
+      if (provider === 'elevenlabs') {
+        // For ElevenLabs: Start Twilio conference with AI + phone
+        const response = await fetch('/api/twilio/start-conference', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            conferenceId: confId,
+            phoneNumbers: [phoneNumber.trim()],
+            agentId: process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID
+          })
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to add phone');
+        if (!response.ok) {
+          throw new Error(data.error || data.message || 'Failed to start conference');
+        }
+
+        console.log('✅ ElevenLabs conference started:', data);
+
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: `📞 Starting 3-way conference with ElevenLabs AI. Calling ${phoneNumber}...`,
+          timestamp: Date.now()
+        }]);
+      } else if (provider === 'vapi') {
+        // For VAPI: Use existing phone call API
+        const response = await fetch('/api/vapi/call-phone', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            phoneNumber: phoneNumber.trim(),
+            conferenceId: confId
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to add phone');
+        }
+
+        console.log('✅ Phone added to VAPI conference:', data);
+
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: `📞 Calling ${phoneNumber}... They will join the conversation shortly.`,
+          timestamp: Date.now()
+        }]);
+      } else {
+        throw new Error(`Conference calling not supported for provider: ${provider}`);
       }
-
-      console.log('✅ Phone added to conference:', data);
-
-      // Show success message
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: `📞 Calling ${phoneNumber}... They will join the conversation shortly.`,
-        timestamp: Date.now()
-      }]);
 
       // Clear phone input
       setPhoneNumber('');
 
     } catch (error) {
       console.error('Error adding phone:', error);
-      alert(error instanceof Error ? error.message : 'Failed to add phone to call');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to add phone to call';
+      alert(errorMessage);
+
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `❌ ${errorMessage}`,
+        timestamp: Date.now()
+      }]);
     } finally {
       setIsAddingPhone(false);
     }
@@ -860,7 +897,7 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
         </button>
 
         {/* Conference Call - Add Phone Participant */}
-        {isCallActive && provider === 'vapi' && (
+        {isCallActive && (provider === 'vapi' || provider === 'elevenlabs') && (
           <div className="mt-3 p-3 bg-blue-50 border border-blue-100 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               <UserPlus className="w-4 h-4 text-blue-600" />
