@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Voice Agent Session Notebook: Implementation Plan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .terminal {
+            background: #0f172a;
+            color: #94a3b8;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .terminal .prompt { color: #22d3ee; }
+        .terminal .comment { color: #475569; }
+        .terminal .success { color: #86efac; }
+
+        .code-block {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .code-block .keyword { color: #c084fc; }
+        .code-block .string { color: #86efac; }
+        .code-block .comment { color: #64748b; }
+        .code-block .number { color: #fbbf24; }
+    </style>
+</head>
+<body class="bg-white text-slate-900">
+    <div class="max-w-6xl mx-auto px-6 py-12">
+
+        <!-- Header -->
+        <div class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-10 h-10 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <div>
+                    <h1 class="text-4xl font-light text-slate-900">AI Voice Agent Session Notebook</h1>
+                    <p class="text-slate-600 mt-2">Real-time context and action panel for VAPI voice assistants</p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 ml-13">
+                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">Voice AI</span>
+                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">VAPI Integration</span>
+                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">Lead Generation</span>
+                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">Real-time Context</span>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Executive Summary</h2>
+            </div>
+
+            <div class="ml-9 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-2">Problem Statement</h3>
+                    <p class="text-sm text-slate-600">During VAPI voice calls, AI agents need real-time context, action capabilities, and conversation guidance to effectively handle lead generation and customer support scenarios.</p>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-2">Proposed Solution</h3>
+                    <p class="text-sm text-slate-600">A live session notebook page that displays conversation context, available actions, caller history, and AI guidelines during active voice calls.</p>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-2">Primary Use Cases</h3>
+                    <ul class="text-sm text-slate-600 space-y-1">
+                        <li>• Lead qualification and capture</li>
+                        <li>• Customer support ticket creation</li>
+                        <li>• Follow-up scheduling</li>
+                        <li>• Knowledge base access</li>
+                    </ul>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-2">Success Metrics</h3>
+                    <ul class="text-sm text-slate-600 space-y-1">
+                        <li>• Call completion rate >90%</li>
+                        <li>• Lead capture accuracy >95%</li>
+                        <li>• Average call handling time <5min</li>
+                        <li>• Customer satisfaction score >4.5/5</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Requirements -->
+        <div class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Functional Requirements</h2>
+            </div>
+
+            <div class="ml-9 space-y-6">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">FR-1: Real-time Session Context Display</h3>
+                    <div class="space-y-2 text-sm text-slate-600">
+                        <p><strong>As an</strong> AI voice agent,</p>
+                        <p><strong>I want to</strong> see the current conversation state, caller information, and call metadata,</p>
+                        <p><strong>So that</strong> I can provide contextual, personalized responses.</p>
+                        <div class="mt-3 p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-xs text-slate-700 mb-2">Acceptance Criteria:</p>
+                            <ul class="text-xs text-slate-600 space-y-1">
+                                <li>✓ Display call ID, session ID, call duration</li>
+                                <li>✓ Show caller phone number, name (if available)</li>
+                                <li>✓ Display conversation topic/intent</li>
+                                <li>✓ Show call status (in-progress, on-hold, etc.)</li>
+                                <li>✓ Update in real-time (WebSocket or 2-second polling)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">FR-2: Quick Action Buttons</h3>
+                    <div class="space-y-2 text-sm text-slate-600">
+                        <p><strong>As an</strong> AI voice agent,</p>
+                        <p><strong>I want to</strong> trigger backend actions through one-click buttons,</p>
+                        <p><strong>So that</strong> I can efficiently execute common tasks during calls.</p>
+                        <div class="mt-3 p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-xs text-slate-700 mb-2">Available Actions:</p>
+                            <ul class="text-xs text-slate-600 space-y-1">
+                                <li>• Save Lead - Capture caller info to Agent Hub workspace</li>
+                                <li>• Create Note - Add session notes and discussion points</li>
+                                <li>• Flag Question - Mark unanswered questions for follow-up</li>
+                                <li>• Schedule Follow-up - Set reminder for next contact</li>
+                                <li>• Transfer Call - Escalate to human agent</li>
+                                <li>• Send Resource - Email/SMS documentation links</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">FR-3: Conversation History & Context</h3>
+                    <div class="space-y-2 text-sm text-slate-600">
+                        <p><strong>As an</strong> AI voice agent,</p>
+                        <p><strong>I want to</strong> access caller's previous interactions and workspace data,</p>
+                        <p><strong>So that</strong> returning callers receive personalized service.</p>
+                        <div class="mt-3 p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-xs text-slate-700 mb-2">Context Features:</p>
+                            <ul class="text-xs text-slate-600 space-y-1">
+                                <li>• Previous call summaries (last 3 calls)</li>
+                                <li>• Saved interests and preferences</li>
+                                <li>• Pending questions and action items</li>
+                                <li>• Account status and tier (if applicable)</li>
+                                <li>• Integration history (tools discussed/used)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">FR-4: AI Guidelines & Prompts</h3>
+                    <div class="space-y-2 text-sm text-slate-600">
+                        <p><strong>As an</strong> AI voice agent,</p>
+                        <p><strong>I want to</strong> see contextual conversation strategies and response guidelines,</p>
+                        <p><strong>So that</strong> I can handle different scenarios effectively.</p>
+                        <div class="mt-3 p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-xs text-slate-700 mb-2">Guideline Types:</p>
+                            <ul class="text-xs text-slate-600 space-y-1">
+                                <li>• Greeting scripts (new vs. returning caller)</li>
+                                <li>• Qualification questions for leads</li>
+                                <li>• Objection handling templates</li>
+                                <li>• Technical troubleshooting steps</li>
+                                <li>• Escalation criteria and procedures</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">FR-5: Knowledge Base Quick Reference</h3>
+                    <div class="space-y-2 text-sm text-slate-600">
+                        <p><strong>As an</strong> AI voice agent,</p>
+                        <p><strong>I want to</strong> quickly search and access documentation during calls,</p>
+                        <p><strong>So that</strong> I can provide accurate, detailed answers.</p>
+                        <div class="mt-3 p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-xs text-slate-700 mb-2">Quick Access Features:</p>
+                            <ul class="text-xs text-slate-600 space-y-1">
+                                <li>• Integration list with status badges</li>
+                                <li>• Common question shortcuts</li>
+                                <li>• Pricing information cards</li>
+                                <li>• Setup guide links</li>
+                                <li>• API endpoint references</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Architecture -->
+        <div class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Technical Architecture</h2>
+            </div>
+
+            <div class="ml-9 space-y-6">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">System Components</h3>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-xs mb-2">Frontend - Next.js Page</p>
+                            <p class="text-xs text-slate-600"><code class="px-1 py-0.5 bg-slate-100 rounded">/app/session-notebook/[callId]/page.tsx</code></p>
+                            <p class="text-xs text-slate-600 mt-1">Dynamic route based on VAPI call ID for per-session context</p>
+                        </div>
+
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-xs mb-2">State Management - Zustand Store</p>
+                            <p class="text-xs text-slate-600">Real-time session state with WebSocket updates</p>
+                        </div>
+
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-xs mb-2">Backend API - Next.js API Routes</p>
+                            <p class="text-xs text-slate-600"><code class="px-1 py-0.5 bg-slate-100 rounded">/api/session/[callId]/route.ts</code> - Session data</p>
+                            <p class="text-xs text-slate-600"><code class="px-1 py-0.5 bg-slate-100 rounded">/api/session/[callId]/actions/route.ts</code> - Action handlers</p>
+                        </div>
+
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-xs mb-2">Integration Layer - Agent Hub MCP</p>
+                            <p class="text-xs text-slate-600">Workspace operations for lead/session data storage</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Data Flow</h3>
+                    <div class="terminal p-4 rounded-lg text-xs">
+                        <div class="comment">// VAPI Voice Call Initiated</div>
+                        <div class="mt-2">VAPI Call → Webhook (/api/vapi-webhook)</div>
+                        <div class="ml-4 mt-1 text-slate-400">↓ Extract call metadata</div>
+                        <div class="ml-4 mt-1 text-slate-400">↓ Store session in activeSessions Map</div>
+                        <div class="ml-4 mt-1 text-slate-400">↓ Create workspace session file</div>
+
+                        <div class="mt-3">Session Notebook Page (/session-notebook/[callId])</div>
+                        <div class="ml-4 mt-1 text-slate-400">↓ Poll /api/session/[callId] every 2s</div>
+                        <div class="ml-4 mt-1 text-slate-400">↓ Update UI with latest context</div>
+
+                        <div class="mt-3">User Action (Save Lead, Create Note, etc.)</div>
+                        <div class="ml-4 mt-1 text-slate-400">↓ POST /api/session/[callId]/actions</div>
+                        <div class="ml-4 mt-1 text-slate-400">↓ Call Agent Hub MCP to save data</div>
+                        <div class="ml-4 mt-1 text-slate-400">↓ Update session state</div>
+                        <div class="ml-4 mt-1 success">→ Return confirmation</div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Existing Integration Points</h3>
+                    <div class="space-y-2">
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-xs mb-1">VAPI Webhook Handler</p>
+                            <p class="text-xs text-slate-600 mono">/app/api/vapi-webhook/route.ts</p>
+                            <p class="text-xs text-slate-500 mt-1">Already extracts call metadata and maintains activeSessions map</p>
+                        </div>
+
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-xs mb-1">Agent Hub Integration</p>
+                            <p class="text-xs text-slate-600">Agent: integration-expert (68e1af59dd4ab3bce91a07dc)</p>
+                            <p class="text-xs text-slate-500 mt-1">MCP tools available for workspace operations</p>
+                        </div>
+
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-xs mb-1">Existing Dashboard</p>
+                            <p class="text-xs text-slate-600 mono">/app/dashboard/page.tsx</p>
+                            <p class="text-xs text-slate-500 mt-1">Shows leads, sessions, questions - can share data structures</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Specifications -->
+        <div class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">API Specifications</h2>
+            </div>
+
+            <div class="ml-9 space-y-4">
+                <div class="terminal p-4 rounded-lg text-xs">
+                    <div class="comment"># Get Session Context</div>
+                    <div class="prompt mt-2">$ GET /api/session/{callId}</div>
+                    <div class="mt-3 text-slate-300">Response:</div>
+                    <pre class="mt-1 text-slate-300">{
+  "callId": "call_abc123",
+  "sessionId": "call_abc123",
+  "status": "in-progress",
+  "duration": 127,
+  "caller": {
+    "phone": "+14155551234",
+    "name": "John Doe",
+    "isReturning": true,
+    "previousCalls": 2
+  },
+  "context": {
+    "topic": "JIRA Integration",
+    "intent": "lead_qualification",
+    "interests": ["JIRA", "API", "Webhooks"]
+  },
+  "workspace": {
+    "leadExists": true,
+    "leadId": "lead_jdoe_1234",
+    "pendingQuestions": 1,
+    "lastNote": "Discussed automated ticket creation"
+  }
+}</pre>
+                </div>
+
+                <div class="terminal p-4 rounded-lg text-xs">
+                    <div class="comment"># Execute Action</div>
+                    <div class="prompt mt-2">$ POST /api/session/{callId}/actions</div>
+                    <div class="mt-3 text-slate-300">Request Body:</div>
+                    <pre class="mt-1 text-slate-300">{
+  "action": "save_lead",
+  "data": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "phone": "+14155551234",
+    "company": "Acme Corp",
+    "role": "CTO",
+    "interests": ["JIRA", "API"]
+  }
+}</pre>
+                    <div class="mt-3 success">→ Lead saved to Agent Hub workspace</div>
+                </div>
+
+                <div class="terminal p-4 rounded-lg text-xs">
+                    <div class="comment"># Get Caller History</div>
+                    <div class="prompt mt-2">$ GET /api/session/{callId}/history</div>
+                    <div class="mt-3 text-slate-300">Response:</div>
+                    <pre class="mt-1 text-slate-300">{
+  "previousCalls": [
+    {
+      "callId": "call_xyz789",
+      "date": "2025-10-10T14:30:00Z",
+      "duration": 180,
+      "summary": "Initial consultation about JIRA integration",
+      "outcome": "scheduled_followup"
+    }
+  ],
+  "savedInterests": ["JIRA", "SendGrid", "API"],
+  "pendingActions": [
+    {
+      "type": "followup",
+      "description": "Send JIRA implementation guide",
+      "dueDate": "2025-10-16"
+    }
+  ]
+}</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Database Schema -->
+        <div class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Data Structures</h2>
+            </div>
+
+            <div class="ml-9 space-y-4">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Agent Hub Workspace Structure</h3>
+                    <div class="terminal p-3 rounded text-xs">
+                        <div class="comment"># Workspace organization in Agent Hub</div>
+                        <div class="mt-2 text-slate-300">/agent/integration-expert/</div>
+                        <div class="ml-4 text-slate-400">├── leads/</div>
+                        <div class="ml-8 text-slate-400">│   ├── {phoneNumber}/</div>
+                        <div class="ml-12 text-slate-400">│   │   ├── info.json</div>
+                        <div class="ml-12 text-slate-400">│   │   └── sessions/</div>
+                        <div class="ml-16 text-slate-400">│   │       └── {callId}.json</div>
+                        <div class="ml-4 text-slate-400">├── questions/</div>
+                        <div class="ml-8 text-slate-400">│   └── pending_{timestamp}.json</div>
+                        <div class="ml-4 text-slate-400">└── sessions/</div>
+                        <div class="ml-8 text-slate-400">    └── active_{callId}.json</div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Session State (activeSessions Map)</h3>
+                    <div class="code-block p-3 rounded text-xs">
+                        <pre><span class="keyword">interface</span> <span class="string">SessionData</span> {
+  callId: <span class="keyword">string</span>;
+  controlUrl: <span class="keyword">string</span>;
+  agentHubSessionId?: <span class="keyword">string</span>;
+  createdAt: <span class="keyword">number</span>;
+
+  <span class="comment">// Enhanced fields for notebook</span>
+  caller?: {
+    phone?: <span class="keyword">string</span>;
+    name?: <span class="keyword">string</span>;
+    isReturning: <span class="keyword">boolean</span>;
+  };
+  context?: {
+    topic?: <span class="keyword">string</span>;
+    intent?: <span class="keyword">string</span>;
+    interests: <span class="keyword">string</span>[];
+  };
+  workspace?: {
+    leadId?: <span class="keyword">string</span>;
+    hasHistory: <span class="keyword">boolean</span>;
+  };
+}</pre>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Lead Info Structure (workspace file)</h3>
+                    <div class="code-block p-3 rounded text-xs">
+                        <pre>{
+  <span class="string">"leadId"</span>: <span class="string">"lead_jdoe_1234"</span>,
+  <span class="string">"phoneNumber"</span>: <span class="string">"+14155551234"</span>,
+  <span class="string">"firstName"</span>: <span class="string">"John"</span>,
+  <span class="string">"lastName"</span>: <span class="string">"Doe"</span>,
+  <span class="string">"company"</span>: <span class="string">"Acme Corp"</span>,
+  <span class="string">"role"</span>: <span class="string">"CTO"</span>,
+  <span class="string">"email"</span>: <span class="string">"john.doe@acme.com"</span>,
+  <span class="string">"status"</span>: <span class="string">"qualified"</span>,
+  <span class="string">"createdAt"</span>: <span class="string">"2025-10-15T10:00:00Z"</span>,
+  <span class="string">"lastContact"</span>: <span class="string">"2025-10-15T14:30:00Z"</span>,
+  <span class="string">"interests"</span>: [<span class="string">"JIRA"</span>, <span class="string">"API"</span>, <span class="string">"Webhooks"</span>],
+  <span class="string">"notes"</span>: <span class="string">"Technical decision maker, interested in automation"</span>
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Infrastructure -->
+        <div class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"></path>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Infrastructure & Dependencies</h2>
+            </div>
+
+            <div class="ml-9 space-y-4">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">✅ Existing Services (Already Available)</h3>
+                    <div class="space-y-2">
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="font-medium text-xs">VAPI Voice Platform</p>
+                                    <p class="text-xs text-slate-600 mt-1">Assistant ID: 957955fc-dba8-4766-9132-4bcda7aad3b2</p>
+                                    <p class="text-xs text-slate-500">Webhook configured, async execution enabled</p>
+                                </div>
+                                <span class="text-xs text-green-600">Active</span>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="font-medium text-xs">Agent Hub API</p>
+                                    <p class="text-xs text-slate-600 mt-1">Integration Expert: 68e1af59dd4ab3bce91a07dc</p>
+                                    <p class="text-xs text-slate-500">MCP tools for workspace operations available</p>
+                                </div>
+                                <span class="text-xs text-green-600">Active</span>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="font-medium text-xs">Session State Management</p>
+                                    <p class="text-xs text-slate-600 mt-1">In-memory Map in webhook handler</p>
+                                    <p class="text-xs text-slate-500">Tracks active calls, provides control URLs</p>
+                                </div>
+                                <span class="text-xs text-green-600">Active</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">🔧 New Dependencies Required</h3>
+                    <div class="space-y-2">
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-xs mb-2">Real-time Updates</p>
+                            <p class="text-xs text-slate-600">Option 1: Simple polling (every 2 seconds)</p>
+                            <p class="text-xs text-slate-600">Option 2: Server-Sent Events (SSE)</p>
+                            <p class="text-xs text-slate-500 mt-1"><strong>Recommendation:</strong> Start with polling, upgrade to SSE if needed</p>
+                        </div>
+
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-xs mb-2">None - All existing!</p>
+                            <p class="text-xs text-slate-600">Can be built with existing stack:</p>
+                            <ul class="text-xs text-slate-500 mt-1 space-y-0.5">
+                                <li>• Next.js 15 (already in use)</li>
+                                <li>• Tailwind CSS (already configured)</li>
+                                <li>• Lucide icons (already installed)</li>
+                                <li>• Zustand (already available)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Performance Considerations</h3>
+                    <div class="space-y-2 text-xs text-slate-600">
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-slate-700 mb-1">API Response Time</p>
+                            <p>Target: <200ms for session context retrieval</p>
+                            <p class="text-slate-500 mt-1">Strategy: Cache caller history in activeSessions map</p>
+                        </div>
+
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-slate-700 mb-1">Polling Frequency</p>
+                            <p>Initial: 2-second intervals (30 requests/minute)</p>
+                            <p class="text-slate-500 mt-1">Optimization: Exponential backoff when idle</p>
+                        </div>
+
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-slate-700 mb-1">Memory Usage</p>
+                            <p>activeSessions map: ~10KB per session × 50 concurrent = 500KB</p>
+                            <p class="text-slate-500 mt-1">Cleanup: Auto-expire sessions after 1 hour</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation Timeline -->
+        <div class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Implementation Timeline</h2>
+            </div>
+
+            <div class="ml-9 space-y-4">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-medium">1</div>
+                        <h3 class="font-medium text-sm">Phase 1: Foundation (Days 1-2)</h3>
+                    </div>
+                    <div class="ml-11 space-y-2 text-xs">
+                        <div class="p-2 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-slate-700">Session API Routes</p>
+                            <p class="text-slate-600 mt-1">Create GET /api/session/[callId] endpoint</p>
+                            <p class="text-slate-600">Enhance activeSessions map with caller context</p>
+                            <p class="text-slate-500 mt-1">Estimated: 4 hours</p>
+                        </div>
+
+                        <div class="p-2 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-slate-700">Basic UI Structure</p>
+                            <p class="text-slate-600 mt-1">Create /session-notebook/[callId]/page.tsx</p>
+                            <p class="text-slate-600">Implement polling mechanism with Zustand</p>
+                            <p class="text-slate-600">Display call metadata and status</p>
+                            <p class="text-slate-500 mt-1">Estimated: 4 hours</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-medium">2</div>
+                        <h3 class="font-medium text-sm">Phase 2: Core Features (Days 3-4)</h3>
+                    </div>
+                    <div class="ml-11 space-y-2 text-xs">
+                        <div class="p-2 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-slate-700">Action System</p>
+                            <p class="text-slate-600 mt-1">Implement POST /api/session/[callId]/actions</p>
+                            <p class="text-slate-600">Add Save Lead, Create Note handlers</p>
+                            <p class="text-slate-600">Integrate with Agent Hub MCP workspace</p>
+                            <p class="text-slate-500 mt-1">Estimated: 6 hours</p>
+                        </div>
+
+                        <div class="p-2 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-slate-700">Caller History</p>
+                            <p class="text-slate-600 mt-1">Query workspace for previous sessions</p>
+                            <p class="text-slate-600">Display returning caller context</p>
+                            <p class="text-slate-600">Show interests and pending items</p>
+                            <p class="text-slate-500 mt-1">Estimated: 4 hours</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-medium">3</div>
+                        <h3 class="font-medium text-sm">Phase 3: Polish & Testing (Days 5-6)</h3>
+                    </div>
+                    <div class="ml-11 space-y-2 text-xs">
+                        <div class="p-2 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-slate-700">UI Enhancement</p>
+                            <p class="text-slate-600 mt-1">Add guidelines and quick reference sections</p>
+                            <p class="text-slate-600">Implement responsive design</p>
+                            <p class="text-slate-600">Add loading states and error handling</p>
+                            <p class="text-slate-500 mt-1">Estimated: 4 hours</p>
+                        </div>
+
+                        <div class="p-2 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-slate-700">Integration Testing</p>
+                            <p class="text-slate-600 mt-1">Test with live VAPI calls</p>
+                            <p class="text-slate-600">Verify workspace data persistence</p>
+                            <p class="text-slate-600">Load testing with concurrent sessions</p>
+                            <p class="text-slate-500 mt-1">Estimated: 4 hours</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs font-medium">4</div>
+                        <h3 class="font-medium text-sm">Phase 4: Future Enhancements (Optional)</h3>
+                    </div>
+                    <div class="ml-11 space-y-2 text-xs">
+                        <div class="p-2 bg-white rounded border border-slate-200">
+                            <p class="text-slate-600">• WebSocket for true real-time updates</p>
+                            <p class="text-slate-600 mt-1">• AI-suggested responses based on context</p>
+                            <p class="text-slate-600">• Voice sentiment analysis integration</p>
+                            <p class="text-slate-600">• Multi-language support</p>
+                            <p class="text-slate-600">• Advanced analytics dashboard</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Testing Strategy -->
+        <div class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Testing Strategy</h2>
+            </div>
+
+            <div class="ml-9 space-y-4">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Unit Tests</h3>
+                    <div class="space-y-2 text-xs">
+                        <div class="p-2 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-slate-700">Session State Management</p>
+                            <p class="text-slate-600 mt-1">✓ activeSessions map CRUD operations</p>
+                            <p class="text-slate-600">✓ Session expiration and cleanup</p>
+                            <p class="text-slate-600">✓ Caller context extraction from VAPI payload</p>
+                        </div>
+
+                        <div class="p-2 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-slate-700">Action Handlers</p>
+                            <p class="text-slate-600 mt-1">✓ Save Lead to workspace</p>
+                            <p class="text-slate-600">✓ Create Note with timestamp</p>
+                            <p class="text-slate-600">✓ Flag Question for follow-up</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Integration Tests</h3>
+                    <div class="space-y-2 text-xs">
+                        <div class="p-2 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-slate-700">VAPI Webhook Flow</p>
+                            <p class="text-slate-600 mt-1">1. Send test VAPI webhook payload</p>
+                            <p class="text-slate-600">2. Verify session created in activeSessions</p>
+                            <p class="text-slate-600">3. GET /api/session/[callId] returns correct data</p>
+                            <p class="text-slate-600">4. Execute action and verify workspace update</p>
+                        </div>
+
+                        <div class="p-2 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-slate-700">Agent Hub MCP Integration</p>
+                            <p class="text-slate-600 mt-1">✓ Workspace item creation</p>
+                            <p class="text-slate-600">✓ File structure validation</p>
+                            <p class="text-slate-600">✓ Data retrieval for returning callers</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">E2E Tests</h3>
+                    <div class="terminal p-3 rounded text-xs">
+                        <div class="comment"># Scenario: New Caller Lead Capture</div>
+                        <div class="mt-2">1. Initiate VAPI call (new phone number)</div>
+                        <div class="ml-4 success">→ Session notebook displays call context</div>
+                        <div class="mt-1">2. AI qualifies lead during conversation</div>
+                        <div class="ml-4 success">→ Shows "No previous history" message</div>
+                        <div class="mt-1">3. User clicks "Save Lead" button</div>
+                        <div class="ml-4 success">→ Lead data saved to workspace</div>
+                        <div class="mt-1">4. Session ends, cleanup triggered</div>
+                        <div class="ml-4 success">→ Session removed from activeSessions</div>
+
+                        <div class="comment mt-4"># Scenario: Returning Caller</div>
+                        <div class="mt-2">1. Initiate VAPI call (existing phone number)</div>
+                        <div class="ml-4 success">→ Notebook shows "Returning caller: 2 previous calls"</div>
+                        <div class="mt-1">2. Display previous interests and notes</div>
+                        <div class="ml-4 success">→ AI references past conversations</div>
+                        <div class="mt-1">3. Add new note during call</div>
+                        <div class="ml-4 success">→ Note appended to session history</div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Performance Tests</h3>
+                    <div class="space-y-2 text-xs">
+                        <div class="p-2 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-slate-700">Load Testing</p>
+                            <p class="text-slate-600 mt-1">• 50 concurrent sessions</p>
+                            <p class="text-slate-600">• 25 requests/second (polling from all sessions)</p>
+                            <p class="text-slate-600">• Monitor API response times (<200ms target)</p>
+                        </div>
+
+                        <div class="p-2 bg-white rounded border border-slate-200">
+                            <p class="font-medium text-slate-700">Memory Profiling</p>
+                            <p class="text-slate-600 mt-1">• Measure activeSessions map growth</p>
+                            <p class="text-slate-600">• Verify cleanup on session end</p>
+                            <p class="text-slate-600">• Check for memory leaks over 24hr period</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- UI Components -->
+        <div class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">UI Component Breakdown</h2>
+            </div>
+
+            <div class="ml-9 space-y-4">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Layout Structure</h3>
+                    <div class="terminal p-3 rounded text-xs">
+                        <div class="text-slate-300">&lt;SessionNotebook&gt;</div>
+                        <div class="ml-4 text-slate-400">├── &lt;SessionHeader&gt;</div>
+                        <div class="ml-8 text-slate-500">│   ├── Call Status Badge</div>
+                        <div class="ml-8 text-slate-500">│   ├── Duration Timer</div>
+                        <div class="ml-8 text-slate-500">│   └── Caller Info</div>
+                        <div class="ml-4 text-slate-400">├── &lt;ContextPanel&gt;</div>
+                        <div class="ml-8 text-slate-500">│   ├── Topic & Intent</div>
+                        <div class="ml-8 text-slate-500">│   ├── Caller History</div>
+                        <div class="ml-8 text-slate-500">│   └── Interests Tags</div>
+                        <div class="ml-4 text-slate-400">├── &lt;ActionPanel&gt;</div>
+                        <div class="ml-8 text-slate-500">│   ├── Save Lead Button</div>
+                        <div class="ml-8 text-slate-500">│   ├── Create Note Button</div>
+                        <div class="ml-8 text-slate-500">│   ├── Flag Question Button</div>
+                        <div class="ml-8 text-slate-500">│   └── Schedule Followup</div>
+                        <div class="ml-4 text-slate-400">├── &lt;GuidelinesPanel&gt;</div>
+                        <div class="ml-8 text-slate-500">│   ├── Conversation Scripts</div>
+                        <div class="ml-8 text-slate-500">│   └── Next Steps Suggestions</div>
+                        <div class="ml-4 text-slate-400">└── &lt;QuickReference&gt;</div>
+                        <div class="ml-8 text-slate-500">    ├── Integration List</div>
+                        <div class="ml-8 text-slate-500">    └── Common Questions</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <h3 class="font-medium text-sm mb-3">Session Header</h3>
+                        <div class="p-3 bg-white rounded border border-slate-200 text-xs">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">In Progress</span>
+                                <span class="text-slate-600 mono">2:47</span>
+                            </div>
+                            <p class="font-medium text-slate-900">John Doe</p>
+                            <p class="text-slate-600">+1 (415) 555-1234</p>
+                            <p class="text-slate-500 mt-1">Returning • 2 prev calls</p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <h3 class="font-medium text-sm mb-3">Context Panel</h3>
+                        <div class="p-3 bg-white rounded border border-slate-200 text-xs">
+                            <p class="font-medium text-slate-700 mb-1">Topic</p>
+                            <p class="text-slate-900">JIRA Integration</p>
+                            <p class="font-medium text-slate-700 mt-2 mb-1">Intent</p>
+                            <p class="text-slate-900">Lead Qualification</p>
+                            <div class="mt-2 flex flex-wrap gap-1">
+                                <span class="px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-xs">JIRA</span>
+                                <span class="px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-xs">API</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <h3 class="font-medium text-sm mb-3">Action Panel</h3>
+                        <div class="p-3 bg-white rounded border border-slate-200 space-y-2">
+                            <button class="w-full px-3 py-2 bg-slate-900 text-white rounded text-xs font-medium hover:bg-slate-800">
+                                Save Lead
+                            </button>
+                            <button class="w-full px-3 py-2 bg-slate-100 text-slate-900 rounded text-xs font-medium hover:bg-slate-200">
+                                Create Note
+                            </button>
+                            <button class="w-full px-3 py-2 bg-slate-100 text-slate-900 rounded text-xs font-medium hover:bg-slate-200">
+                                Flag Question
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <h3 class="font-medium text-sm mb-3">Quick Reference</h3>
+                        <div class="p-3 bg-white rounded border border-slate-200 text-xs">
+                            <p class="font-medium text-slate-700 mb-2">Top Integrations</p>
+                            <ul class="space-y-1 text-slate-600">
+                                <li>• JIRA - Project Management</li>
+                                <li>• SendGrid - Email Service</li>
+                                <li>• Stripe - Payments</li>
+                                <li>• Slack - Team Chat</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-24 pt-8 border-t border-slate-200 text-sm text-slate-600">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="font-medium text-slate-900">AI Voice Agent Session Notebook</p>
+                    <p class="text-xs mt-1">Implementation Specification v1.0</p>
+                </div>
+                <div class="text-right">
+                    <p>Created: October 15, 2025</p>
+                    <p class="text-xs mt-1">Status: <span class="text-green-600">Ready for Development</span></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

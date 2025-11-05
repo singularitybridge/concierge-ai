@@ -7,6 +7,8 @@ import Vapi from '@vapi-ai/web';
 import { useConversation } from '@elevenlabs/react';
 import { AudioCaptureManager } from '../utils/audioCaptureManager';
 import { AudioPlaybackManager } from '../utils/audioPlaybackManager';
+import VoiceActionModal from './VoiceActionModal';
+import { executeClientFunction } from '../utils/clientSideFunctions';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -34,6 +36,25 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
   const [geminiWs, setGeminiWs] = useState<WebSocket | null>(null);
   const audioCaptureRef = useRef<AudioCaptureManager | null>(null);
   const audioPlaybackRef = useRef<AudioPlaybackManager | null>(null);
+
+  // Voice Action Modal State
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'success' | 'error' | 'info' | 'warning';
+    actions: Array<{
+      label: string;
+      onClick: () => void;
+      variant?: 'primary' | 'secondary' | 'danger';
+    }>;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info',
+    actions: []
+  });
 
   const agentTools = {
     vapi: ['Voice-to-Text (Deepgram)', 'Text-to-Voice (11Labs/PlayHT)', 'Function Calling', 'Custom Tools'],
@@ -103,6 +124,70 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
         transcript: message.transcript,
         fullMessage: message
       });
+
+      // Handle client-side function calls (OpenAI format from VAPI)
+      if (message.type === 'model-output' && message.output && Array.isArray(message.output)) {
+        const functionCalls = message.output.filter((item: any) => item.type === 'function');
+
+        for (const functionCall of functionCalls) {
+          const functionName = functionCall.function.name;
+          const functionCallId = functionCall.id;
+
+          // Parse arguments if they're a JSON string
+          let parameters = {};
+          try {
+            parameters = typeof functionCall.function.arguments === 'string'
+              ? JSON.parse(functionCall.function.arguments)
+              : functionCall.function.arguments;
+          } catch (e) {
+            console.error('Failed to parse function arguments:', e);
+          }
+
+          console.log('🔧 Client-side function call:', { functionName, parameters, functionCallId });
+
+          try {
+            // Execute the function with context
+            const result = await executeClientFunction(
+              functionName,
+              parameters,
+              {
+                showModal: (modalParams) => {
+                  setModalState({
+                    isOpen: true,
+                    title: modalParams.title,
+                    message: modalParams.message,
+                    type: modalParams.type || 'info',
+                    actions: modalParams.actions || []
+                  });
+                },
+                endCall: endCall,
+                updateState: (key: string, value: any) => {
+                  console.log('State update:', key, value);
+                }
+              }
+            );
+
+            console.log('✅ Function executed successfully:', result);
+
+            // Add function execution to chat
+            setMessages(prev => [...prev, {
+              role: 'assistant',
+              content: `✓ ${functionName}`,
+              timestamp: Date.now()
+            }]);
+
+          } catch (error: any) {
+            console.error('❌ Function execution error:', error);
+
+            // Add error to chat
+            setMessages(prev => [...prev, {
+              role: 'assistant',
+              content: `✗ Error: ${error.message}`,
+              timestamp: Date.now()
+            }]);
+          }
+        }
+      }
 
       if (message.type === 'transcript') {
         const isPartial = message.transcriptType === 'partial';
@@ -784,6 +869,16 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
           </button>
         </div>
       </div>
+
+      {/* Voice Action Modal */}
+      <VoiceActionModal
+        isOpen={modalState.isOpen}
+        onClose={() => setModalState(prev => ({ ...prev, isOpen: false }))}
+        title={modalState.title}
+        message={modalState.message}
+        type={modalState.type}
+        actions={modalState.actions}
+      />
     </div>
   );
 }

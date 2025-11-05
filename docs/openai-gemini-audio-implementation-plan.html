@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Realtime & Gemini Live Audio Implementation Plan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .terminal {
+            background: #0f172a;
+            color: #94a3b8;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .terminal .prompt { color: #22d3ee; }
+        .terminal .comment { color: #475569; }
+        .terminal .success { color: #86efac; }
+
+        .code-block {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .code-block .keyword { color: #c084fc; }
+        .code-block .string { color: #86efac; }
+        .code-block .comment { color: #64748b; }
+        .code-block .number { color: #fbbf24; }
+    </style>
+</head>
+<body class="bg-white text-slate-900">
+    <div class="max-w-6xl mx-auto px-6 py-12">
+
+        <!-- Header -->
+        <div class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-900">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" x2="12" y1="19" y2="22"/>
+                </svg>
+                <h1 class="text-3xl font-light text-slate-900">OpenAI Realtime & Gemini Live Audio</h1>
+            </div>
+            <p class="text-lg text-slate-600 mb-4">Complete Web Audio API integration for real-time voice conversations</p>
+            <div class="flex gap-2">
+                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">Web Audio API</span>
+                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">WebSocket Streaming</span>
+                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">PCM16 Audio</span>
+                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">Real-time Processing</span>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <section class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-900">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" x2="8" y1="13" y2="13"/>
+                    <line x1="16" x2="8" y1="17" y2="17"/>
+                    <line x1="10" x2="8" y1="9" y2="9"/>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Executive Summary</h2>
+            </div>
+
+            <div class="ml-9 grid grid-cols-2 gap-4">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-2">Current State</h3>
+                    <p class="text-sm text-slate-600">WebSocket connections established with OpenAI and Gemini. Text transcription working. Audio references exist but unused (audioContextRef, audioQueueRef). VAPI and ElevenLabs fully functional via React SDKs.</p>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-2">Target State</h3>
+                    <p class="text-sm text-slate-600">Full bidirectional audio streaming with Web Audio API. Real-time microphone capture, PCM16 encoding, WebSocket transmission, audio decoding, and playback. Feature parity with VAPI/ElevenLabs UX.</p>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-2">Implementation Approach</h3>
+                    <p class="text-sm text-slate-600">Create dedicated audio handling utilities. Implement MediaRecorder-based capture with AudioWorklet for processing. Use AudioContext for playback with buffering. Integrate into existing VoiceSessionChat component.</p>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-2">Key Challenges</h3>
+                    <p class="text-sm text-slate-600">Browser audio format limitations, latency management, buffer synchronization, different API protocols (OpenAI vs Gemini), error recovery, memory management for long sessions.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Requirements -->
+        <section class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-900">
+                    <path d="M9 11l3 3L22 4"/>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Functional Requirements</h2>
+            </div>
+
+            <div class="ml-9 space-y-4">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3 mb-3">
+                        <div class="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs flex-shrink-0 mt-0.5">1</div>
+                        <div>
+                            <h3 class="font-medium text-sm mb-1">Microphone Audio Capture</h3>
+                            <p class="text-sm text-slate-600 mb-2">As a user, I want the system to capture my voice input through the microphone in real-time when a voice call is active.</p>
+                        </div>
+                    </div>
+                    <div class="ml-9 space-y-1">
+                        <div class="text-sm text-slate-600"><span class="font-medium">Given:</span> User has granted microphone permissions</div>
+                        <div class="text-sm text-slate-600"><span class="font-medium">When:</span> Voice call starts with OpenAI or Gemini provider</div>
+                        <div class="text-sm text-slate-600"><span class="font-medium">Then:</span> System captures audio at 24kHz sample rate in PCM16 format</div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3 mb-3">
+                        <div class="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs flex-shrink-0 mt-0.5">2</div>
+                        <div>
+                            <h3 class="font-medium text-sm mb-1">Real-time Audio Streaming</h3>
+                            <p class="text-sm text-slate-600 mb-2">As a user, I want my voice to be sent to the AI in real-time chunks so the AI can respond with minimal latency.</p>
+                        </div>
+                    </div>
+                    <div class="ml-9 space-y-1">
+                        <div class="text-sm text-slate-600"><span class="font-medium">Given:</span> Audio is being captured from microphone</div>
+                        <div class="text-sm text-slate-600"><span class="font-medium">When:</span> Audio chunks are available (every 100ms)</div>
+                        <div class="text-sm text-slate-600"><span class="font-medium">Then:</span> System encodes to base64 and sends via WebSocket immediately</div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3 mb-3">
+                        <div class="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs flex-shrink-0 mt-0.5">3</div>
+                        <div>
+                            <h3 class="font-medium text-sm mb-1">Audio Response Playback</h3>
+                            <p class="text-sm text-slate-600 mb-2">As a user, I want to hear the AI's voice response played back through my speakers with smooth, uninterrupted audio.</p>
+                        </div>
+                    </div>
+                    <div class="ml-9 space-y-1">
+                        <div class="text-sm text-slate-600"><span class="font-medium">Given:</span> WebSocket receives audio data from AI</div>
+                        <div class="text-sm text-slate-600"><span class="font-medium">When:</span> Audio chunks arrive via response events</div>
+                        <div class="text-sm text-slate-600"><span class="font-medium">Then:</span> System decodes, buffers, and plays audio smoothly without gaps</div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3 mb-3">
+                        <div class="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs flex-shrink-0 mt-0.5">4</div>
+                        <div>
+                            <h3 class="font-medium text-sm mb-1">Provider-Specific Protocol Handling</h3>
+                            <p class="text-sm text-slate-600 mb-2">As a developer, I want the system to handle the unique protocols of OpenAI and Gemini APIs correctly.</p>
+                        </div>
+                    </div>
+                    <div class="ml-9 space-y-1">
+                        <div class="text-sm text-slate-600"><span class="font-medium">OpenAI:</span> Uses input_audio_buffer.append events with base64 PCM16</div>
+                        <div class="text-sm text-slate-600"><span class="font-medium">Gemini:</span> Uses realtime_input with inline_data containing base64 audio</div>
+                        <div class="text-sm text-slate-600"><span class="font-medium">Then:</span> Each provider has correctly formatted message structures</div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3 mb-3">
+                        <div class="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs flex-shrink-0 mt-0.5">5</div>
+                        <div>
+                            <h3 class="font-medium text-sm mb-1">Session Management & Cleanup</h3>
+                            <p class="text-sm text-slate-600 mb-2">As a user, I want the system to properly clean up resources when ending a call to prevent memory leaks.</p>
+                        </div>
+                    </div>
+                    <div class="ml-9 space-y-1">
+                        <div class="text-sm text-slate-600"><span class="font-medium">Given:</span> Active voice call with audio streams</div>
+                        <div class="text-sm text-slate-600"><span class="font-medium">When:</span> User clicks "End Call" or component unmounts</div>
+                        <div class="text-sm text-slate-600"><span class="font-medium">Then:</span> All audio tracks stopped, contexts closed, buffers cleared, listeners removed</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Architecture -->
+        <section class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-900">
+                    <rect width="7" height="7" x="3" y="3" rx="1"/>
+                    <rect width="7" height="7" x="14" y="3" rx="1"/>
+                    <rect width="7" height="7" x="14" y="14" rx="1"/>
+                    <rect width="7" height="7" x="3" y="14" rx="1"/>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Technical Architecture</h2>
+            </div>
+
+            <div class="ml-9 space-y-6">
+                <!-- Audio Capture Pipeline -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3 text-slate-900">Audio Capture Pipeline</h3>
+                    <div class="code-block p-4 rounded-lg text-sm overflow-x-auto">
+                        <pre class="text-slate-200">
+<span class="comment">// Input Flow</span>
+Microphone (getUserMedia)
+    ↓
+MediaStream (48kHz native browser)
+    ↓
+AudioContext (resample to 24kHz)
+    ↓
+ScriptProcessorNode / AudioWorkletNode
+    ↓
+PCM16 Encoding (Float32 → Int16)
+    ↓
+Base64 Encoding
+    ↓
+WebSocket Send (chunks every 100ms)
+    ↓
+OpenAI/Gemini API</pre>
+                    </div>
+                </div>
+
+                <!-- Audio Playback Pipeline -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3 text-slate-900">Audio Playback Pipeline</h3>
+                    <div class="code-block p-4 rounded-lg text-sm overflow-x-auto">
+                        <pre class="text-slate-200">
+<span class="comment">// Output Flow</span>
+OpenAI/Gemini API
+    ↓
+WebSocket Receive (base64 audio chunks)
+    ↓
+Base64 Decode
+    ↓
+PCM16 Decode (Int16 → Float32)
+    ↓
+Audio Buffer Queue
+    ↓
+AudioContext (24kHz playback)
+    ↓
+AudioBufferSourceNode (scheduled playback)
+    ↓
+Speakers</pre>
+                    </div>
+                </div>
+
+                <!-- Component Architecture -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3 text-slate-900">Component Structure</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                            <h4 class="font-medium text-sm mb-2">Core Audio Utilities</h4>
+                            <div class="space-y-1.5">
+                                <div class="text-xs text-slate-600 mono">app/utils/audioUtils.ts</div>
+                                <div class="text-xs text-slate-600">- PCM16 encoding/decoding</div>
+                                <div class="text-xs text-slate-600">- Base64 conversion</div>
+                                <div class="text-xs text-slate-600">- Sample rate conversion</div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                            <h4 class="font-medium text-sm mb-2">Audio Capture Manager</h4>
+                            <div class="space-y-1.5">
+                                <div class="text-xs text-slate-600 mono">app/utils/audioCaptureManager.ts</div>
+                                <div class="text-xs text-slate-600">- Microphone initialization</div>
+                                <div class="text-xs text-slate-600">- Real-time audio processing</div>
+                                <div class="text-xs text-slate-600">- Stream management</div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                            <h4 class="font-medium text-sm mb-2">Audio Playback Manager</h4>
+                            <div class="space-y-1.5">
+                                <div class="text-xs text-slate-600 mono">app/utils/audioPlaybackManager.ts</div>
+                                <div class="text-xs text-slate-600">- Buffer queue management</div>
+                                <div class="text-xs text-slate-600">- Scheduled playback</div>
+                                <div class="text-xs text-slate-600">- Gap prevention logic</div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                            <h4 class="font-medium text-sm mb-2">Integration Layer</h4>
+                            <div class="space-y-1.5">
+                                <div class="text-xs text-slate-600 mono">VoiceSessionChat.tsx</div>
+                                <div class="text-xs text-slate-600">- useEffect for lifecycle</div>
+                                <div class="text-xs text-slate-600">- WebSocket event binding</div>
+                                <div class="text-xs text-slate-600">- UI state updates</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- State Management -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3 text-slate-900">State Management Strategy</h3>
+                    <div class="code-block p-4 rounded-lg text-sm">
+                        <pre class="text-slate-200">
+<span class="keyword">const</span> [audioState, setAudioState] = <span class="keyword">useState</span>({
+  <span class="string">isCapturing</span>: <span class="keyword">false</span>,
+  <span class="string">isPlaying</span>: <span class="keyword">false</span>,
+  <span class="string">micPermissionGranted</span>: <span class="keyword">false</span>,
+  <span class="string">audioLevel</span>: <span class="number">0</span> <span class="comment">// For visual feedback</span>
+});
+
+<span class="comment">// Refs for persistent audio resources</span>
+<span class="keyword">const</span> audioContextRef = <span class="keyword">useRef</span>&lt;AudioContext | <span class="keyword">null</span>&gt;(<span class="keyword">null</span>);
+<span class="keyword">const</span> mediaStreamRef = <span class="keyword">useRef</span>&lt;MediaStream | <span class="keyword">null</span>&gt;(<span class="keyword">null</span>);
+<span class="keyword">const</span> processorRef = <span class="keyword">useRef</span>&lt;ScriptProcessorNode | <span class="keyword">null</span>&gt;(<span class="keyword">null</span>);
+<span class="keyword">const</span> audioQueueRef = <span class="keyword">useRef</span>&lt;AudioBuffer[]&gt;([]);
+<span class="keyword">const</span> playbackTimeRef = <span class="keyword">useRef</span>&lt;<span class="keyword">number</span>&gt;(<span class="number">0</span>);</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Implementation Details -->
+        <section class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-900">
+                    <polyline points="16 18 22 12 16 6"/>
+                    <polyline points="8 6 2 12 8 18"/>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Core Implementation</h2>
+            </div>
+
+            <div class="ml-9 space-y-6">
+                <!-- PCM16 Encoding -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3 text-slate-900">1. PCM16 Audio Encoding Utility</h3>
+                    <div class="code-block p-4 rounded-lg text-sm overflow-x-auto">
+                        <pre class="text-slate-200">
+<span class="comment">// app/utils/audioUtils.ts</span>
+
+<span class="keyword">export function</span> <span class="string">floatTo16BitPCM</span>(float32Array: Float32Array): Int16Array {
+  <span class="keyword">const</span> int16Array = <span class="keyword">new</span> Int16Array(float32Array.length);
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; float32Array.length; i++) {
+    <span class="keyword">const</span> s = Math.max(-<span class="number">1</span>, Math.min(<span class="number">1</span>, float32Array[i]));
+    int16Array[i] = s &lt; <span class="number">0</span> ? s * <span class="number">0x8000</span> : s * <span class="number">0x7fff</span>;
+  }
+  <span class="keyword">return</span> int16Array;
+}
+
+<span class="keyword">export function</span> <span class="string">pcm16ToFloat32</span>(int16Array: Int16Array): Float32Array {
+  <span class="keyword">const</span> float32Array = <span class="keyword">new</span> Float32Array(int16Array.length);
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; int16Array.length; i++) {
+    float32Array[i] = int16Array[i] / (<span class="number">0x8000</span>);
+  }
+  <span class="keyword">return</span> float32Array;
+}
+
+<span class="keyword">export function</span> <span class="string">arrayBufferToBase64</span>(buffer: ArrayBuffer): <span class="keyword">string</span> {
+  <span class="keyword">const</span> bytes = <span class="keyword">new</span> Uint8Array(buffer);
+  <span class="keyword">let</span> binary = <span class="string">''</span>;
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  <span class="keyword">return</span> btoa(binary);
+}
+
+<span class="keyword">export function</span> <span class="string">base64ToArrayBuffer</span>(base64: <span class="keyword">string</span>): ArrayBuffer {
+  <span class="keyword">const</span> binary = atob(base64);
+  <span class="keyword">const</span> bytes = <span class="keyword">new</span> Uint8Array(binary.length);
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  <span class="keyword">return</span> bytes.buffer;
+}</pre>
+                    </div>
+                </div>
+
+                <!-- Audio Capture Manager -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3 text-slate-900">2. Audio Capture Manager Class</h3>
+                    <div class="code-block p-4 rounded-lg text-sm overflow-x-auto">
+                        <pre class="text-slate-200">
+<span class="comment">// app/utils/audioCaptureManager.ts</span>
+
+<span class="keyword">import</span> { floatTo16BitPCM, arrayBufferToBase64 } <span class="keyword">from</span> <span class="string">'./audioUtils'</span>;
+
+<span class="keyword">export class</span> <span class="string">AudioCaptureManager</span> {
+  <span class="keyword">private</span> audioContext: AudioContext | <span class="keyword">null</span> = <span class="keyword">null</span>;
+  <span class="keyword">private</span> mediaStream: MediaStream | <span class="keyword">null</span> = <span class="keyword">null</span>;
+  <span class="keyword">private</span> processor: ScriptProcessorNode | <span class="keyword">null</span> = <span class="keyword">null</span>;
+  <span class="keyword">private</span> source: MediaStreamAudioSourceNode | <span class="keyword">null</span> = <span class="keyword">null</span>;
+  <span class="keyword">private</span> onAudioData: (base64Audio: <span class="keyword">string</span>) =&gt; <span class="keyword">void</span>;
+
+  <span class="keyword">constructor</span>(onAudioData: (base64Audio: <span class="keyword">string</span>) =&gt; <span class="keyword">void</span>) {
+    <span class="keyword">this</span>.onAudioData = onAudioData;
+  }
+
+  <span class="keyword">async</span> <span class="string">start</span>(): Promise&lt;<span class="keyword">void</span>&gt; {
+    <span class="keyword">try</span> {
+      <span class="comment">// Request microphone access</span>
+      <span class="keyword">this</span>.mediaStream = <span class="keyword">await</span> navigator.mediaDevices.getUserMedia({
+        audio: {
+          channelCount: <span class="number">1</span>,
+          sampleRate: <span class="number">24000</span>,
+          echoCancellation: <span class="keyword">true</span>,
+          noiseSuppression: <span class="keyword">true</span>
+        }
+      });
+
+      <span class="comment">// Create audio context at 24kHz</span>
+      <span class="keyword">this</span>.audioContext = <span class="keyword">new</span> AudioContext({ sampleRate: <span class="number">24000</span> });
+      <span class="keyword">this</span>.source = <span class="keyword">this</span>.audioContext.createMediaStreamSource(<span class="keyword">this</span>.mediaStream);
+
+      <span class="comment">// Create processor (4096 buffer = ~170ms at 24kHz)</span>
+      <span class="keyword">this</span>.processor = <span class="keyword">this</span>.audioContext.createScriptProcessor(<span class="number">4096</span>, <span class="number">1</span>, <span class="number">1</span>);
+
+      <span class="keyword">this</span>.processor.onaudioprocess = (event) =&gt; {
+        <span class="keyword">const</span> float32Data = event.inputBuffer.getChannelData(<span class="number">0</span>);
+        <span class="keyword">const</span> int16Data = floatTo16BitPCM(float32Data);
+        <span class="keyword">const</span> base64Audio = arrayBufferToBase64(int16Data.buffer);
+        <span class="keyword">this</span>.onAudioData(base64Audio);
+      };
+
+      <span class="comment">// Connect nodes</span>
+      <span class="keyword">this</span>.source.connect(<span class="keyword">this</span>.processor);
+      <span class="keyword">this</span>.processor.connect(<span class="keyword">this</span>.audioContext.destination);
+
+    } <span class="keyword">catch</span> (error) {
+      console.error(<span class="string">'Failed to start audio capture:'</span>, error);
+      <span class="keyword">throw</span> error;
+    }
+  }
+
+  <span class="keyword">stop</span>(): <span class="keyword">void</span> {
+    <span class="keyword">if</span> (<span class="keyword">this</span>.processor) {
+      <span class="keyword">this</span>.processor.disconnect();
+      <span class="keyword">this</span>.processor = <span class="keyword">null</span>;
+    }
+    <span class="keyword">if</span> (<span class="keyword">this</span>.source) {
+      <span class="keyword">this</span>.source.disconnect();
+      <span class="keyword">this</span>.source = <span class="keyword">null</span>;
+    }
+    <span class="keyword">if</span> (<span class="keyword">this</span>.mediaStream) {
+      <span class="keyword">this</span>.mediaStream.getTracks().forEach(track =&gt; track.stop());
+      <span class="keyword">this</span>.mediaStream = <span class="keyword">null</span>;
+    }
+    <span class="keyword">if</span> (<span class="keyword">this</span>.audioContext) {
+      <span class="keyword">this</span>.audioContext.close();
+      <span class="keyword">this</span>.audioContext = <span class="keyword">null</span>;
+    }
+  }
+}</pre>
+                    </div>
+                </div>
+
+                <!-- Audio Playback Manager -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3 text-slate-900">3. Audio Playback Manager Class</h3>
+                    <div class="code-block p-4 rounded-lg text-sm overflow-x-auto">
+                        <pre class="text-slate-200">
+<span class="comment">// app/utils/audioPlaybackManager.ts</span>
+
+<span class="keyword">import</span> { pcm16ToFloat32, base64ToArrayBuffer } <span class="keyword">from</span> <span class="string">'./audioUtils'</span>;
+
+<span class="keyword">export class</span> <span class="string">AudioPlaybackManager</span> {
+  <span class="keyword">private</span> audioContext: AudioContext | <span class="keyword">null</span> = <span class="keyword">null</span>;
+  <span class="keyword">private</span> nextPlayTime: <span class="keyword">number</span> = <span class="number">0</span>;
+  <span class="keyword">private</span> audioQueue: AudioBuffer[] = [];
+  <span class="keyword">private</span> isPlaying: <span class="keyword">boolean</span> = <span class="keyword">false</span>;
+
+  <span class="keyword">async</span> <span class="string">initialize</span>(): Promise&lt;<span class="keyword">void</span>&gt; {
+    <span class="keyword">this</span>.audioContext = <span class="keyword">new</span> AudioContext({ sampleRate: <span class="number">24000</span> });
+    <span class="keyword">this</span>.nextPlayTime = <span class="keyword">this</span>.audioContext.currentTime;
+  }
+
+  <span class="keyword">async</span> <span class="string">addAudioChunk</span>(base64Audio: <span class="keyword">string</span>): Promise&lt;<span class="keyword">void</span>&gt; {
+    <span class="keyword">if</span> (!<span class="keyword">this</span>.audioContext) {
+      <span class="keyword">await this</span>.initialize();
+    }
+
+    <span class="keyword">try</span> {
+      <span class="comment">// Decode base64 to PCM16</span>
+      <span class="keyword">const</span> arrayBuffer = base64ToArrayBuffer(base64Audio);
+      <span class="keyword">const</span> int16Array = <span class="keyword">new</span> Int16Array(arrayBuffer);
+      <span class="keyword">const</span> float32Array = pcm16ToFloat32(int16Array);
+
+      <span class="comment">// Create AudioBuffer</span>
+      <span class="keyword">const</span> audioBuffer = <span class="keyword">this</span>.audioContext!.createBuffer(
+        <span class="number">1</span>, <span class="comment">// mono</span>
+        float32Array.length,
+        <span class="number">24000</span> <span class="comment">// sample rate</span>
+      );
+      audioBuffer.getChannelData(<span class="number">0</span>).set(float32Array);
+
+      <span class="keyword">this</span>.audioQueue.push(audioBuffer);
+      <span class="keyword">this</span>.playNext();
+
+    } <span class="keyword">catch</span> (error) {
+      console.error(<span class="string">'Failed to add audio chunk:'</span>, error);
+    }
+  }
+
+  <span class="keyword">private</span> <span class="string">playNext</span>(): <span class="keyword">void</span> {
+    <span class="keyword">if</span> (!<span class="keyword">this</span>.audioContext || <span class="keyword">this</span>.isPlaying) <span class="keyword">return</span>;
+    <span class="keyword">if</span> (<span class="keyword">this</span>.audioQueue.length === <span class="number">0</span>) <span class="keyword">return</span>;
+
+    <span class="keyword">this</span>.isPlaying = <span class="keyword">true</span>;
+    <span class="keyword">const</span> buffer = <span class="keyword">this</span>.audioQueue.shift()!;
+    <span class="keyword">const</span> source = <span class="keyword">this</span>.audioContext.createBufferSource();
+    source.buffer = buffer;
+    source.connect(<span class="keyword">this</span>.audioContext.destination);
+
+    <span class="comment">// Schedule playback</span>
+    <span class="keyword">const</span> currentTime = <span class="keyword">this</span>.audioContext.currentTime;
+    <span class="keyword">const</span> playTime = Math.max(currentTime, <span class="keyword">this</span>.nextPlayTime);
+    source.start(playTime);
+
+    <span class="comment">// Update next play time</span>
+    <span class="keyword">this</span>.nextPlayTime = playTime + buffer.duration;
+
+    <span class="comment">// Play next chunk when done</span>
+    source.onended = () =&gt; {
+      <span class="keyword">this</span>.isPlaying = <span class="keyword">false</span>;
+      <span class="keyword">this</span>.playNext();
+    };
+  }
+
+  <span class="keyword">stop</span>(): <span class="keyword">void</span> {
+    <span class="keyword">this</span>.audioQueue = [];
+    <span class="keyword">if</span> (<span class="keyword">this</span>.audioContext) {
+      <span class="keyword">this</span>.audioContext.close();
+      <span class="keyword">this</span>.audioContext = <span class="keyword">null</span>;
+    }
+    <span class="keyword">this</span>.isPlaying = <span class="keyword">false</span>;
+    <span class="keyword">this</span>.nextPlayTime = <span class="number">0</span>;
+  }
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WebSocket Integration -->
+        <section class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-900">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">WebSocket Integration</h2>
+            </div>
+
+            <div class="ml-9 space-y-6">
+                <!-- OpenAI Integration -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3 text-slate-900">OpenAI Realtime API Integration</h3>
+                    <div class="code-block p-4 rounded-lg text-sm overflow-x-auto">
+                        <pre class="text-slate-200">
+<span class="comment">// Modified startOpenAIRealtimeCall function</span>
+
+<span class="keyword">const</span> startOpenAIRealtimeCall = <span class="keyword">async</span> () =&gt; {
+  <span class="keyword">const</span> apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+  <span class="keyword">if</span> (!apiKey) {
+    console.error(<span class="string">'OpenAI API key not found'</span>);
+    setIsVapiLoading(<span class="keyword">false</span>);
+    <span class="keyword">return</span>;
+  }
+
+  <span class="keyword">const</span> url = <span class="string">`wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17`</span>;
+  <span class="keyword">const</span> ws = <span class="keyword">new</span> WebSocket(url, [
+    <span class="string">'realtime'</span>,
+    <span class="string">`openai-insecure-api-key.${apiKey}`</span>,
+    <span class="string">'openai-beta.realtime-v1'</span>
+  ]);
+
+  <span class="keyword">const</span> playbackManager = <span class="keyword">new</span> AudioPlaybackManager();
+  <span class="keyword">const</span> captureManager = <span class="keyword">new</span> AudioCaptureManager((base64Audio) =&gt; {
+    <span class="comment">// Send audio to OpenAI</span>
+    <span class="keyword">if</span> (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({
+        type: <span class="string">'input_audio_buffer.append'</span>,
+        audio: base64Audio
+      }));
+    }
+  });
+
+  ws.onopen = <span class="keyword">async</span> () =&gt; {
+    console.log(<span class="string">'OpenAI Realtime connected'</span>);
+
+    <span class="comment">// Configure session</span>
+    ws.send(JSON.stringify({
+      type: <span class="string">'session.update'</span>,
+      session: {
+        modalities: [<span class="string">'text'</span>, <span class="string">'audio'</span>],
+        instructions: <span class="string">'You are a helpful AI assistant.'</span>,
+        voice: <span class="string">'alloy'</span>,
+        input_audio_format: <span class="string">'pcm16'</span>,
+        output_audio_format: <span class="string">'pcm16'</span>,
+        turn_detection: {
+          type: <span class="string">'server_vad'</span>,
+          threshold: <span class="number">0.5</span>,
+          silence_duration_ms: <span class="number">500</span>
+        }
+      }
+    }));
+
+    <span class="comment">// Start audio capture</span>
+    <span class="keyword">await</span> playbackManager.initialize();
+    <span class="keyword">await</span> captureManager.start();
+
+    setIsCallActive(<span class="keyword">true</span>);
+    setIsVapiLoading(<span class="keyword">false</span>);
+  };
+
+  ws.onmessage = (event) =&gt; {
+    <span class="keyword">const</span> data = JSON.parse(event.data);
+    console.log(<span class="string">'OpenAI event:'</span>, data.type);
+
+    <span class="comment">// Handle audio response</span>
+    <span class="keyword">if</span> (data.type === <span class="string">'response.audio.delta'</span>) {
+      playbackManager.addAudioChunk(data.delta);
+    }
+
+    <span class="comment">// Handle transcript (existing code)</span>
+    <span class="keyword">if</span> (data.type === <span class="string">'response.audio_transcript.delta'</span>) {
+      setMessages(prev =&gt; {
+        <span class="keyword">const</span> lastMsg = prev[prev.length - <span class="number">1</span>];
+        <span class="keyword">if</span> (lastMsg && lastMsg.role === <span class="string">'assistant'</span>) {
+          <span class="keyword">return</span> [...prev.slice(<span class="number">0</span>, -<span class="number">1</span>), {
+            ...lastMsg,
+            content: lastMsg.content + data.delta
+          }];
+        }
+        <span class="keyword">return</span> [...prev, {
+          role: <span class="string">'assistant'</span>,
+          content: data.delta,
+          timestamp: Date.now()
+        }];
+      });
+    }
+  };
+
+  ws.onerror = (error) =&gt; {
+    console.error(<span class="string">'OpenAI WebSocket error:'</span>, error);
+    captureManager.stop();
+    playbackManager.stop();
+    setIsVapiLoading(<span class="keyword">false</span>);
+  };
+
+  ws.onclose = () =&gt; {
+    console.log(<span class="string">'OpenAI WebSocket closed'</span>);
+    captureManager.stop();
+    playbackManager.stop();
+    setIsCallActive(<span class="keyword">false</span>);
+    setIsVapiLoading(<span class="keyword">false</span>);
+  };
+
+  setOpenaiWs(ws);
+};</pre>
+                    </div>
+                </div>
+
+                <!-- Gemini Integration -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3 text-slate-900">Gemini Live API Integration</h3>
+                    <div class="code-block p-4 rounded-lg text-sm overflow-x-auto">
+                        <pre class="text-slate-200">
+<span class="comment">// Modified startGeminiLiveCall function</span>
+
+<span class="keyword">const</span> startGeminiLiveCall = <span class="keyword">async</span> () =&gt; {
+  <span class="keyword">const</span> apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+  <span class="keyword">if</span> (!apiKey) {
+    console.error(<span class="string">'Gemini API key not found'</span>);
+    setIsVapiLoading(<span class="keyword">false</span>);
+    <span class="keyword">return</span>;
+  }
+
+  <span class="keyword">const</span> url = <span class="string">`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${apiKey}`</span>;
+  <span class="keyword">const</span> ws = <span class="keyword">new</span> WebSocket(url);
+
+  <span class="keyword">const</span> playbackManager = <span class="keyword">new</span> AudioPlaybackManager();
+  <span class="keyword">const</span> captureManager = <span class="keyword">new</span> AudioCaptureManager((base64Audio) =&gt; {
+    <span class="comment">// Send audio to Gemini</span>
+    <span class="keyword">if</span> (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({
+        realtime_input: {
+          media_chunks: [{
+            mime_type: <span class="string">'audio/pcm'</span>,
+            data: base64Audio
+          }]
+        }
+      }));
+    }
+  });
+
+  ws.onopen = <span class="keyword">async</span> () =&gt; {
+    console.log(<span class="string">'Gemini Live connected'</span>);
+
+    <span class="comment">// Send initial setup</span>
+    ws.send(JSON.stringify({
+      setup: {
+        model: <span class="string">'models/gemini-2.0-flash-exp'</span>,
+        generation_config: {
+          response_modalities: [<span class="string">'AUDIO'</span>],
+          speech_config: {
+            voice_config: {
+              prebuilt_voice_config: {
+                voice_name: <span class="string">'Aoede'</span>
+              }
+            }
+          }
+        }
+      }
+    }));
+
+    <span class="comment">// Start audio capture</span>
+    <span class="keyword">await</span> playbackManager.initialize();
+    <span class="keyword">await</span> captureManager.start();
+
+    setIsCallActive(<span class="keyword">true</span>);
+    setIsVapiLoading(<span class="keyword">false</span>);
+  };
+
+  ws.onmessage = (event) =&gt; {
+    <span class="keyword">const</span> data = JSON.parse(event.data);
+    console.log(<span class="string">'Gemini event:'</span>, data);
+
+    <span class="comment">// Handle audio response</span>
+    <span class="keyword">if</span> (data.serverContent?.modelTurn?.parts) {
+      data.serverContent.modelTurn.parts.forEach((part: <span class="keyword">any</span>) =&gt; {
+        <span class="keyword">if</span> (part.inline_data?.data) {
+          playbackManager.addAudioChunk(part.inline_data.data);
+        }
+
+        <span class="comment">// Handle text transcript</span>
+        <span class="keyword">if</span> (part.text) {
+          setMessages(prev =&gt; [...prev, {
+            role: <span class="string">'assistant'</span>,
+            content: part.text,
+            timestamp: Date.now()
+          }]);
+        }
+      });
+    }
+  };
+
+  ws.onerror = (error) =&gt; {
+    console.error(<span class="string">'Gemini WebSocket error:'</span>, error);
+    captureManager.stop();
+    playbackManager.stop();
+    setIsVapiLoading(<span class="keyword">false</span>);
+  };
+
+  ws.onclose = () =&gt; {
+    console.log(<span class="string">'Gemini WebSocket closed'</span>);
+    captureManager.stop();
+    playbackManager.stop();
+    setIsCallActive(<span class="keyword">false</span>);
+    setIsVapiLoading(<span class="keyword">false</span>);
+  };
+
+  setGeminiWs(ws);
+};</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- File Structure -->
+        <section class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-900">
+                    <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Project File Structure</h2>
+            </div>
+
+            <div class="ml-9">
+                <div class="terminal p-4 rounded-lg text-sm">
+                    <div class="text-slate-400">
+ai-realtime-chat/
+├── app/
+│   ├── components/
+│   │   └── VoiceSessionChat.tsx          <span class="success">← Modified</span>
+│   ├── utils/                             <span class="success">← New Directory</span>
+│   │   ├── audioUtils.ts                  <span class="success">← New File</span>
+│   │   ├── audioCaptureManager.ts         <span class="success">← New File</span>
+│   │   └── audioPlaybackManager.ts        <span class="success">← New File</span>
+│   └── hooks/                             <span class="comment">← Optional</span>
+│       └── useAudioSession.ts             <span class="comment">← Custom hook for reusability</span>
+├── package.json                           <span class="comment">← No new dependencies needed</span>
+└── docs/
+    └── openai-gemini-audio-implementation-plan.html
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dependencies -->
+        <section class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-900">
+                    <circle cx="12" cy="12" r="10"/>
+                    <circle cx="12" cy="12" r="4"/>
+                    <line x1="21.17" x2="12" y1="8" y2="8"/>
+                    <line x1="3.95" x2="8.54" y1="6.06" y2="14"/>
+                    <line x1="10.88" x2="15.46" y1="21.94" y2="14"/>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Dependencies & Browser APIs</h2>
+            </div>
+
+            <div class="ml-9 space-y-4">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Required Browser APIs (No External Dependencies)</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-start gap-2 text-sm">
+                            <span class="text-slate-400 mt-1">•</span>
+                            <div>
+                                <span class="font-medium text-slate-900">Web Audio API</span>
+                                <span class="text-slate-600"> - AudioContext, ScriptProcessorNode, AudioBuffer</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm">
+                            <span class="text-slate-400 mt-1">•</span>
+                            <div>
+                                <span class="font-medium text-slate-900">MediaStream API</span>
+                                <span class="text-slate-600"> - getUserMedia for microphone access</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm">
+                            <span class="text-slate-400 mt-1">•</span>
+                            <div>
+                                <span class="font-medium text-slate-900">WebSocket API</span>
+                                <span class="text-slate-600"> - Already in use for real-time communication</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm">
+                            <span class="text-slate-400 mt-1">•</span>
+                            <div>
+                                <span class="font-medium text-slate-900">Base64 Encoding/Decoding</span>
+                                <span class="text-slate-600"> - Native btoa/atob functions</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Existing Dependencies (No Changes Needed)</h3>
+                    <div class="terminal p-3 rounded text-xs">
+                        <div class="prompt">$ cat package.json</div>
+                        <div class="text-slate-300 mt-2">
+{
+  "dependencies": {
+    "@elevenlabs/react": "^0.7.1",      <span class="comment">← ElevenLabs working</span>
+    "@vapi-ai/web": "^2.4.0",           <span class="comment">← VAPI working</span>
+    "next": "15.5.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  }
+}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Browser Compatibility</h3>
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                            <div class="font-medium text-slate-900 mb-1">Supported</div>
+                            <div class="text-slate-600 text-xs">Chrome 89+, Edge 89+, Firefox 76+, Safari 14.1+</div>
+                        </div>
+                        <div>
+                            <div class="font-medium text-slate-900 mb-1">Notes</div>
+                            <div class="text-slate-600 text-xs">HTTPS required for getUserMedia. Safari has stricter autoplay policies.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Implementation Timeline -->
+        <section class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-900">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Implementation Timeline</h2>
+            </div>
+
+            <div class="ml-9 space-y-4">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3 mb-2">
+                        <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm flex-shrink-0">1</div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-sm mb-1">Phase 1: Core Audio Utilities</h3>
+                            <p class="text-xs text-slate-600 mb-2">Estimated: 2-3 hours</p>
+                            <div class="space-y-1">
+                                <div class="text-sm text-slate-600">• Create app/utils/audioUtils.ts with encoding/decoding functions</div>
+                                <div class="text-sm text-slate-600">• Write unit tests for PCM16 conversion</div>
+                                <div class="text-sm text-slate-600">• Test base64 encoding/decoding with sample data</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3 mb-2">
+                        <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm flex-shrink-0">2</div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-sm mb-1">Phase 2: Audio Capture Implementation</h3>
+                            <p class="text-xs text-slate-600 mb-2">Estimated: 3-4 hours</p>
+                            <div class="space-y-1">
+                                <div class="text-sm text-slate-600">• Create AudioCaptureManager class</div>
+                                <div class="text-sm text-slate-600">• Implement microphone permissions handling</div>
+                                <div class="text-sm text-slate-600">• Set up ScriptProcessorNode for real-time processing</div>
+                                <div class="text-sm text-slate-600">• Test audio capture with console logging</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3 mb-2">
+                        <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm flex-shrink-0">3</div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-sm mb-1">Phase 3: Audio Playback Implementation</h3>
+                            <p class="text-xs text-slate-600 mb-2">Estimated: 3-4 hours</p>
+                            <div class="space-y-1">
+                                <div class="text-sm text-slate-600">• Create AudioPlaybackManager class</div>
+                                <div class="text-sm text-slate-600">• Implement buffer queue management</div>
+                                <div class="text-sm text-slate-600">• Set up scheduled playback to prevent gaps</div>
+                                <div class="text-sm text-slate-600">• Test playback with sample audio files</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3 mb-2">
+                        <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm flex-shrink-0">4</div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-sm mb-1">Phase 4: OpenAI Integration</h3>
+                            <p class="text-xs text-slate-600 mb-2">Estimated: 4-5 hours</p>
+                            <div class="space-y-1">
+                                <div class="text-sm text-slate-600">• Modify startOpenAIRealtimeCall function</div>
+                                <div class="text-sm text-slate-600">• Connect AudioCaptureManager to WebSocket send</div>
+                                <div class="text-sm text-slate-600">• Handle response.audio.delta events for playback</div>
+                                <div class="text-sm text-slate-600">• Test end-to-end OpenAI voice conversation</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3 mb-2">
+                        <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm flex-shrink-0">5</div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-sm mb-1">Phase 5: Gemini Integration</h3>
+                            <p class="text-xs text-slate-600 mb-2">Estimated: 4-5 hours</p>
+                            <div class="space-y-1">
+                                <div class="text-sm text-slate-600">• Modify startGeminiLiveCall function</div>
+                                <div class="text-sm text-slate-600">• Adapt message format for Gemini protocol</div>
+                                <div class="text-sm text-slate-600">• Handle serverContent audio responses</div>
+                                <div class="text-sm text-slate-600">• Test end-to-end Gemini voice conversation</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3 mb-2">
+                        <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm flex-shrink-0">6</div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-sm mb-1">Phase 6: Error Handling & Cleanup</h3>
+                            <p class="text-xs text-slate-600 mb-2">Estimated: 2-3 hours</p>
+                            <div class="space-y-1">
+                                <div class="text-sm text-slate-600">• Implement comprehensive error handling</div>
+                                <div class="text-sm text-slate-600">• Add cleanup logic in useEffect return</div>
+                                <div class="text-sm text-slate-600">• Test edge cases (permissions denied, network errors)</div>
+                                <div class="text-sm text-slate-600">• Memory leak testing with long sessions</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3 mb-2">
+                        <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm flex-shrink-0">7</div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-sm mb-1">Phase 7: UX Enhancements</h3>
+                            <p class="text-xs text-slate-600 mb-2">Estimated: 2-3 hours</p>
+                            <div class="space-y-1">
+                                <div class="text-sm text-slate-600">• Add audio level visualization during capture</div>
+                                <div class="text-sm text-slate-600">• Show playback status indicator</div>
+                                <div class="text-sm text-slate-600">• Match VAPI/ElevenLabs UX patterns</div>
+                                <div class="text-sm text-slate-600">• Add loading states for audio initialization</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 border-l-4 border-slate-900 bg-slate-50">
+                    <div class="font-medium text-sm mb-1">Total Estimated Time</div>
+                    <div class="text-sm text-slate-600">20-27 hours across 7 phases</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testing Strategy -->
+        <section class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-900">
+                    <path d="M2 12a5 5 0 0 0 5 5 8 8 0 0 1 5 2 8 8 0 0 1 5-2 5 5 0 0 0 5-5V7h-5a8 8 0 0 0-5 2 8 8 0 0 0-5-2H2Z"/>
+                    <path d="M6 11c1.5 0 3 .5 3 2-2 0-3 0-3-2Z"/>
+                    <path d="M18 11c-1.5 0-3 .5-3 2 2 0 3 0 3-2Z"/>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Testing Strategy</h2>
+            </div>
+
+            <div class="ml-9 space-y-4">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Unit Tests</h3>
+                    <div class="space-y-2 text-sm text-slate-600">
+                        <div>• PCM16 encoding/decoding accuracy (ensure no data loss)</div>
+                        <div>• Base64 conversion correctness</div>
+                        <div>• AudioBuffer creation with various sizes</div>
+                        <div>• Buffer queue operations (add, remove, clear)</div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Integration Tests</h3>
+                    <div class="space-y-2 text-sm text-slate-600">
+                        <div>• End-to-end audio capture → encode → WebSocket send</div>
+                        <div>• WebSocket receive → decode → playback</div>
+                        <div>• Full conversation loop with OpenAI API</div>
+                        <div>• Full conversation loop with Gemini API</div>
+                        <div>• Provider switching without memory leaks</div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Manual Testing Scenarios</h3>
+                    <div class="terminal p-3 rounded text-xs">
+                        <div class="comment"># Scenario 1: Happy Path</div>
+                        <div class="text-slate-300">1. Select OpenAI provider</div>
+                        <div class="text-slate-300">2. Click "Start Voice Call"</div>
+                        <div class="text-slate-300">3. Grant microphone permissions</div>
+                        <div class="text-slate-300">4. Speak: "Hello, how are you?"</div>
+                        <div class="success">✓ Expect: AI responds with audio and text</div>
+                        <div class="mt-2"></div>
+                        <div class="comment"># Scenario 2: Permission Denied</div>
+                        <div class="text-slate-300">1. Deny microphone permissions</div>
+                        <div class="success">✓ Expect: Error message shown, graceful failure</div>
+                        <div class="mt-2"></div>
+                        <div class="comment"># Scenario 3: Network Interruption</div>
+                        <div class="text-slate-300">1. Start call successfully</div>
+                        <div class="text-slate-300">2. Disconnect network mid-conversation</div>
+                        <div class="success">✓ Expect: WebSocket error handled, cleanup executed</div>
+                        <div class="mt-2"></div>
+                        <div class="comment"># Scenario 4: Long Session</div>
+                        <div class="text-slate-300">1. Run continuous conversation for 10+ minutes</div>
+                        <div class="success">✓ Expect: No memory leaks, smooth audio throughout</div>
+                        <div class="mt-2"></div>
+                        <div class="comment"># Scenario 5: Provider Switch</div>
+                        <div class="text-slate-300">1. Start OpenAI call → End call</div>
+                        <div class="text-slate-300">2. Switch to Gemini → Start call</div>
+                        <div class="success">✓ Expect: Clean transition, no resource conflicts</div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Performance Metrics</h3>
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                            <div class="font-medium text-slate-900 mb-1">Latency Target</div>
+                            <div class="text-slate-600 text-xs">Total round-trip time &lt; 1000ms (capture → send → receive → playback)</div>
+                        </div>
+                        <div>
+                            <div class="font-medium text-slate-900 mb-1">Memory Usage</div>
+                            <div class="text-slate-600 text-xs">Buffer queue max 5 seconds of audio (~240KB for 24kHz PCM16)</div>
+                        </div>
+                        <div>
+                            <div class="font-medium text-slate-900 mb-1">CPU Usage</div>
+                            <div class="text-slate-600 text-xs">Audio processing &lt; 10% CPU on modern devices</div>
+                        </div>
+                        <div>
+                            <div class="font-medium text-slate-900 mb-1">Audio Quality</div>
+                            <div class="text-slate-600 text-xs">No audible artifacts, gaps, or distortion</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Edge Cases & Error Handling -->
+        <section class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-900">
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                    <path d="M12 9v4"/>
+                    <path d="M12 17h.01"/>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Edge Cases & Error Handling</h2>
+            </div>
+
+            <div class="ml-9 space-y-4">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Microphone Permission Errors</h3>
+                    <div class="code-block p-3 rounded text-xs overflow-x-auto">
+                        <pre class="text-slate-200">
+<span class="keyword">try</span> {
+  <span class="keyword">const</span> stream = <span class="keyword">await</span> navigator.mediaDevices.getUserMedia({ audio: <span class="keyword">true</span> });
+} <span class="keyword">catch</span> (error) {
+  <span class="keyword">if</span> (error.name === <span class="string">'NotAllowedError'</span>) {
+    <span class="comment">// User denied permission</span>
+    showError(<span class="string">'Microphone access denied. Please enable in browser settings.'</span>);
+  } <span class="keyword">else if</span> (error.name === <span class="string">'NotFoundError'</span>) {
+    <span class="comment">// No microphone found</span>
+    showError(<span class="string">'No microphone detected. Please connect a microphone.'</span>);
+  } <span class="keyword">else</span> {
+    showError(<span class="string">'Failed to access microphone: '</span> + error.message);
+  }
+}</pre>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">WebSocket Connection Failures</h3>
+                    <div class="code-block p-3 rounded text-xs overflow-x-auto">
+                        <pre class="text-slate-200">
+ws.onerror = (error) =&gt; {
+  console.error(<span class="string">'WebSocket error:'</span>, error);
+
+  <span class="comment">// Clean up audio resources</span>
+  captureManager?.stop();
+  playbackManager?.stop();
+
+  <span class="comment">// Update UI state</span>
+  setIsCallActive(<span class="keyword">false</span>);
+  setIsVapiLoading(<span class="keyword">false</span>);
+
+  <span class="comment">// Show user-friendly error</span>
+  showError(<span class="string">'Connection lost. Please check your internet and try again.'</span>);
+};
+
+ws.onclose = (event) =&gt; {
+  <span class="keyword">if</span> (!event.wasClean) {
+    <span class="comment">// Unexpected disconnection</span>
+    showError(<span class="string">`Connection closed unexpectedly: ${event.reason}`</span>);
+  }
+  cleanup();
+};</pre>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Audio Playback Buffer Underrun</h3>
+                    <div class="code-block p-3 rounded text-xs overflow-x-auto">
+                        <pre class="text-slate-200">
+<span class="keyword">private</span> <span class="string">playNext</span>(): <span class="keyword">void</span> {
+  <span class="keyword">if</span> (<span class="keyword">this</span>.audioQueue.length === <span class="number">0</span>) {
+    <span class="comment">// No audio available - wait for next chunk</span>
+    console.warn(<span class="string">'Audio buffer underrun - waiting for data'</span>);
+    <span class="keyword">this</span>.isPlaying = <span class="keyword">false</span>;
+    <span class="keyword">return</span>;
+  }
+
+  <span class="comment">// Add small buffer time to prevent gaps</span>
+  <span class="keyword">const</span> bufferTime = <span class="number">0.1</span>; <span class="comment">// 100ms safety margin</span>
+  <span class="keyword">const</span> playTime = Math.max(
+    <span class="keyword">this</span>.audioContext!.currentTime + bufferTime,
+    <span class="keyword">this</span>.nextPlayTime
+  );
+
+  source.start(playTime);
+}</pre>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Memory Management for Long Sessions</h3>
+                    <div class="code-block p-3 rounded text-xs overflow-x-auto">
+                        <pre class="text-slate-200">
+<span class="comment">// Limit queue size to prevent memory bloat</span>
+<span class="keyword">async</span> <span class="string">addAudioChunk</span>(base64Audio: <span class="keyword">string</span>): Promise&lt;<span class="keyword">void</span>&gt; {
+  <span class="keyword">const</span> MAX_QUEUE_SIZE = <span class="number">10</span>; <span class="comment">// ~5 seconds of audio</span>
+
+  <span class="keyword">if</span> (<span class="keyword">this</span>.audioQueue.length &gt;= MAX_QUEUE_SIZE) {
+    console.warn(<span class="string">'Audio queue full - dropping oldest chunk'</span>);
+    <span class="keyword">this</span>.audioQueue.shift();
+  }
+
+  <span class="keyword">const</span> buffer = <span class="keyword">await this</span>.decodeAudioChunk(base64Audio);
+  <span class="keyword">this</span>.audioQueue.push(buffer);
+  <span class="keyword">this</span>.playNext();
+}</pre>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Component Unmount Cleanup</h3>
+                    <div class="code-block p-3 rounded text-xs overflow-x-auto">
+                        <pre class="text-slate-200">
+useEffect(() =&gt; {
+  <span class="keyword">let</span> captureManager: AudioCaptureManager | <span class="keyword">null</span> = <span class="keyword">null</span>;
+  <span class="keyword">let</span> playbackManager: AudioPlaybackManager | <span class="keyword">null</span> = <span class="keyword">null</span>;
+
+  <span class="comment">// ... initialization code ...</span>
+
+  <span class="keyword">return</span> () =&gt; {
+    <span class="comment">// Critical: Clean up ALL resources on unmount</span>
+    captureManager?.stop();
+    playbackManager?.stop();
+
+    <span class="keyword">if</span> (openaiWs) {
+      openaiWs.close();
+      setOpenaiWs(<span class="keyword">null</span>);
+    }
+
+    <span class="keyword">if</span> (geminiWs) {
+      geminiWs.close();
+      setGeminiWs(<span class="keyword">null</span>);
+    }
+  };
+}, [provider, isCallActive]);</pre>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">Audio Format Compatibility</h3>
+                    <div class="space-y-2 text-sm text-slate-600">
+                        <div>• Ensure browser supports 24kHz sample rate (fallback to 48kHz with resampling)</div>
+                        <div>• Handle mono/stereo conversion if needed (OpenAI/Gemini expect mono)</div>
+                        <div>• Validate audio chunk sizes before processing</div>
+                        <div>• Handle malformed base64 data gracefully</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Next Steps -->
+        <section class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-900">
+                    <path d="M5 12h14"/>
+                    <path d="m12 5 7 7-7 7"/>
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Next Steps</h2>
+            </div>
+
+            <div class="ml-9">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <ol class="space-y-3">
+                        <li class="flex items-start gap-3">
+                            <span class="font-medium text-slate-900 flex-shrink-0">1.</span>
+                            <div>
+                                <div class="font-medium text-sm text-slate-900 mb-1">Review & Approve Plan</div>
+                                <div class="text-sm text-slate-600">Stakeholder sign-off on architecture and timeline</div>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="font-medium text-slate-900 flex-shrink-0">2.</span>
+                            <div>
+                                <div class="font-medium text-sm text-slate-900 mb-1">Create Feature Branch</div>
+                                <div class="text-sm text-slate-600 mono">git checkout -b feature/openai-gemini-audio-implementation</div>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="font-medium text-slate-900 flex-shrink-0">3.</span>
+                            <div>
+                                <div class="font-medium text-sm text-slate-900 mb-1">Begin Phase 1 Implementation</div>
+                                <div class="text-sm text-slate-600">Start with core audio utilities (audioUtils.ts)</div>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="font-medium text-slate-900 flex-shrink-0">4.</span>
+                            <div>
+                                <div class="font-medium text-sm text-slate-900 mb-1">Test Each Phase Incrementally</div>
+                                <div class="text-sm text-slate-600">Don't move to next phase until current is fully tested</div>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="font-medium text-slate-900 flex-shrink-0">5.</span>
+                            <div>
+                                <div class="font-medium text-sm text-slate-900 mb-1">Code Review & Merge</div>
+                                <div class="text-sm text-slate-600">Pull request with comprehensive testing documentation</div>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="pt-8 border-t border-slate-200 text-sm text-slate-600 fade-in">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p>Implementation Plan v1.0</p>
+                    <p class="text-xs text-slate-500 mt-1">Generated: October 6, 2025</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-medium text-slate-900">Ready for Implementation</p>
+                    <p class="text-xs text-slate-500 mt-1">Estimated: 20-27 hours</p>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>
