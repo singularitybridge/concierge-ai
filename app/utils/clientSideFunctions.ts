@@ -158,8 +158,9 @@ export const clientSideFunctions: Record<string, ClientFunctionHandler> = {
    */
   end_call: async (params, context) => {
     if (context.endCall) {
-      context.endCall();
-      return 'Ending call now. Goodbye!';
+      // End call immediately without waiting
+      setTimeout(() => context.endCall(), 100);
+      return 'Goodbye!';
     }
     return 'Unable to end call - no call active';
   },
