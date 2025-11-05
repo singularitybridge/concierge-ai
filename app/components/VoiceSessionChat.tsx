@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Phone, PhoneOff, Mic, Loader2, Trash2, Settings } from 'lucide-react';
+import { Send, Phone, PhoneOff, Mic, Loader2, Trash2, Settings, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import Vapi from '@vapi-ai/web';
 import { useConversation } from '@elevenlabs/react';
@@ -36,6 +36,11 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
   const [geminiWs, setGeminiWs] = useState<WebSocket | null>(null);
   const audioCaptureRef = useRef<AudioCaptureManager | null>(null);
   const audioPlaybackRef = useRef<AudioPlaybackManager | null>(null);
+
+  // Conference call state
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [isAddingPhone, setIsAddingPhone] = useState(false);
+  const [conferenceId, setConferenceId] = useState<string>('');
 
   // Voice Action Modal State
   const [modalState, setModalState] = useState<{
@@ -605,6 +610,60 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
     }
   };
 
+  const addPhoneToCall = async () => {
+    if (!phoneNumber.trim()) {
+      alert('Please enter a phone number');
+      return;
+    }
+
+    setIsAddingPhone(true);
+    try {
+      // Generate conference ID if not already set
+      const confId = conferenceId || `conf-${Date.now()}`;
+      if (!conferenceId) {
+        setConferenceId(confId);
+      }
+
+      console.log('📞 Adding phone to conference:', { phoneNumber, conferenceId: confId });
+
+      // Call API to initiate outbound call
+      const response = await fetch('/api/vapi/call-phone', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          phoneNumber: phoneNumber.trim(),
+          conferenceId: confId
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add phone');
+      }
+
+      console.log('✅ Phone added to conference:', data);
+
+      // Show success message
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `📞 Calling ${phoneNumber}... They will join the conversation shortly.`,
+        timestamp: Date.now()
+      }]);
+
+      // Clear phone input
+      setPhoneNumber('');
+
+    } catch (error) {
+      console.error('Error adding phone:', error);
+      alert(error instanceof Error ? error.message : 'Failed to add phone to call');
+    } finally {
+      setIsAddingPhone(false);
+    }
+  };
+
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -799,6 +858,43 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
             </>
           )}
         </button>
+
+        {/* Conference Call - Add Phone Participant */}
+        {isCallActive && provider === 'vapi' && (
+          <div className="mt-3 p-3 bg-blue-50 border border-blue-100 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <UserPlus className="w-4 h-4 text-blue-600" />
+              <span className="text-xs font-medium text-blue-900">Add Phone Participant</span>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="+972-52-6722216"
+                className="flex-1 px-3 py-2 text-sm border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={isAddingPhone}
+              />
+              <button
+                onClick={addPhoneToCall}
+                disabled={isAddingPhone || !phoneNumber.trim()}
+                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isAddingPhone ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Calling...</span>
+                  </>
+                ) : (
+                  <>
+                    <Phone className="w-4 h-4" />
+                    <span>Call</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Messages */}
