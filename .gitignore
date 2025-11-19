@@ -43,3 +43,9 @@ next-env.d.ts
 # Log files
 logs/
 *.log
+
+# Temporary status files and files with secrets
+elevenlabs-call-status.txt
+elevenlabs-provider-selection.txt
+elevenlabs-with-tools.txt
+test-voice-agents.html

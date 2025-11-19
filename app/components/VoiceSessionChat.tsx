@@ -63,16 +63,77 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
 
   const agentTools = {
     vapi: ['Voice-to-Text (Deepgram)', 'Text-to-Voice (11Labs/PlayHT)', 'Function Calling', 'Custom Tools'],
-    elevenlabs: ['Voice-to-Voice AI', 'Conversational AI', 'Real-time Processing', 'Context Awareness'],
+    elevenlabs: ['Voice-to-Voice AI', 'Conversational AI', 'Client Tools', 'Function Calling'],
     openai: ['GPT-4o Realtime', 'Voice-to-Voice', 'Function Calling', 'Low Latency'],
     gemini: ['Gemini 2.0 Live', 'Multimodal AI', 'Real-time Streaming', 'Context Awareness']
   };
 
   // ElevenLabs conversation
   const elevenLabsConversation = useConversation({
+    clientTools: {
+      show_modal: async (parameters: { title: string; message: string; type?: string }) => {
+        console.log('🔧 ElevenLabs client tool: show_modal', parameters);
+        setModalState({
+          isOpen: true,
+          title: parameters.title,
+          message: parameters.message,
+          type: (parameters.type as 'success' | 'error' | 'info' | 'warning') || 'info',
+          actions: []
+        });
+        return `Showed modal: ${parameters.title}`;
+      },
+      show_success: async (parameters: { message: string }) => {
+        console.log('🔧 ElevenLabs client tool: show_success', parameters);
+        setModalState({
+          isOpen: true,
+          title: 'Success',
+          message: parameters.message,
+          type: 'success',
+          actions: []
+        });
+        return `Showed success message: ${parameters.message}`;
+      },
+      show_error: async (parameters: { message: string }) => {
+        console.log('🔧 ElevenLabs client tool: show_error', parameters);
+        setModalState({
+          isOpen: true,
+          title: 'Error',
+          message: parameters.message,
+          type: 'error',
+          actions: []
+        });
+        return `Showed error message: ${parameters.message}`;
+      },
+      show_confirmation: async (parameters: { title: string; message: string }) => {
+        console.log('🔧 ElevenLabs client tool: show_confirmation', parameters);
+        return new Promise((resolve) => {
+          setModalState({
+            isOpen: true,
+            title: parameters.title,
+            message: parameters.message,
+            type: 'info',
+            actions: [
+              { label: 'Confirm', onClick: () => resolve('confirmed') },
+              { label: 'Cancel', onClick: () => resolve('cancelled') }
+            ]
+          });
+        });
+      },
+      navigate_to: async (parameters: { path: string }) => {
+        console.log('🔧 ElevenLabs client tool: navigate_to', parameters);
+        window.location.href = parameters.path;
+        return `Navigating to: ${parameters.path}`;
+      },
+      end_call: async () => {
+        console.log('🔧 ElevenLabs client tool: end_call');
+        elevenLabsConversation.endSession();
+        return 'Call ended';
+      }
+    },
     onConnect: () => {
       setIsCallActive(true);
       setIsVapiLoading(false);
+      console.log('✅ ElevenLabs connected with client tools');
     },
     onDisconnect: () => {
       setIsCallActive(false);
