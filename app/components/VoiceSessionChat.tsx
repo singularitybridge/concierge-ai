@@ -526,106 +526,52 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
           </div>
         )}
 
-        {/* Agent Info */}
-        <div className="mb-3 p-4 bg-white rounded-lg border border-stone-200">
-          <div className="flex items-start gap-3 mb-3">
-            {/* Avatar */}
-            <div className="flex-shrink-0">
-              <div className="w-16 h-16 rounded-full border border-stone-200 shadow-sm overflow-hidden">
-                <img
-                  src="/avatars/assistant-avatar.jpg"
-                  alt="Hotel Concierge"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-medium text-stone-800">
-                  {provider === 'vapi' && 'Hotel Concierge'}
-                  {provider === 'elevenlabs' && 'Guest Services'}
-                </h3>
-                {provider === 'vapi' && (
-                  <Link
-                    href="/vapi"
-                    className="p-1 text-stone-500 hover:bg-stone-100 rounded transition-colors"
-                    aria-label="Settings"
-                  >
-                    <Settings className="w-3.5 h-3.5" />
-                  </Link>
-                )}
-              </div>
-              <p className="text-xs text-stone-500 mt-1">
-                {provider === 'vapi' && 'Reservations & local recommendations'}
-                {provider === 'elevenlabs' && 'Real-time guest assistance'}
-              </p>
-            </div>
-          </div>
-
-          {/* Services */}
-          <div>
-            <p className="text-xs text-stone-400 mb-2 uppercase tracking-wider">Available Services</p>
-            <div className="flex flex-wrap gap-1.5">
-              {agentTools[provider].map((tool, idx) => (
-                <span
-                  key={idx}
-                  className="px-2.5 py-1 bg-stone-50 text-xs text-stone-600 rounded-full"
+        {/* Agent Info - Minimal */}
+        {!isCallActive && (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-medium text-stone-800">
+                {provider === 'vapi' ? 'Hotel Concierge' : 'Guest Services'}
+              </h3>
+              {provider === 'vapi' && (
+                <Link
+                  href="/vapi"
+                  className="p-1 text-stone-400 hover:text-stone-600 transition-colors"
+                  aria-label="Settings"
                 >
-                  {tool}
-                </span>
-              ))}
+                  <Settings className="w-3.5 h-3.5" />
+                </Link>
+              )}
+            </div>
+            <div className="w-8 h-8 rounded-full border border-stone-200 overflow-hidden">
+              <img
+                src="/avatars/assistant-avatar.jpg"
+                alt="Concierge"
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
-        </div>
-
-        {/* Call Button */}
-        <button
-          id="voice-call-button"
-          onClick={isCallActive ? endCall : startCall}
-          disabled={isVapiLoading}
-          className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
-            isCallActive
-              ? 'bg-red-500 hover:bg-red-600 text-white'
-              : 'bg-stone-800 hover:bg-stone-900 text-white'
-          } disabled:opacity-50`}
-        >
-          {isVapiLoading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : isCallActive ? (
-            <>
-              <PhoneOff className="w-5 h-5" />
-              <span>End Call</span>
-            </>
-          ) : (
-            <>
-              <Phone className="w-5 h-5" />
-              <span>Speak with Concierge</span>
-            </>
-          )}
-        </button>
-
+        )}
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {/* Voice Status */}
-        {isCallActive && (
-          <div className="flex items-center gap-2 justify-center mb-3">
-            <div className="flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1.5 rounded-full text-xs font-medium">
-              <Mic className="w-3.5 h-3.5 animate-pulse" />
-              <span>Connected</span>
-            </div>
+        {messages.length === 0 && !isCallActive && (
+          <div className="text-center py-12">
+            <Mic className="w-8 h-8 text-stone-300 mx-auto mb-3" />
+            <p className="text-sm text-stone-600" style={{ fontFamily: 'var(--font-cormorant)' }}>How may I assist you?</p>
+            <p className="text-xs text-stone-400 mt-2">
+              Tap below to speak with our concierge
+            </p>
           </div>
         )}
 
-        {messages.length === 0 && (
-          <div className="text-center py-12">
-            <Phone className="w-8 h-8 text-stone-300 mx-auto mb-3" />
-            <p className="text-sm text-stone-600" style={{ fontFamily: 'var(--font-cormorant)' }}>How may I assist you?</p>
-            <p className="text-xs text-stone-400 mt-2">
-              Tap above to speak with our concierge
-            </p>
+        {messages.length === 0 && isCallActive && (
+          <div className="text-center py-8">
+            <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1.5 rounded-full text-xs font-medium">
+              <Mic className="w-3.5 h-3.5 animate-pulse" />
+              <span>Listening...</span>
+            </div>
           </div>
         )}
 
@@ -654,27 +600,55 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="p-4">
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder={isCallActive ? "Type your message..." : "Start a call to chat..."}
-            disabled={isLoading || !isCallActive}
-            className="flex-1 px-4 py-2.5 bg-white border border-stone-200 rounded-full text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:border-stone-400 disabled:opacity-50"
-          />
+      {/* Bottom Controls */}
+      <div className="p-4 border-t border-stone-100">
+        {!isCallActive ? (
+          /* Speak Button - Initial State */
           <button
-            onClick={sendMessage}
-            disabled={isLoading || !input.trim() || !isCallActive}
-            className="p-2.5 bg-stone-800 text-white rounded-full hover:bg-stone-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            aria-label="Send message"
+            id="voice-call-button"
+            onClick={startCall}
+            disabled={isVapiLoading}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-stone-800 text-white hover:bg-stone-700 rounded-full transition-colors disabled:opacity-50"
           >
-            <Send className="w-5 h-5" />
+            {isVapiLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                <Phone className="w-4 h-4" />
+                <span>Speak with Concierge</span>
+              </>
+            )}
           </button>
-        </div>
+        ) : (
+          /* Chat Active - Input with Send and End buttons */
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Type your message..."
+              disabled={isLoading}
+              className="flex-1 px-4 py-2 bg-white border border-stone-200 rounded-full text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-300 disabled:opacity-50"
+            />
+            <button
+              onClick={sendMessage}
+              disabled={isLoading || !input.trim()}
+              className="p-2 text-stone-600 hover:text-stone-800 disabled:opacity-30 transition-colors"
+              aria-label="Send message"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+            <button
+              id="voice-call-button"
+              onClick={endCall}
+              className="p-2 text-red-500 hover:text-red-600 transition-colors"
+              aria-label="End call"
+            >
+              <PhoneOff className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Voice Action Modal */}
