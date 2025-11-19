@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
+
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: 'swap',
+});
 
 const inter = Inter({
   variable: "--font-inter",
@@ -8,15 +15,9 @@ const inter = Inter({
   display: 'swap',
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  display: 'swap',
-});
-
 export const metadata: Metadata = {
-  title: "AI Realtime Voice Chat",
-  description: "Voice chat powered by AI agents",
+  title: "The 1898 Niseko | Concierge",
+  description: "Luxury boutique hotel in Niseko, Japan",
 };
 
 export default function RootLayout({
@@ -27,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
+        className={`${cormorant.variable} ${inter.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
         {children}

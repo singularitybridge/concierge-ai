@@ -292,6 +292,50 @@ export const clientSideFunctions: Record<string, ClientFunctionHandler> = {
     }
 
     return 'Navigation not available';
+  },
+
+  /**
+   * Show registration summary for Grand Opening event
+   */
+  show_registration_summary: async (params) => {
+    const { guestName } = params;
+
+    if (typeof window !== 'undefined') {
+      const event = new CustomEvent('show-registration', { detail: params });
+      window.dispatchEvent(event);
+    }
+
+    return `Showed registration summary for ${guestName}`;
+  },
+
+  /**
+   * Show registration complete success message
+   */
+  registration_complete: async (params) => {
+    const { guestName } = params;
+
+    if (typeof window !== 'undefined') {
+      const event = new CustomEvent('registration-complete', { detail: params });
+      window.dispatchEvent(event);
+    }
+
+    return `Registration completed for ${guestName}`;
+  },
+
+  /**
+   * Navigate to a specific tab on the hotel pages
+   */
+  navigate_tab: async (params) => {
+    const { tab } = params;
+
+    if (typeof window !== 'undefined') {
+      // Dispatch custom event to change tab
+      const event = new CustomEvent('navigate-tab', { detail: { tab } });
+      window.dispatchEvent(event);
+      return `Navigated to ${tab} tab`;
+    }
+
+    return 'Tab navigation not available';
   }
 };
 
