@@ -175,7 +175,7 @@ export default function AdminPage() {
             {tasks.map((task) => (
               <Link
                 key={task.id}
-                href={`/agents/${task.agent}`}
+                href={`/tasks/${task.id}`}
                 className="flex items-center justify-between p-4 bg-white rounded-lg hover:bg-stone-50 transition-colors group"
               >
                 <div className="flex-1 min-w-0">
