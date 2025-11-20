@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, TrendingUp, Users, Wrench, Network, Cpu, ChevronRight, Plus, X, Loader2 } from 'lucide-react';
+import { ArrowLeft, TrendingUp, Users, Wrench, Network, Cpu, ChevronRight, Plus, X, Loader2, LogOut } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 const tasks = [
   {
@@ -72,10 +73,23 @@ const agentAssignments = [
 ];
 
 export default function AdminPage() {
+  const { isAuthenticated, logout } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [taskInput, setTaskInput] = useState('');
   const [isAssigning, setIsAssigning] = useState(false);
   const [assignedAgent, setAssignedAgent] = useState<{ name: string; title: string } | null>(null);
+
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-stone-400" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const handleSubmitTask = async () => {
     if (!taskInput.trim()) return;
@@ -112,19 +126,28 @@ export default function AdminPage() {
       {/* Header */}
       <div className="bg-white border-b border-stone-100">
         <div className="max-w-3xl mx-auto px-6 py-6">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="p-2 text-stone-400 hover:text-stone-600 rounded-full transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div>
-              <h1 className="text-2xl font-light text-stone-800 tracking-wide" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                THE 1898 NISEKO
-              </h1>
-              <p className="text-xs text-stone-400 uppercase tracking-widest mt-1">Property Management</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link
+                href="/"
+                className="p-2 text-stone-400 hover:text-stone-600 rounded-full transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Link>
+              <div>
+                <h1 className="text-2xl font-light text-stone-800 tracking-wide" style={{ fontFamily: 'var(--font-cormorant)' }}>
+                  THE 1898 NISEKO
+                </h1>
+                <p className="text-xs text-stone-400 uppercase tracking-widest mt-1">Property Management</p>
+              </div>
             </div>
+            <button
+              onClick={logout}
+              className="p-2 text-stone-400 hover:text-stone-600 rounded-full transition-colors"
+              title="Logout"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </div>

@@ -189,6 +189,40 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
     scrollToBottom();
   }, [messages]);
 
+  // Listen for external messages (from quick actions, etc.)
+  useEffect(() => {
+    const handleExternalMessage = (event: CustomEvent<{ message: string }>) => {
+      const { message } = event.detail;
+
+      // Add as user message
+      const userMessage: Message = {
+        role: 'user',
+        content: message,
+        timestamp: Date.now()
+      };
+      setMessages(prev => [...prev, userMessage]);
+
+      // Send to active provider if call is active
+      if (isCallActive) {
+        if (provider === 'vapi' && vapi) {
+          vapi.send({
+            type: 'add-message',
+            message: {
+              role: 'user',
+              content: message
+            }
+          });
+        }
+        // ElevenLabs doesn't support text messages during calls
+      }
+    };
+
+    window.addEventListener('send-chat-message', handleExternalMessage as EventListener);
+    return () => {
+      window.removeEventListener('send-chat-message', handleExternalMessage as EventListener);
+    };
+  }, [isCallActive, provider, vapi]);
+
   // Initialize VAPI
   useEffect(() => {
     if (provider !== 'vapi') return;
