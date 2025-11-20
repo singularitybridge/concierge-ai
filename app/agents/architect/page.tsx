@@ -1,8 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Cpu, Activity, GitBranch, Shield, Zap, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Cpu, Activity, GitBranch, Shield, Zap, CheckCircle, Clock, ListTodo, LayoutDashboard } from 'lucide-react';
 import VoiceSessionChat from '../../components/VoiceSessionChat';
 
 // System narrative data
@@ -47,7 +48,45 @@ const agentHealthStatus = [
   { name: 'Operations', status: 'learning', load: 67 },
 ];
 
+// Tasks assigned to Aiko
+const agentTasks = [
+  {
+    id: 1,
+    title: 'Optimize Voice Latency',
+    description: 'Reduce VAPI response time for guest interactions',
+    priority: 'High',
+    status: 'In Progress',
+    createdAt: '2 hours ago',
+  },
+  {
+    id: 2,
+    title: 'Deploy Pricing Algorithm',
+    description: 'Roll out dynamic pricing v2.4 with seasonal adjustments',
+    priority: 'Medium',
+    status: 'Pending',
+    createdAt: '1 day ago',
+  },
+  {
+    id: 3,
+    title: 'Security Audit',
+    description: 'Run quarterly security scan on all agent endpoints',
+    priority: 'High',
+    status: 'Scheduled',
+    createdAt: '3 days ago',
+  },
+  {
+    id: 4,
+    title: 'Database Optimization',
+    description: 'Index optimization for guest reservation queries',
+    priority: 'Low',
+    status: 'Pending',
+    createdAt: '5 days ago',
+  },
+];
+
 export default function ArchitectAgentPage() {
+  const [view, setView] = useState<'dashboard' | 'tasks'>('dashboard');
+
   return (
     <div className="flex h-screen bg-stone-100">
       {/* Left: Digital Architect Dashboard */}
@@ -72,6 +111,18 @@ export default function ArchitectAgentPage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
 
+            {/* View Toggle */}
+            <button
+              onClick={() => setView(view === 'dashboard' ? 'tasks' : 'dashboard')}
+              className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-sm rounded-full text-stone-600 hover:bg-white transition-colors"
+            >
+              {view === 'dashboard' ? (
+                <ListTodo className="w-5 h-5" />
+              ) : (
+                <LayoutDashboard className="w-5 h-5" />
+              )}
+            </button>
+
             {/* Title Overlay */}
             <div className="absolute bottom-6 left-8 right-8">
               <div className="flex items-center gap-3 mb-3">
@@ -92,6 +143,38 @@ export default function ArchitectAgentPage() {
 
           {/* Scrollable Content */}
           <div className="flex-1 overflow-y-auto">
+            {view === 'tasks' ? (
+              /* Tasks View */
+              <div className="p-6 space-y-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-medium text-stone-700">Assigned Tasks</h3>
+                  <span className="text-xs text-stone-500">{agentTasks.length} tasks</span>
+                </div>
+                {agentTasks.map((task) => (
+                  <div key={task.id} className="p-4 bg-stone-50 rounded-lg">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${
+                          task.priority === 'High' ? 'bg-red-500' :
+                          task.priority === 'Medium' ? 'bg-amber-500' :
+                          'bg-stone-300'
+                        }`} />
+                        <h4 className="text-sm font-medium text-stone-800">{task.title}</h4>
+                      </div>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        task.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
+                        task.status === 'Pending' ? 'bg-amber-100 text-amber-700' :
+                        'bg-stone-100 text-stone-600'
+                      }`}>
+                        {task.status}
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-600 mb-2">{task.description}</p>
+                    <p className="text-xs text-stone-400">{task.createdAt}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
             <div className="p-6 space-y-6">
 
               {/* The Story */}
@@ -205,6 +288,7 @@ export default function ArchitectAgentPage() {
               </div>
 
             </div>
+          )}
           </div>
         </div>
       </div>

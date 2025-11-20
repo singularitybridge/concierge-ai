@@ -1,8 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Wrench, Bed, Sparkles, AlertTriangle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Wrench, Bed, Sparkles, AlertTriangle, CheckCircle, ListTodo, LayoutDashboard } from 'lucide-react';
 import VoiceSessionChat from '../../components/VoiceSessionChat';
 
 // Mock room status data
@@ -33,7 +34,45 @@ const inventory = [
   { item: 'Welcome tea', stock: 24, min: 18, status: 'OK' },
 ];
 
+// Tasks assigned to Mika Hayashi
+const agentTasks = [
+  {
+    id: 1,
+    title: 'Onsen Temperature Check',
+    description: 'Resolve Valley Suite heating fluctuation reported by guest',
+    priority: 'High',
+    status: 'In Progress',
+    createdAt: '2 hours ago',
+  },
+  {
+    id: 2,
+    title: 'Inventory Restock',
+    description: 'Order shampoo sets - currently below minimum stock level',
+    priority: 'Medium',
+    status: 'Pending',
+    createdAt: '1 day ago',
+  },
+  {
+    id: 3,
+    title: 'Pre-arrival Room Check',
+    description: 'Inspect Sky Suite before Tanaka Family arrival at 15:00',
+    priority: 'High',
+    status: 'Pending',
+    createdAt: '3 hours ago',
+  },
+  {
+    id: 4,
+    title: 'Fireplace Maintenance',
+    description: 'Schedule annual maintenance for lobby fireplace',
+    priority: 'Low',
+    status: 'Scheduled',
+    createdAt: '1 day ago',
+  },
+];
+
 export default function OperationsAgentPage() {
+  const [view, setView] = useState<'dashboard' | 'tasks'>('dashboard');
+
   return (
     <div className="flex h-screen bg-stone-100">
       {/* Left: Operations Dashboard */}
@@ -58,6 +97,18 @@ export default function OperationsAgentPage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
 
+            {/* View Toggle */}
+            <button
+              onClick={() => setView(view === 'dashboard' ? 'tasks' : 'dashboard')}
+              className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-sm rounded-full text-stone-600 hover:bg-white transition-colors"
+            >
+              {view === 'dashboard' ? (
+                <ListTodo className="w-5 h-5" />
+              ) : (
+                <LayoutDashboard className="w-5 h-5" />
+              )}
+            </button>
+
             {/* Title Overlay */}
             <div className="absolute bottom-6 left-8 right-8">
               <div className="flex items-center gap-3 mb-2">
@@ -74,7 +125,39 @@ export default function OperationsAgentPage() {
 
           {/* Scrollable Content */}
           <div className="flex-1 overflow-y-auto">
-          {/* Content */}
+          {view === 'tasks' ? (
+            /* Tasks View */
+            <div className="p-6 space-y-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium text-stone-700">Assigned Tasks</h3>
+                <span className="text-xs text-stone-500">{agentTasks.length} tasks</span>
+              </div>
+              {agentTasks.map((task) => (
+                <div key={task.id} className="p-4 bg-stone-50 rounded-lg">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${
+                        task.priority === 'High' ? 'bg-red-500' :
+                        task.priority === 'Medium' ? 'bg-amber-500' :
+                        'bg-stone-300'
+                      }`} />
+                      <h4 className="text-sm font-medium text-stone-800">{task.title}</h4>
+                    </div>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                      task.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
+                      task.status === 'Pending' ? 'bg-amber-100 text-amber-700' :
+                      'bg-stone-100 text-stone-600'
+                    }`}>
+                      {task.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-stone-600 mb-2">{task.description}</p>
+                  <p className="text-xs text-stone-400">{task.createdAt}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+          /* Dashboard Content */
           <div className="p-6 space-y-6">
             {/* Room Status Grid */}
             <div>
@@ -183,6 +266,7 @@ export default function OperationsAgentPage() {
               </div>
             </div>
           </div>
+          )}
           </div>
         </div>
       </div>
