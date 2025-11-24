@@ -300,7 +300,17 @@ export default function GuestPage() {
 
       {/* Right: Voice Chat */}
       <div className="flex-[1] min-w-0 p-6">
-        <VoiceSessionChat agentId="concierge" sessionId="guest-portal" />
+        <VoiceSessionChat
+          agentId="concierge"
+          sessionId="guest-portal"
+          elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_GUEST_AGENT_ID}
+          contextData={{
+            guest: guestData,
+            activities,
+            experiences,
+            quickActions: quickActions.map(a => ({ label: a.label, description: a.description }))
+          }}
+        />
       </div>
     </div>
   );

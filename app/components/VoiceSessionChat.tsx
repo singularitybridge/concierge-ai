@@ -19,17 +19,25 @@ type VoiceProvider = 'vapi' | 'elevenlabs';
 interface VoiceSessionChatProps {
   agentId: string;
   sessionId?: string;
+  elevenLabsAgentId?: string; // Optional custom ElevenLabs agent ID
+  contextData?: Record<string, unknown>; // Dynamic context data for the agent
 }
 
-export default function VoiceSessionChat({ agentId, sessionId = 'default' }: VoiceSessionChatProps) {
+export default function VoiceSessionChat({ agentId, sessionId = 'default', elevenLabsAgentId, contextData }: VoiceSessionChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [provider, setProvider] = useState<VoiceProvider>('vapi');
+  const [provider, setProvider] = useState<VoiceProvider>('elevenlabs');
   const [vapi, setVapi] = useState<Vapi | null>(null);
   const [isCallActive, setIsCallActive] = useState(false);
   const [isVapiLoading, setIsVapiLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const contextDataRef = useRef<Record<string, unknown> | undefined>(contextData);
+
+  // Keep ref updated with latest contextData
+  useEffect(() => {
+    contextDataRef.current = contextData;
+  }, [contextData]);
 
   // Conference call state
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -120,6 +128,24 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
         console.log('🔧 ElevenLabs client tool: end_call');
         elevenLabsConversation.endSession();
         return 'Call ended';
+      },
+      get_context: async () => {
+        console.log('🔧 ElevenLabs client tool: get_context', contextDataRef.current);
+        if (contextDataRef.current) {
+          return JSON.stringify(contextDataRef.current);
+        }
+        return 'No context data available';
+      },
+      request_service: async (parameters: { service_type: string; details: string; priority?: string }) => {
+        console.log('🔧 ElevenLabs client tool: request_service', parameters);
+        setModalState({
+          isOpen: true,
+          title: 'Service Request Submitted',
+          message: `Your ${parameters.service_type.replace('_', ' ')} request has been received: ${parameters.details}`,
+          type: 'success',
+          actions: []
+        });
+        return `Service request submitted: ${parameters.service_type} - ${parameters.details}`;
       },
       show_registration_summary: async (parameters: {
         guestName: string;
@@ -360,7 +386,7 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
         await vapi.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID || '');
       } else if (provider === 'elevenlabs') {
         await elevenLabsConversation.startSession({
-          agentId: process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || '',
+          agentId: elevenLabsAgentId || process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || '',
         });
       }
     } catch (error) {
@@ -403,7 +429,7 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default' }: Voi
           body: JSON.stringify({
             conferenceId: confId,
             phoneNumbers: [phoneNumber.trim()],
-            agentId: process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID
+            agentId: elevenLabsAgentId || process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID
           })
         });
 

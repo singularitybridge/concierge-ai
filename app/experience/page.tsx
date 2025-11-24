@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
-  LogOut, Loader2, Calendar, MapPin, Clock, Sparkles,
-  Car, Plane, Utensils, Home, ChevronRight
+  LogOut, Loader2, Calendar, MapPin, Clock, Sparkles, ChevronRight
 } from 'lucide-react';
 import VoiceSessionChat from '../components/VoiceSessionChat';
 
@@ -17,33 +16,44 @@ const eventDetails = {
   location: 'The 1898 Niseko, Hokkaido',
 };
 
-// Hotel info tabs content
+// Quick actions for common questions
+const quickActions = [
+  { label: 'RSVP', message: 'I would like to register for the Grand Opening event.' },
+  { label: 'Transportation', message: 'What transportation options are available to get to the hotel?' },
+  { label: 'Dining', message: 'Tell me about the dining options at the event.' },
+  { label: 'Overnight', message: 'Can I stay overnight after the event? What suites are available?' },
+];
+
+// Hotel info tabs content with expanded details
 const hotelInfo = {
   suites: {
     title: 'Our Suites',
+    description: 'Each of our 24 suites blends traditional Japanese aesthetics with modern luxury. All suites feature private onsen baths fed by natural hot springs, heated floors, and panoramic mountain views.',
     items: [
-      { name: 'Mountain View Suite', description: 'Panoramic views of Mount Yotei, private onsen' },
-      { name: 'Garden Suite', description: 'Traditional zen garden, tatami living area' },
-      { name: 'Onsen Suite', description: 'Indoor/outdoor private hot spring bath' },
-      { name: 'Sky Suite', description: 'Top floor, wraparound terrace, fireplace' },
+      { name: 'Mountain View Suite', description: '65 sqm with panoramic Mount Yotei views, king bed, private indoor/outdoor onsen, tatami sitting area. From ¥120,000/night.' },
+      { name: 'Garden Suite', description: '55 sqm overlooking our zen garden, queen bed, traditional tatami living area, rain shower, writing desk. From ¥90,000/night.' },
+      { name: 'Onsen Suite', description: '70 sqm with premium indoor/outdoor private onsen, king bed, heated floors throughout, separate living area. From ¥150,000/night.' },
+      { name: 'Sky Suite', description: '85 sqm penthouse with wraparound terrace, king bed, fireplace, panoramic 270° views, butler service included. From ¥200,000/night.' },
     ]
   },
   dining: {
     title: 'Culinary Experience',
+    description: 'Our culinary program celebrates Hokkaido\'s exceptional ingredients. Chef Watanabe trained in Kyoto for 15 years and sources 80% of ingredients from local Hokkaido farms and fisheries.',
     items: [
-      { name: 'Kaiseki Dinner', description: 'Multi-course seasonal Japanese cuisine' },
-      { name: 'Sushi Omakase', description: 'Chef\'s selection of finest local seafood' },
-      { name: 'Teppanyaki', description: 'Premium Wagyu and Hokkaido produce' },
-      { name: 'In-Room Dining', description: '24-hour private dining service' },
+      { name: 'Kaiseki Dinner', description: '8-12 course seasonal Japanese haute cuisine at Yuki Restaurant. Vegetarian and vegan options available. ¥18,000-35,000 per person. Reservations required.' },
+      { name: 'Sushi Omakase', description: 'Chef\'s selection featuring morning catch from Otaru and Shakotan. 12-piece omakase ¥15,000. Available at the sushi counter, seats 8.' },
+      { name: 'Teppanyaki', description: 'Premium A5 Wagyu from Furano, fresh Hokkaido scallops, seasonal vegetables. Private teppan tables available. ¥25,000 per person.' },
+      { name: 'In-Room Dining', description: '24-hour service with full menu until 10:30 PM, late-night menu available. Breakfast sets, ramen, donburi, and more. 30-45 minute delivery.' },
     ]
   },
   location: {
     title: 'Location & Access',
+    description: 'The 1898 Niseko is ideally situated in the heart of Niseko, offering easy access to world-class ski resorts and the charming village. We provide complimentary shuttle service to all major areas.',
     items: [
-      { name: 'New Chitose Airport', description: '2.5 hours by car, complimentary pickup available' },
-      { name: 'Niseko Ski Resorts', description: '10 minutes to Grand Hirafu, Annupuri' },
-      { name: 'Niseko Village', description: '5 minutes to shops and restaurants' },
-      { name: 'Sapporo City', description: '2 hours scenic drive through Hokkaido' },
+      { name: 'New Chitose Airport', description: '110 km, approximately 2.5 hours by car. Complimentary luxury SUV pickup available with 48-hour advance booking. ¥35,000 per car (up to 4 guests).' },
+      { name: 'Niseko Ski Resorts', description: '10 minutes to Grand Hirafu (largest area), 12 min to Niseko Village, 15 min to Annupuri. Free shuttle every 30 minutes, 8 AM - 10 PM.' },
+      { name: 'Niseko Village', description: '5 minutes to shops, restaurants, and après-ski. Walking distance to convenience stores. Our concierge can arrange restaurant reservations.' },
+      { name: 'Day Trips', description: 'Sapporo 2 hours, Otaru 1.5 hours (canal district, sushi), Lake Toya 1 hour. Private car service available ¥50,000/day.' },
     ]
   }
 };
@@ -68,6 +78,25 @@ export default function ExperiencePage() {
     router.push('/');
   };
 
+  const sendToChat = (message: string) => {
+    window.dispatchEvent(new CustomEvent('send-chat-message', { detail: { message } }));
+  };
+
+  // Listen for navigate-tab events from AI agent
+  useEffect(() => {
+    const handleNavigateTab = (event: CustomEvent<{ tab: string }>) => {
+      const tab = event.detail.tab.toLowerCase();
+      if (tab === 'suites' || tab === 'dining' || tab === 'location') {
+        setActiveTab(tab);
+      }
+    };
+
+    window.addEventListener('navigate-tab', handleNavigateTab as EventListener);
+    return () => {
+      window.removeEventListener('navigate-tab', handleNavigateTab as EventListener);
+    };
+  }, []);
+
   if (isAuthenticated === null) {
     return (
       <div className="min-h-screen bg-stone-100 flex items-center justify-center">
@@ -79,8 +108,6 @@ export default function ExperiencePage() {
   if (!isAuthenticated) {
     return null;
   }
-
-  const currentInfo = hotelInfo[activeTab];
 
   return (
     <div className="flex h-screen bg-stone-100">
@@ -119,6 +146,19 @@ export default function ExperiencePage() {
 
         {/* Content - Scrollable */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {/* Quick Actions */}
+            <div className="flex flex-wrap gap-2">
+              {quickActions.map((action) => (
+                <button
+                  key={action.label}
+                  onClick={() => sendToChat(action.message)}
+                  className="px-3 py-1.5 text-xs bg-white text-stone-600 rounded-lg hover:bg-stone-50 transition-colors"
+                >
+                  {action.label}
+                </button>
+              ))}
+            </div>
+
             {/* Event Details Card */}
             <div className="bg-white rounded-xl p-5">
               <h2 className="text-lg font-medium text-stone-800 mb-4" style={{ fontFamily: 'var(--font-cormorant)' }}>
@@ -150,27 +190,13 @@ export default function ExperiencePage() {
             </div>
 
             {/* Registration Info */}
-            <div className="bg-gradient-to-br from-stone-800 to-stone-900 rounded-xl p-5 text-white">
+            <div className="bg-stone-800 rounded-xl p-5 text-white">
               <h3 className="text-sm font-medium mb-3">Complete Your RSVP</h3>
-              <p className="text-xs text-white/70 mb-4 leading-relaxed">
+              <p className="text-xs text-white/70 leading-relaxed">
                 Speak with our AI concierge to register for the Grand Opening.
                 We'll collect your details for transportation, dining preferences,
                 and any special requirements.
               </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="text-xs px-2 py-1 bg-white/10 rounded flex items-center gap-1">
-                  <Plane className="w-3 h-3" /> Airport Pickup
-                </span>
-                <span className="text-xs px-2 py-1 bg-white/10 rounded flex items-center gap-1">
-                  <Car className="w-3 h-3" /> Valet Parking
-                </span>
-                <span className="text-xs px-2 py-1 bg-white/10 rounded flex items-center gap-1">
-                  <Utensils className="w-3 h-3" /> Dietary Needs
-                </span>
-                <span className="text-xs px-2 py-1 bg-white/10 rounded flex items-center gap-1">
-                  <Home className="w-3 h-3" /> Overnight Stay
-                </span>
-              </div>
             </div>
 
             {/* Hotel Info Tabs */}
@@ -192,14 +218,15 @@ export default function ExperiencePage() {
               </div>
 
               <div className="bg-white rounded-xl p-5">
-                <h3 className="text-sm font-medium text-stone-800 mb-4">{currentInfo.title}</h3>
+                <h3 className="text-sm font-medium text-stone-800 mb-2">{hotelInfo[activeTab].title}</h3>
+                <p className="text-xs text-stone-500 mb-4 leading-relaxed">{hotelInfo[activeTab].description}</p>
                 <div className="space-y-3">
-                  {currentInfo.items.map((item) => (
+                  {hotelInfo[activeTab].items.map((item) => (
                     <div key={item.name} className="flex items-start gap-3">
                       <ChevronRight className="w-4 h-4 text-stone-300 mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="text-sm text-stone-800">{item.name}</p>
-                        <p className="text-xs text-stone-500">{item.description}</p>
+                        <p className="text-sm font-medium text-stone-800">{item.name}</p>
+                        <p className="text-xs text-stone-500 leading-relaxed">{item.description}</p>
                       </div>
                     </div>
                   ))}
@@ -216,7 +243,17 @@ export default function ExperiencePage() {
 
       {/* Right: Voice Chat */}
       <div className="flex-[1] min-w-0 p-6">
-        <VoiceSessionChat agentId="registration-concierge" sessionId="grand-opening-rsvp" />
+        <VoiceSessionChat
+          agentId="registration-concierge"
+          sessionId="grand-opening-rsvp"
+          elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID}
+          contextData={{
+            event: eventDetails,
+            hotelInfo,
+            quickActions: quickActions.map(a => ({ label: a.label })),
+            activeTab
+          }}
+        />
       </div>
     </div>
   );

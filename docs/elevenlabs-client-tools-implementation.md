@@ -310,6 +310,84 @@ NEXT_PUBLIC_ELEVENLABS_API_KEY=your_api_key_here
 - ⏳ Dashboard configuration pending
 - ⏳ Live voice testing pending
 
+## Multi-Agent Setup (Updated 2025-01-20)
+
+### Overview
+The project now supports multiple ElevenLabs agents for different contexts:
+- **Registration Agent**: For `/experience` page - Grand Opening RSVP
+- **Guest Agent**: For `/guest` page - Guest concierge
+
+### Environment Variables
+```env
+NEXT_PUBLIC_ELEVENLABS_AGENT_ID=agent_xxx  # Registration concierge
+NEXT_PUBLIC_ELEVENLABS_GUEST_AGENT_ID=agent_yyy  # Guest concierge
+```
+
+### Passing Context Data to Agents
+
+VoiceSessionChat now accepts `contextData` prop to pass page-specific data:
+
+```tsx
+<VoiceSessionChat
+  agentId="concierge"
+  sessionId="guest-portal"
+  elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_GUEST_AGENT_ID}
+  contextData={{
+    guest: guestData,
+    activities,
+    experiences
+  }}
+/>
+```
+
+### New Client Tools
+
+Two additional tools for context-aware agents:
+
+#### Tool 7: get_context
+Fetches page context data (guest info, activities, etc.)
+```typescript
+get_context: async () => {
+  return JSON.stringify(contextDataRef.current);
+}
+```
+
+#### Tool 8: request_service
+Submits service requests (room service, housekeeping, etc.)
+```typescript
+request_service: async (parameters: { service_type: string; details: string; priority?: string }) => {
+  // Show confirmation modal and return status
+}
+```
+
+### Important: Using Refs for Dynamic Data
+
+Since `useConversation` hook captures values at mount time, use a ref for contextData:
+
+```typescript
+const contextDataRef = useRef(contextData);
+
+useEffect(() => {
+  contextDataRef.current = contextData;
+}, [contextData]);
+
+// In clientTools:
+get_context: async () => JSON.stringify(contextDataRef.current)
+```
+
+### Agent Setup Scripts
+
+- `scripts/create-elevenlabs-guest-agent.ts` - Create guest concierge agent
+- `scripts/update-guest-agent-tools.ts` - Update guest agent tools
+- `scripts/update-registration-agent-tools.ts` - Update registration agent tools
+
+### Tool Configuration Notes
+
+- `expects_response: true` - Agent waits for tool response (use for data fetching)
+- `expects_response: false` - Fire and forget (use for UI updates like modals)
+
 ## Conclusion
 
 ElevenLabs client tools are fully implemented in the code and ready for testing once the tools are configured in the ElevenLabs dashboard. The implementation mirrors the VAPI function calling functionality, providing a consistent user experience across both voice providers.
+
+The multi-agent setup allows different pages to use context-specific AI agents with tailored prompts and knowledge bases.
