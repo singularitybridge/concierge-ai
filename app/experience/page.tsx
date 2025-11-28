@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
-  LogOut, Loader2, Calendar, MapPin, Clock, Sparkles, ChevronRight
+  LogOut, Loader2, Calendar, MapPin, Clock, Sparkles, ChevronRight,
+  User, Building2, Mail, Phone, Users, Car, UtensilsCrossed, BedDouble, MessageSquare, Check, X
 } from 'lucide-react';
 import VoiceSessionChat from '../components/VoiceSessionChat';
 
@@ -16,51 +17,86 @@ const eventDetails = {
   location: 'The 1898 Niseko, Hokkaido',
 };
 
-// Quick actions for common questions
-const quickActions = [
-  { label: 'RSVP', message: 'I would like to register for the Grand Opening event.' },
-  { label: 'Transportation', message: 'What transportation options are available to get to the hotel?' },
-  { label: 'Dining', message: 'Tell me about the dining options at the event.' },
-  { label: 'Overnight', message: 'Can I stay overnight after the event? What suites are available?' },
-];
-
-// Hotel info tabs content with expanded details
+// Hotel info content
 const hotelInfo = {
   suites: {
     title: 'Our Suites',
-    description: 'Each of our 24 suites blends traditional Japanese aesthetics with modern luxury. All suites feature private onsen baths fed by natural hot springs, heated floors, and panoramic mountain views.',
+    description: 'Each of our 24 suites blends traditional Japanese aesthetics with modern luxury.',
     items: [
-      { name: 'Mountain View Suite', description: '65 sqm with panoramic Mount Yotei views, king bed, private indoor/outdoor onsen, tatami sitting area. From ¥120,000/night.' },
-      { name: 'Garden Suite', description: '55 sqm overlooking our zen garden, queen bed, traditional tatami living area, rain shower, writing desk. From ¥90,000/night.' },
-      { name: 'Onsen Suite', description: '70 sqm with premium indoor/outdoor private onsen, king bed, heated floors throughout, separate living area. From ¥150,000/night.' },
-      { name: 'Sky Suite', description: '85 sqm penthouse with wraparound terrace, king bed, fireplace, panoramic 270° views, butler service included. From ¥200,000/night.' },
+      { name: 'Mountain View Suite', description: '65 sqm, panoramic Mount Yotei views, private onsen. From ¥120,000/night.' },
+      { name: 'Garden Suite', description: '55 sqm, zen garden views, tatami living area. From ¥90,000/night.' },
+      { name: 'Onsen Suite', description: '70 sqm, premium private onsen, heated floors. From ¥150,000/night.' },
+      { name: 'Sky Suite', description: '85 sqm penthouse, wraparound terrace, butler service. From ¥200,000/night.' },
     ]
   },
   dining: {
     title: 'Culinary Experience',
-    description: 'Our culinary program celebrates Hokkaido\'s exceptional ingredients. Chef Watanabe trained in Kyoto for 15 years and sources 80% of ingredients from local Hokkaido farms and fisheries.',
+    description: 'Chef Watanabe celebrates Hokkaido\'s exceptional ingredients.',
     items: [
-      { name: 'Kaiseki Dinner', description: '8-12 course seasonal Japanese haute cuisine at Yuki Restaurant. Vegetarian and vegan options available. ¥18,000-35,000 per person. Reservations required.' },
-      { name: 'Sushi Omakase', description: 'Chef\'s selection featuring morning catch from Otaru and Shakotan. 12-piece omakase ¥15,000. Available at the sushi counter, seats 8.' },
-      { name: 'Teppanyaki', description: 'Premium A5 Wagyu from Furano, fresh Hokkaido scallops, seasonal vegetables. Private teppan tables available. ¥25,000 per person.' },
-      { name: 'In-Room Dining', description: '24-hour service with full menu until 10:30 PM, late-night menu available. Breakfast sets, ramen, donburi, and more. 30-45 minute delivery.' },
+      { name: 'Kaiseki Dinner', description: '8-12 course seasonal cuisine. ¥18,000-35,000 per person.' },
+      { name: 'Sushi Omakase', description: 'Chef\'s selection, 12 pieces. ¥15,000.' },
+      { name: 'Teppanyaki', description: 'Premium A5 Wagyu, Hokkaido scallops. ¥25,000 per person.' },
+      { name: 'In-Room Dining', description: '24-hour service, full menu until 10:30 PM.' },
     ]
   },
   location: {
-    title: 'Location & Access',
-    description: 'The 1898 Niseko is ideally situated in the heart of Niseko, offering easy access to world-class ski resorts and the charming village. We provide complimentary shuttle service to all major areas.',
+    title: 'Getting Here',
+    description: 'Ideally situated in the heart of Niseko with complimentary shuttle service.',
     items: [
-      { name: 'New Chitose Airport', description: '110 km, approximately 2.5 hours by car. Complimentary luxury SUV pickup available with 48-hour advance booking. ¥35,000 per car (up to 4 guests).' },
-      { name: 'Niseko Ski Resorts', description: '10 minutes to Grand Hirafu (largest area), 12 min to Niseko Village, 15 min to Annupuri. Free shuttle every 30 minutes, 8 AM - 10 PM.' },
-      { name: 'Niseko Village', description: '5 minutes to shops, restaurants, and après-ski. Walking distance to convenience stores. Our concierge can arrange restaurant reservations.' },
-      { name: 'Day Trips', description: 'Sapporo 2 hours, Otaru 1.5 hours (canal district, sushi), Lake Toya 1 hour. Private car service available ¥50,000/day.' },
+      { name: 'New Chitose Airport', description: '110 km, ~2.5 hours. Luxury SUV pickup ¥35,000 (up to 4 guests).' },
+      { name: 'Ski Resorts', description: '10-15 min to Grand Hirafu, Niseko Village, Annupuri. Free shuttle.' },
+      { name: 'Niseko Village', description: '5 min to shops & restaurants. Walking distance.' },
+      { name: 'Day Trips', description: 'Sapporo 2h, Otaru 1.5h, Lake Toya 1h. Private car ¥50,000/day.' },
     ]
   }
 };
 
+// Guest registration data structure
+interface GuestRegistration {
+  name: string;
+  company: string;
+  email: string;
+  phone: string;
+  partySize: string;
+  children: string;
+  transportation: string;
+  dietary: string;
+  overnight: string;
+  remarks: string;
+}
+
+const emptyRegistration: GuestRegistration = {
+  name: '',
+  company: '',
+  email: '',
+  phone: '',
+  partySize: '',
+  children: '',
+  transportation: '',
+  dietary: '',
+  overnight: '',
+  remarks: ''
+};
+
+// Field display config
+const registrationFields = [
+  { key: 'name', label: 'Name', icon: User },
+  { key: 'company', label: 'Company', icon: Building2 },
+  { key: 'email', label: 'Email', icon: Mail },
+  { key: 'phone', label: 'Phone', icon: Phone },
+  { key: 'partySize', label: 'Party Size', icon: Users },
+  { key: 'transportation', label: 'Transportation', icon: Car },
+  { key: 'dietary', label: 'Dietary', icon: UtensilsCrossed },
+  { key: 'overnight', label: 'Accommodation', icon: BedDouble },
+] as const;
+
+type InfoPanelType = 'suites' | 'dining' | 'location' | null;
+
 export default function ExperiencePage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [activeTab, setActiveTab] = useState<'suites' | 'dining' | 'location'>('suites');
+  const [registration, setRegistration] = useState<GuestRegistration>(emptyRegistration);
+  const [infoPanel, setInfoPanel] = useState<InfoPanelType>(null);
+  const [isComplete, setIsComplete] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -78,21 +114,65 @@ export default function ExperiencePage() {
     router.push('/');
   };
 
-  const sendToChat = (message: string) => {
-    window.dispatchEvent(new CustomEvent('send-chat-message', { detail: { message } }));
-  };
+  // Count filled fields for progress
+  const filledCount = Object.values(registration).filter(v => v && v.trim() !== '').length;
+  const totalFields = registrationFields.length;
 
-  // Listen for navigate-tab events from AI agent
+  // Listen for agent events
   useEffect(() => {
-    const handleNavigateTab = (event: CustomEvent<{ tab: string }>) => {
-      const tab = event.detail.tab.toLowerCase();
-      if (tab === 'suites' || tab === 'dining' || tab === 'location') {
-        setActiveTab(tab);
+    // Update a single registration field
+    const handleUpdateField = (event: CustomEvent<{ field: string; value: string }>) => {
+      const { field, value } = event.detail;
+      setRegistration(prev => ({ ...prev, [field]: value }));
+    };
+
+    // Show info panel (suites, dining, location)
+    const handleShowInfo = (event: CustomEvent<{ panel: string }>) => {
+      const panel = event.detail.panel.toLowerCase() as InfoPanelType;
+      if (panel === 'suites' || panel === 'dining' || panel === 'location') {
+        setInfoPanel(panel);
       }
     };
 
+    // Hide info panel
+    const handleHideInfo = () => {
+      setInfoPanel(null);
+    };
+
+    // Mark registration complete
+    const handleComplete = () => {
+      setIsComplete(true);
+      setInfoPanel(null);
+    };
+
+    // Reset registration
+    const handleReset = () => {
+      setRegistration(emptyRegistration);
+      setIsComplete(false);
+      setInfoPanel(null);
+    };
+
+    // Legacy navigate-tab support
+    const handleNavigateTab = (event: CustomEvent<{ tab: string }>) => {
+      const tab = event.detail.tab.toLowerCase() as InfoPanelType;
+      if (tab === 'suites' || tab === 'dining' || tab === 'location') {
+        setInfoPanel(tab);
+      }
+    };
+
+    window.addEventListener('update-registration-field', handleUpdateField as EventListener);
+    window.addEventListener('show-info-panel', handleShowInfo as EventListener);
+    window.addEventListener('hide-info-panel', handleHideInfo as EventListener);
+    window.addEventListener('registration-complete', handleComplete as EventListener);
+    window.addEventListener('reset-registration', handleReset as EventListener);
     window.addEventListener('navigate-tab', handleNavigateTab as EventListener);
+
     return () => {
+      window.removeEventListener('update-registration-field', handleUpdateField as EventListener);
+      window.removeEventListener('show-info-panel', handleShowInfo as EventListener);
+      window.removeEventListener('hide-info-panel', handleHideInfo as EventListener);
+      window.removeEventListener('registration-complete', handleComplete as EventListener);
+      window.removeEventListener('reset-registration', handleReset as EventListener);
       window.removeEventListener('navigate-tab', handleNavigateTab as EventListener);
     };
   }, []);
@@ -113,8 +193,8 @@ export default function ExperiencePage() {
     <div className="flex h-screen bg-stone-100">
       {/* Left: Registration Experience */}
       <div className="flex-[2] min-w-0 flex flex-col">
-        {/* Hero Section - Fixed at top */}
-        <div className="relative h-48 flex-shrink-0">
+        {/* Hero Section */}
+        <div className="relative h-44 flex-shrink-0">
           <Image
             src="/hotel3.jpg"
             alt="The 1898 Niseko"
@@ -132,7 +212,7 @@ export default function ExperiencePage() {
             <LogOut className="w-4 h-4" />
           </button>
 
-          {/* Event Info */}
+          {/* Event Header */}
           <div className="absolute bottom-4 left-6 right-6">
             <div className="flex items-center gap-2 mb-1">
               <Sparkles className="w-3 h-3 text-amber-400" />
@@ -145,99 +225,140 @@ export default function ExperiencePage() {
         </div>
 
         {/* Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {/* Quick Actions */}
-            <div className="flex flex-wrap gap-2">
-              {quickActions.map((action) => (
-                <button
-                  key={action.label}
-                  onClick={() => sendToChat(action.message)}
-                  className="px-3 py-1.5 text-xs bg-white text-stone-600 rounded-lg hover:bg-stone-50 transition-colors"
-                >
-                  {action.label}
-                </button>
-              ))}
+        <div className="flex-1 overflow-y-auto p-6 space-y-5">
+          {/* Event Details - Compact */}
+          <div className="bg-white rounded-xl p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Calendar className="w-4 h-4 text-stone-400" />
+                <span className="text-sm text-stone-700">{eventDetails.date}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Clock className="w-4 h-4 text-stone-400" />
+                <span className="text-sm text-stone-700">{eventDetails.time}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <MapPin className="w-4 h-4 text-stone-400" />
+                <span className="text-sm text-stone-700">Niseko, Hokkaido</span>
+              </div>
             </div>
+          </div>
 
-            {/* Event Details Card */}
-            <div className="bg-white rounded-xl p-5">
-              <h2 className="text-lg font-medium text-stone-800 mb-4" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                Event Details
+          {/* Your Registration Card */}
+          <div className={`rounded-xl p-5 transition-all ${isComplete ? 'bg-emerald-50 border border-emerald-200' : 'bg-white'}`}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-stone-800" style={{ fontFamily: 'var(--font-cormorant)' }}>
+                {isComplete ? 'Registration Complete' : 'Your Registration'}
               </h2>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <Calendar className="w-4 h-4 text-stone-400" />
-                  <div>
-                    <p className="text-sm text-stone-800">{eventDetails.date}</p>
-                    <p className="text-xs text-stone-500">Mark your calendar</p>
-                  </div>
+              {!isComplete && filledCount > 0 && (
+                <span className="text-xs text-stone-400">
+                  {filledCount} of {totalFields} details
+                </span>
+              )}
+              {isComplete && (
+                <div className="flex items-center gap-1.5 text-emerald-600">
+                  <Check className="w-4 h-4" />
+                  <span className="text-xs font-medium">Confirmed</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Clock className="w-4 h-4 text-stone-400" />
-                  <div>
-                    <p className="text-sm text-stone-800">{eventDetails.time}</p>
-                    <p className="text-xs text-stone-500">Cocktails & ceremony</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <MapPin className="w-4 h-4 text-stone-400" />
-                  <div>
-                    <p className="text-sm text-stone-800">{eventDetails.location}</p>
-                    <p className="text-xs text-stone-500">Niseko, Hokkaido, Japan</p>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* Registration Info */}
-            <div className="bg-stone-800 rounded-xl p-5 text-white">
-              <h3 className="text-sm font-medium mb-3">Complete Your RSVP</h3>
-              <p className="text-xs text-white/70 leading-relaxed">
-                Speak with our AI concierge to register for the Grand Opening.
-                We'll collect your details for transportation, dining preferences,
-                and any special requirements.
-              </p>
-            </div>
-
-            {/* Hotel Info Tabs */}
-            <div>
-              <div className="flex gap-1 mb-4">
-                {(['suites', 'dining', 'location'] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`px-3 py-1.5 text-xs rounded-lg transition-colors capitalize ${
-                      activeTab === tab
-                        ? 'bg-stone-800 text-white'
-                        : 'bg-white text-stone-600 hover:bg-stone-100'
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
+            {isComplete ? (
+              <div className="text-center py-4">
+                <p className="text-sm text-emerald-700 mb-2">
+                  Thank you, {registration.name || 'Guest'}!
+                </p>
+                <p className="text-xs text-emerald-600/70">
+                  We look forward to welcoming you on December 10th.
+                </p>
               </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {registrationFields.map(({ key, label, icon: Icon }) => {
+                  const value = registration[key as keyof GuestRegistration];
+                  const hasValue = value && value.trim() !== '';
 
-              <div className="bg-white rounded-xl p-5">
-                <h3 className="text-sm font-medium text-stone-800 mb-2">{hotelInfo[activeTab].title}</h3>
-                <p className="text-xs text-stone-500 mb-4 leading-relaxed">{hotelInfo[activeTab].description}</p>
-                <div className="space-y-3">
-                  {hotelInfo[activeTab].items.map((item) => (
-                    <div key={item.name} className="flex items-start gap-3">
-                      <ChevronRight className="w-4 h-4 text-stone-300 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="text-sm font-medium text-stone-800">{item.name}</p>
-                        <p className="text-xs text-stone-500 leading-relaxed">{item.description}</p>
+                  return (
+                    <div
+                      key={key}
+                      className={`flex items-start gap-2.5 p-2.5 rounded-lg transition-all ${
+                        hasValue
+                          ? 'bg-stone-50'
+                          : 'bg-stone-50/50'
+                      }`}
+                    >
+                      <Icon className={`w-3.5 h-3.5 mt-0.5 flex-shrink-0 ${
+                        hasValue ? 'text-stone-600' : 'text-stone-300'
+                      }`} />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] uppercase tracking-wide text-stone-400 mb-0.5">
+                          {label}
+                        </p>
+                        <p className={`text-sm truncate ${
+                          hasValue ? 'text-stone-800' : 'text-stone-300'
+                        }`}>
+                          {hasValue ? value : '—'}
+                        </p>
                       </div>
                     </div>
-                  ))}
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Special Remarks - Full width if has value */}
+            {!isComplete && registration.remarks && (
+              <div className="mt-3 p-2.5 rounded-lg bg-stone-50">
+                <div className="flex items-start gap-2.5">
+                  <MessageSquare className="w-3.5 h-3.5 mt-0.5 text-stone-600 flex-shrink-0" />
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wide text-stone-400 mb-0.5">
+                      Special Requests
+                    </p>
+                    <p className="text-sm text-stone-800">{registration.remarks}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+          </div>
 
-            {/* Note */}
-            <p className="text-center text-xs text-stone-400">
-              Questions? Ask our AI concierge for assistance.
+          {/* Dynamic Info Panel - Shows hotel info when relevant */}
+          {infoPanel && hotelInfo[infoPanel] && (
+            <div className="bg-white rounded-xl p-5 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-medium text-stone-800">
+                  {hotelInfo[infoPanel].title}
+                </h3>
+                <button
+                  onClick={() => setInfoPanel(null)}
+                  className="p-1 text-stone-400 hover:text-stone-600 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <p className="text-xs text-stone-500 mb-4 leading-relaxed">
+                {hotelInfo[infoPanel].description}
+              </p>
+              <div className="space-y-2.5">
+                {hotelInfo[infoPanel].items.map((item) => (
+                  <div key={item.name} className="flex items-start gap-2.5">
+                    <ChevronRight className="w-3.5 h-3.5 text-stone-300 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-stone-700">{item.name}</p>
+                      <p className="text-xs text-stone-500 leading-relaxed">{item.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Subtle hint when no panel is shown */}
+          {!infoPanel && !isComplete && (
+            <p className="text-center text-xs text-stone-400 py-2">
+              Ask about suites, dining, or directions anytime
             </p>
+          )}
         </div>
       </div>
 
@@ -247,11 +368,20 @@ export default function ExperiencePage() {
           agentId="registration-concierge"
           sessionId="grand-opening-rsvp"
           elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID}
+          title="Takeshi"
+          avatar="/avatars/registration-avatar.jpg"
+          welcomeMessage="Good evening! I'm Takeshi, and I'm delighted you're considering joining us for our Grand Opening. Let me help you register — it would be my pleasure to assist with any questions about the celebration."
+          suggestions={[
+            "I'd like to register",
+            "Tell me about the suites",
+            "What dining options are available?",
+            "How do I get there?"
+          ]}
           contextData={{
             event: eventDetails,
-            hotelInfo,
-            quickActions: quickActions.map(a => ({ label: a.label })),
-            activeTab
+            registration,
+            infoPanel,
+            isComplete
           }}
         />
       </div>

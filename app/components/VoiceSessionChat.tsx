@@ -21,9 +21,14 @@ interface VoiceSessionChatProps {
   sessionId?: string;
   elevenLabsAgentId?: string; // Optional custom ElevenLabs agent ID
   contextData?: Record<string, unknown>; // Dynamic context data for the agent
+  title?: string; // Custom title for the chat header
+  subtitle?: string; // Custom subtitle for the chat header
+  suggestions?: string[]; // Suggestions to show before chat starts
+  avatar?: string; // Avatar image path
+  welcomeMessage?: string; // Welcome/intro message about the agent
 }
 
-export default function VoiceSessionChat({ agentId, sessionId = 'default', elevenLabsAgentId, contextData }: VoiceSessionChatProps) {
+export default function VoiceSessionChat({ agentId, sessionId = 'default', elevenLabsAgentId, contextData, title, subtitle, suggestions, avatar, welcomeMessage }: VoiceSessionChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -175,9 +180,118 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default', eleve
       },
       navigate_tab: async (parameters: { tab: string }) => {
         console.log('🔧 ElevenLabs client tool: navigate_tab', parameters);
-        const event = new CustomEvent('navigate-tab', { detail: { tab: parameters.tab } });
+        // Also dispatch show-info-panel for new experience page
+        const event = new CustomEvent('show-info-panel', { detail: { panel: parameters.tab } });
         window.dispatchEvent(event);
-        return `Navigated to ${parameters.tab} tab`;
+        // Legacy support
+        const legacyEvent = new CustomEvent('navigate-tab', { detail: { tab: parameters.tab } });
+        window.dispatchEvent(legacyEvent);
+        return `Showing ${parameters.tab} information`;
+      },
+      // Live Registration Tools
+      update_registration_field: async (parameters: { field: string; value: string }) => {
+        console.log('🔧 ElevenLabs client tool: update_registration_field', parameters);
+        const event = new CustomEvent('update-registration-field', {
+          detail: { field: parameters.field, value: parameters.value }
+        });
+        window.dispatchEvent(event);
+        return `Updated ${parameters.field} to ${parameters.value}`;
+      },
+      show_info_panel: async (parameters: { panel: string }) => {
+        console.log('🔧 ElevenLabs client tool: show_info_panel', parameters);
+        const event = new CustomEvent('show-info-panel', { detail: { panel: parameters.panel } });
+        window.dispatchEvent(event);
+        return `Showing ${parameters.panel} information panel`;
+      },
+      hide_info_panel: async () => {
+        console.log('🔧 ElevenLabs client tool: hide_info_panel');
+        const event = new CustomEvent('hide-info-panel', {});
+        window.dispatchEvent(event);
+        return 'Info panel hidden';
+      },
+      mark_registration_complete: async (parameters: { guestName: string }) => {
+        console.log('🔧 ElevenLabs client tool: mark_registration_complete', parameters);
+        const event = new CustomEvent('registration-complete', { detail: { guestName: parameters.guestName } });
+        window.dispatchEvent(event);
+        return `Registration completed for ${parameters.guestName}`;
+      },
+      // Tea Shop Tools
+      tea_show_product: async (parameters: { productId: string }) => {
+        console.log('🔧 ElevenLabs client tool: tea_show_product', parameters);
+        const event = new CustomEvent('tea-show-product', { detail: { productId: parameters.productId } });
+        window.dispatchEvent(event);
+        return `Showing product details for ${parameters.productId}`;
+      },
+      tea_add_to_cart: async (parameters: { productId: string; quantity?: number }) => {
+        console.log('🔧 ElevenLabs client tool: tea_add_to_cart', parameters);
+        const event = new CustomEvent('tea-add-to-cart', {
+          detail: { productId: parameters.productId, quantity: parameters.quantity || 1 }
+        });
+        window.dispatchEvent(event);
+        return `Added ${parameters.quantity || 1} of ${parameters.productId} to cart`;
+      },
+      tea_show_cart: async () => {
+        console.log('🔧 ElevenLabs client tool: tea_show_cart');
+        const event = new CustomEvent('tea-show-cart', {});
+        window.dispatchEvent(event);
+        return 'Showing cart';
+      },
+      tea_confirm_order: async () => {
+        console.log('🔧 ElevenLabs client tool: tea_confirm_order');
+        const event = new CustomEvent('tea-confirm-order', {});
+        window.dispatchEvent(event);
+        return 'Order confirmed';
+      },
+      tea_filter_category: async (parameters: { category: string }) => {
+        console.log('🔧 ElevenLabs client tool: tea_filter_category', parameters);
+        const event = new CustomEvent('tea-filter-category', { detail: { category: parameters.category } });
+        window.dispatchEvent(event);
+        return `Filtered to ${parameters.category} category`;
+      },
+      // Hotel Boutique Tools
+      shop_show_product: async (parameters: { productId: string }) => {
+        console.log('🔧 ElevenLabs client tool: shop_show_product', parameters);
+        const event = new CustomEvent('shop-show-product', { detail: { productId: parameters.productId } });
+        window.dispatchEvent(event);
+        return `Showing product details for ${parameters.productId}`;
+      },
+      shop_add_to_cart: async (parameters: { productId: string; quantity?: number }) => {
+        console.log('🔧 ElevenLabs client tool: shop_add_to_cart', parameters);
+        const event = new CustomEvent('shop-add-to-cart', {
+          detail: { productId: parameters.productId, quantity: parameters.quantity || 1 }
+        });
+        window.dispatchEvent(event);
+        return `Added ${parameters.quantity || 1} of ${parameters.productId} to order`;
+      },
+      shop_show_cart: async () => {
+        console.log('🔧 ElevenLabs client tool: shop_show_cart');
+        const event = new CustomEvent('shop-show-cart', {});
+        window.dispatchEvent(event);
+        return 'Showing order';
+      },
+      shop_confirm_order: async () => {
+        console.log('🔧 ElevenLabs client tool: shop_confirm_order');
+        const event = new CustomEvent('shop-confirm-order', {});
+        window.dispatchEvent(event);
+        return 'Order confirmed';
+      },
+      shop_remove_from_cart: async (parameters: { productId: string }) => {
+        console.log('🔧 ElevenLabs client tool: shop_remove_from_cart', parameters);
+        const event = new CustomEvent('shop-remove-from-cart', { detail: { productId: parameters.productId } });
+        window.dispatchEvent(event);
+        return `Removed ${parameters.productId} from order`;
+      },
+      shop_clear_cart: async () => {
+        console.log('🔧 ElevenLabs client tool: shop_clear_cart');
+        const event = new CustomEvent('shop-clear-cart', {});
+        window.dispatchEvent(event);
+        return 'Order cleared';
+      },
+      shop_close_product: async () => {
+        console.log('🔧 ElevenLabs client tool: shop_close_product');
+        const event = new CustomEvent('shop-close-product', {});
+        window.dispatchEvent(event);
+        return 'Product modal closed';
       }
     },
     onConnect: () => {
@@ -540,89 +654,70 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default', eleve
   };
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="px-4 py-3">
-        {/* Title Row */}
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-2xl font-light text-stone-800 tracking-wide" style={{ fontFamily: 'var(--font-cormorant)' }}>Concierge <span className="text-stone-400">AI</span></h2>
+    <div className="h-full flex flex-col bg-white rounded-2xl shadow-sm overflow-hidden">
+      {/* Header - Always visible */}
+      <div className="px-5 py-4 border-b border-stone-100">
+        <div className="flex items-center gap-4">
+          {/* Avatar */}
+          <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-stone-100">
+            <img
+              src={avatar || '/avatars/assistant-avatar.jpg'}
+              alt={title || 'Concierge'}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          {/* Name & Status */}
+          <div className="flex-1 min-w-0">
+            <h2 className="text-xl font-medium text-stone-800" style={{ fontFamily: 'var(--font-cormorant)' }}>
+              {title || 'Concierge'}
+            </h2>
+            {isCallActive ? (
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <span className="text-xs text-green-600">Connected</span>
+              </div>
+            ) : (
+              <p className="text-xs text-stone-400">AI Assistant</p>
+            )}
+          </div>
+          {/* Clear Button - Only when messages exist */}
           {messages.length > 0 && (
             <button
               onClick={clearChat}
-              className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="p-2 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
               aria-label="Clear chat"
             >
               <Trash2 className="w-4 h-4" />
             </button>
           )}
         </div>
-
-        {/* Voice Provider Selector */}
-        {!isCallActive && (
-          <div className="mb-3">
-            <p className="text-xs text-stone-400 mb-2">Voice Provider</p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setProvider('vapi')}
-                className={`text-xs transition-colors ${
-                  provider === 'vapi'
-                    ? 'text-stone-800'
-                    : 'text-stone-400 hover:text-stone-600'
-                }`}
-              >
-                VAPI
-              </button>
-              <button
-                onClick={() => setProvider('elevenlabs')}
-                className={`text-xs transition-colors ${
-                  provider === 'elevenlabs'
-                    ? 'text-stone-800'
-                    : 'text-stone-400 hover:text-stone-600'
-                }`}
-              >
-                ElevenLabs
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Agent Info - Minimal */}
-        {!isCallActive && (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg font-medium text-stone-800">
-                {provider === 'vapi' ? 'Hotel Concierge' : 'Guest Services'}
-              </h3>
-              {provider === 'vapi' && (
-                <Link
-                  href="/vapi"
-                  className="p-1 text-stone-400 hover:text-stone-600 transition-colors"
-                  aria-label="Settings"
-                >
-                  <Settings className="w-3.5 h-3.5" />
-                </Link>
-              )}
-            </div>
-            <div className="w-8 h-8 rounded-full border border-stone-200 overflow-hidden">
-              <img
-                src="/avatars/assistant-avatar.jpg"
-                alt="Concierge"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.length === 0 && !isCallActive && (
-          <div className="text-center py-12">
-            <Mic className="w-8 h-8 text-stone-300 mx-auto mb-3" />
-            <p className="text-sm text-stone-600" style={{ fontFamily: 'var(--font-cormorant)' }}>How may I assist you?</p>
-            <p className="text-xs text-stone-400 mt-2">
-              Tap below to speak with our concierge
+          <div className="flex flex-col items-center justify-center h-full text-center px-4">
+            {/* Welcome Message */}
+            <p className="text-sm text-stone-600 leading-relaxed max-w-[280px]">
+              {welcomeMessage || 'I\'m here to help. Tap below to start a conversation.'}
             </p>
+
+            {/* Suggestions */}
+            {suggestions && suggestions.length > 0 && (
+              <div className="mt-8 w-full">
+                <p className="text-[10px] uppercase tracking-wider text-stone-400 mb-3">Try saying</p>
+                <div className="space-y-2">
+                  {suggestions.map((suggestion, idx) => (
+                    <div
+                      key={idx}
+                      className="px-4 py-2.5 text-sm text-stone-600 bg-stone-50 rounded-xl text-left"
+                    >
+                      "{suggestion}"
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

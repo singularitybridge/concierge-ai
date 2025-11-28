@@ -304,6 +304,15 @@ export default function GuestPage() {
           agentId="concierge"
           sessionId="guest-portal"
           elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_GUEST_AGENT_ID}
+          title="Yuki"
+          avatar="/avatars/guest-avatar.jpg"
+          welcomeMessage="Hello Avi! Welcome to The 1898. I'm Yuki, your personal concierge. It's wonderful to have you with us — how can I make your stay special today?"
+          suggestions={[
+            "Book the onsen",
+            "Order room service",
+            "What activities are nearby?",
+            "Request housekeeping"
+          ]}
           contextData={{
             guest: guestData,
             activities,
