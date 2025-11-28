@@ -57,6 +57,13 @@ export default function WelcomePage() {
             >
               <p className="text-sm text-stone-800">Staff Portal</p>
             </Link>
+
+            <Link
+              href="/shop"
+              className="block p-3 bg-white/70 backdrop-blur-sm rounded-lg hover:bg-white/90 transition-colors text-center"
+            >
+              <p className="text-sm text-stone-800">Hotel Boutique</p>
+            </Link>
           </div>
 
           {/* Footer */}

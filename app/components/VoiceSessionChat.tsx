@@ -141,16 +141,63 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default', eleve
         }
         return 'No context data available';
       },
-      request_service: async (parameters: { service_type: string; details: string; priority?: string }) => {
+      request_service: async (parameters: { service_type: string; details: string; preferred_time?: string }) => {
         console.log('🔧 ElevenLabs client tool: request_service', parameters);
+        // First, highlight the quick action button
+        window.dispatchEvent(new CustomEvent('service-processing', {
+          detail: { serviceType: parameters.service_type }
+        }));
+        // Dispatch event to update guest page
+        const event = new CustomEvent('service-request', {
+          detail: {
+            type: parameters.service_type,
+            details: parameters.details,
+            time: parameters.preferred_time || 'As soon as possible'
+          }
+        });
+        window.dispatchEvent(event);
+        // Show confirmation modal
         setModalState({
           isOpen: true,
-          title: 'Service Request Submitted',
-          message: `Your ${parameters.service_type.replace('_', ' ')} request has been received: ${parameters.details}`,
+          title: 'Request Confirmed',
+          message: `Your ${parameters.service_type.replace(/_/g, ' ')} request has been submitted. ${parameters.details}`,
           type: 'success',
           actions: []
         });
-        return `Service request submitted: ${parameters.service_type} - ${parameters.details}`;
+        return `Service request confirmed: ${parameters.service_type} - ${parameters.details}`;
+      },
+      book_activity: async (parameters: { activity_type: string; date: string; time: string; details?: string }) => {
+        console.log('🔧 ElevenLabs client tool: book_activity', parameters);
+        // Highlight the quick action button (activity_type maps to serviceType)
+        window.dispatchEvent(new CustomEvent('service-processing', {
+          detail: { serviceType: parameters.activity_type }
+        }));
+        // Dispatch event to update schedule
+        const event = new CustomEvent('update-schedule', {
+          detail: {
+            action: 'add',
+            title: parameters.activity_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            time: `${parameters.date}, ${parameters.time}`,
+            location: parameters.details || 'To be confirmed',
+            status: 'pending'
+          }
+        });
+        window.dispatchEvent(event);
+        // Show confirmation modal
+        setModalState({
+          isOpen: true,
+          title: 'Booking Requested',
+          message: `Your ${parameters.activity_type.replace(/_/g, ' ')} booking for ${parameters.date} at ${parameters.time} is being processed.`,
+          type: 'success',
+          actions: []
+        });
+        return `Activity booked: ${parameters.activity_type} on ${parameters.date} at ${parameters.time}`;
+      },
+      update_schedule: async (parameters: { action: string; title: string; time?: string; location?: string; status?: string }) => {
+        console.log('🔧 ElevenLabs client tool: update_schedule', parameters);
+        const event = new CustomEvent('update-schedule', { detail: parameters });
+        window.dispatchEvent(event);
+        return `Schedule updated: ${parameters.action} - ${parameters.title}`;
       },
       show_registration_summary: async (parameters: {
         guestName: string;

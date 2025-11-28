@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
   LogOut, Loader2, Calendar, MapPin, Utensils, Snowflake,
-  Waves, Clock, Phone, MessageCircle, ChevronRight, Sparkles,
-  Wine, Mountain, Car, Shirt, PawPrint, Plane
+  Waves, Clock, ChevronRight, Sparkles, Check,
+  Wine, Mountain, Car, Shirt, PawPrint, Plane, Coffee, Sparkle
 } from 'lucide-react';
 import VoiceSessionChat from '../components/VoiceSessionChat';
 
@@ -30,10 +30,10 @@ const guestData = {
 };
 
 const quickActions = [
-  { icon: Utensils, label: 'Room Service', description: 'Order in-room dining', message: 'How does room service work? What can I order?' },
-  { icon: Waves, label: 'Onsen Booking', description: 'Reserve private bath', message: 'I would like to book a private onsen session. What times are available?' },
-  { icon: Phone, label: 'Concierge', description: 'Request assistance', message: 'I need assistance with something. Can you help me?' },
-  { icon: Shirt, label: 'Housekeeping', description: 'Room refresh', message: 'I would like to request housekeeping service for my room.' },
+  { icon: Utensils, label: 'Room Service', description: 'Order in-room dining', serviceType: 'room_service' },
+  { icon: Waves, label: 'Onsen Booking', description: 'Reserve private bath', serviceType: 'onsen' },
+  { icon: Coffee, label: 'Amenities', description: 'Towels & supplies', serviceType: 'amenities' },
+  { icon: Shirt, label: 'Housekeeping', description: 'Room refresh', serviceType: 'housekeeping' },
 ];
 
 const activities = [
@@ -69,8 +69,30 @@ const experiences = [
   { icon: Car, title: 'Village Tour', description: 'Local culture & shops' },
 ];
 
+// Service request type
+interface ServiceRequest {
+  id: string;
+  type: string;
+  details: string;
+  time: string;
+  status: 'pending' | 'confirmed' | 'in_progress' | 'completed';
+}
+
+// Activity type
+interface Activity {
+  id: number;
+  title: string;
+  time: string;
+  location: string;
+  icon: typeof Wine;
+  status: 'confirmed' | 'pending' | 'cancelled';
+}
+
 export default function GuestPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
+  const [schedule, setSchedule] = useState<Activity[]>(activities);
+  const [activeAction, setActiveAction] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -83,13 +105,57 @@ export default function GuestPage() {
     }
   }, [router]);
 
+  // Listen for agent events
+  useEffect(() => {
+    const handleServiceProcessing = (event: CustomEvent<{ serviceType: string }>) => {
+      // Highlight the quick action button when agent starts processing
+      setActiveAction(event.detail.serviceType);
+    };
+
+    const handleServiceRequest = (event: CustomEvent<ServiceRequest>) => {
+      const request = event.detail;
+      setServiceRequests(prev => [...prev, { ...request, id: `sr-${Date.now()}`, status: 'confirmed' }]);
+      // Clear active action when service is confirmed
+      setActiveAction(null);
+    };
+
+    const handleUpdateSchedule = (event: CustomEvent<{ action: string; title: string; time?: string; location?: string; status?: string }>) => {
+      const { action, title, time, location, status } = event.detail;
+      if (action === 'add' && time && location) {
+        setSchedule(prev => [...prev, {
+          id: Date.now(),
+          title,
+          time,
+          location,
+          icon: Sparkle,
+          status: (status as 'confirmed' | 'pending') || 'pending'
+        }]);
+        // Clear active action when activity is booked
+        setActiveAction(null);
+      }
+    };
+
+    window.addEventListener('service-processing', handleServiceProcessing as EventListener);
+    window.addEventListener('service-request', handleServiceRequest as EventListener);
+    window.addEventListener('update-schedule', handleUpdateSchedule as EventListener);
+
+    return () => {
+      window.removeEventListener('service-processing', handleServiceProcessing as EventListener);
+      window.removeEventListener('service-request', handleServiceRequest as EventListener);
+      window.removeEventListener('update-schedule', handleUpdateSchedule as EventListener);
+    };
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem('guest_authenticated');
     router.push('/');
   };
 
-  const sendToChat = (message: string) => {
-    window.dispatchEvent(new CustomEvent('send-chat-message', { detail: { message } }));
+  const handleQuickAction = (serviceType: string) => {
+    // Set active action for visual feedback
+    setActiveAction(serviceType);
+    // Dispatch event to trigger voice chat with the service type
+    window.dispatchEvent(new CustomEvent('quick-action', { detail: { serviceType } }));
   };
 
   if (isAuthenticated === null) {
@@ -211,24 +277,61 @@ export default function GuestPage() {
             <div>
               <h3 className="text-xs font-medium text-stone-500 mb-3 uppercase tracking-wider">Quick Actions</h3>
               <div className="grid grid-cols-4 gap-2">
-                {quickActions.map((action) => (
-                  <button
-                    key={action.label}
-                    onClick={() => sendToChat(action.message)}
-                    className="p-3 bg-white rounded-lg hover:bg-stone-50 transition-colors text-center group"
-                  >
-                    <action.icon className="w-5 h-5 text-stone-400 mx-auto mb-2 group-hover:text-stone-600" />
-                    <p className="text-xs font-medium text-stone-700">{action.label}</p>
-                  </button>
-                ))}
+                {quickActions.map((action) => {
+                  const isActive = activeAction === action.serviceType;
+                  return (
+                    <button
+                      key={action.label}
+                      onClick={() => handleQuickAction(action.serviceType)}
+                      className={`p-3 rounded-lg transition-all text-center group ${
+                        isActive
+                          ? 'bg-stone-800 ring-2 ring-stone-800 ring-offset-2'
+                          : 'bg-white hover:bg-stone-50'
+                      }`}
+                    >
+                      <action.icon className={`w-5 h-5 mx-auto mb-2 transition-colors ${
+                        isActive ? 'text-white' : 'text-stone-400 group-hover:text-stone-600'
+                      }`} />
+                      <p className={`text-xs font-medium transition-colors ${
+                        isActive ? 'text-white' : 'text-stone-700'
+                      }`}>{action.label}</p>
+                      <p className={`text-[10px] mt-0.5 transition-colors ${
+                        isActive ? 'text-stone-300' : 'text-stone-400'
+                      }`}>{action.description}</p>
+                    </button>
+                  );
+                })}
               </div>
             </div>
+
+            {/* Active Service Requests */}
+            {serviceRequests.length > 0 && (
+              <div>
+                <h3 className="text-xs font-medium text-stone-500 mb-3 uppercase tracking-wider">Active Requests</h3>
+                <div className="space-y-2">
+                  {serviceRequests.map((request) => (
+                    <div key={request.id} className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+                      <div className="p-2 bg-emerald-100 rounded-lg">
+                        <Check className="w-4 h-4 text-emerald-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-stone-800 capitalize">{request.type.replace('_', ' ')}</p>
+                        <p className="text-xs text-stone-500">{request.details}</p>
+                      </div>
+                      <span className="text-xs px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full">
+                        {request.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Upcoming Activities */}
             <div>
               <h3 className="text-xs font-medium text-stone-500 mb-3 uppercase tracking-wider">Your Schedule</h3>
               <div className="space-y-2">
-                {activities.map((activity) => (
+                {schedule.map((activity) => (
                   <div
                     key={activity.id}
                     className="flex items-center gap-3 p-3 bg-white rounded-lg"
@@ -283,18 +386,6 @@ export default function GuestPage() {
                 ))}
               </div>
             </div>
-
-            {/* Contact */}
-            <div className="p-4 bg-stone-800 rounded-xl">
-              <div className="flex items-center gap-3">
-                <MessageCircle className="w-5 h-5 text-white/60" />
-                <div className="flex-1">
-                  <p className="text-sm text-white">Need assistance?</p>
-                  <p className="text-xs text-white/60">Our AI concierge is available 24/7</p>
-                </div>
-                <ChevronRight className="w-4 h-4 text-white/40" />
-              </div>
-            </div>
         </div>
       </div>
 
@@ -308,16 +399,17 @@ export default function GuestPage() {
           avatar="/avatars/guest-avatar.jpg"
           welcomeMessage="Hello Avi! Welcome to The 1898. I'm Yuki, your personal concierge. It's wonderful to have you with us — how can I make your stay special today?"
           suggestions={[
-            "Book the onsen",
-            "Order room service",
-            "What activities are nearby?",
-            "Request housekeeping"
+            "Clean my room please",
+            "I'd like room service",
+            "Book an onsen session",
+            "What's good for dinner?"
           ]}
           contextData={{
             guest: guestData,
-            activities,
+            schedule: schedule.map(s => ({ title: s.title, time: s.time, location: s.location, status: s.status })),
+            serviceRequests,
             experiences,
-            quickActions: quickActions.map(a => ({ label: a.label, description: a.description }))
+            availableServices: quickActions.map(a => ({ label: a.label, description: a.description, type: a.serviceType }))
           }}
         />
       </div>
