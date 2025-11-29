@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, TrendingUp, Users, Wrench, Network, Cpu, ChevronRight, Plus, X, Loader2, LogOut } from 'lucide-react';
+import { ArrowLeft, TrendingUp, Users, Wrench, Network, Cpu, ChevronRight, Plus, X, Loader2, LogOut, BookOpen, Shield, Sparkles, ClipboardList } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 const tasks = [
@@ -32,20 +32,20 @@ const tasks = [
 
 const agents = [
   {
-    id: 'revenue',
-    name: 'Yuki Tanaka',
-    title: 'Revenue Manager',
-    description: 'Pricing optimization, occupancy analytics, and demand forecasting',
-    icon: TrendingUp,
-    avatar: '/avatars/revenue.jpg',
-  },
-  {
     id: 'guests',
     name: 'Kenji Sato',
     title: 'Guest Services Director',
     description: 'Reservations, guest profiles, and special requests management',
     icon: Users,
     avatar: '/avatars/guests.jpg',
+  },
+  {
+    id: 'revenue',
+    name: 'Yuki Tanaka',
+    title: 'Revenue Manager',
+    description: 'Pricing optimization, occupancy analytics, and demand forecasting',
+    icon: TrendingUp,
+    avatar: '/avatars/revenue.jpg',
   },
   {
     id: 'operations',
@@ -70,6 +70,33 @@ const agentAssignments = [
   { name: 'Kenji Sato', title: 'Guest Services Director', keywords: ['guest', 'reservation', 'arrival', 'request', 'vip', 'welcome'] },
   { name: 'Mika Hayashi', title: 'Operations Manager', keywords: ['maintenance', 'housekeeping', 'clean', 'repair', 'room', 'inventory'] },
   { name: 'Aiko', title: 'Digital Architect', keywords: ['system', 'error', 'bug', 'performance', 'update', 'deploy'] },
+];
+
+const knowledgeBaseDocs = [
+  {
+    id: 'guest-experience',
+    title: 'Guest Experience Standards',
+    description: 'VIP protocols, complaint resolution, and service recovery procedures',
+    icon: Sparkles,
+  },
+  {
+    id: 'emergency-procedures',
+    title: 'Emergency Procedures',
+    description: 'Fire safety, medical emergencies, and avalanche protocols',
+    icon: Shield,
+  },
+  {
+    id: 'housekeeping-manual',
+    title: 'Housekeeping Operations',
+    description: 'Room cleaning standards, turndown service, and amenity guidelines',
+    icon: ClipboardList,
+  },
+  {
+    id: 'concierge-guide',
+    title: 'Concierge Service Guide',
+    description: 'Local recommendations, transportation, and activity bookings',
+    icon: BookOpen,
+  },
 ];
 
 export default function AdminPage() {
@@ -154,6 +181,50 @@ export default function AdminPage() {
 
       {/* Content */}
       <div className="max-w-3xl mx-auto px-6 py-12">
+        {/* Your Team */}
+        <div className="mb-10">
+          <h2 className="text-3xl font-light text-stone-800 mb-3" style={{ fontFamily: 'var(--font-cormorant)' }}>
+            Your Team
+          </h2>
+          <p className="text-sm text-stone-500">
+            AI assistants dedicated to managing your property
+          </p>
+        </div>
+
+        {/* Agent Cards */}
+        <div className="space-y-3 mb-12">
+          {agents.map((agent) => (
+            <Link
+              key={agent.id}
+              href={`/agents/${agent.id}`}
+              className="flex items-center gap-4 p-4 bg-white rounded-lg hover:bg-stone-50 transition-colors group"
+            >
+              <div className="relative w-12 h-12 rounded-full overflow-hidden bg-stone-200 flex-shrink-0">
+                <Image
+                  src={agent.avatar}
+                  alt={agent.name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-medium text-stone-800 group-hover:text-stone-900">
+                  {agent.name}
+                </h3>
+                <p className="text-xs text-stone-500">
+                  {agent.title}
+                </p>
+                <p className="text-xs text-stone-400 mt-1 truncate">
+                  {agent.description}
+                </p>
+              </div>
+              <svg className="w-4 h-4 text-stone-300 group-hover:text-stone-400 transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          ))}
+        </div>
+
         {/* Active Tasks */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-3">
@@ -195,77 +266,62 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Your Team */}
-        <div className="mb-10">
+        {/* Knowledge Base */}
+        <div className="mb-6">
           <h2 className="text-3xl font-light text-stone-800 mb-3" style={{ fontFamily: 'var(--font-cormorant)' }}>
-            Your Team
+            Knowledge Base
           </h2>
           <p className="text-sm text-stone-500">
-            AI assistants dedicated to managing your property
+            Standard operating procedures and reference materials
           </p>
         </div>
 
-        {/* Agent Cards */}
-        <div className="space-y-3 mb-10">
-          {agents.map((agent) => (
+        {/* Knowledge Base Documents */}
+        <div className="space-y-3 mb-6">
+          {knowledgeBaseDocs.map((doc) => (
             <Link
-              key={agent.id}
-              href={`/agents/${agent.id}`}
+              key={doc.id}
+              href={`/docs/${doc.id}`}
               className="flex items-center gap-4 p-4 bg-white rounded-lg hover:bg-stone-50 transition-colors group"
             >
-              <div className="relative w-12 h-12 rounded-full overflow-hidden bg-stone-200 flex-shrink-0">
-                <Image
-                  src={agent.avatar}
-                  alt={agent.name}
-                  fill
-                  className="object-cover"
-                />
+              <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center flex-shrink-0">
+                <doc.icon className="w-5 h-5 text-stone-400" />
               </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-stone-800 group-hover:text-stone-900">
-                  {agent.name}
+              <div className="flex-1">
+                <h3 className="text-sm font-medium text-stone-700 group-hover:text-stone-900">
+                  {doc.title}
                 </h3>
-                <p className="text-xs text-stone-500">
-                  {agent.title}
-                </p>
-                <p className="text-xs text-stone-400 mt-1 truncate">
-                  {agent.description}
+                <p className="text-xs text-stone-400 mt-0.5">
+                  {doc.description}
                 </p>
               </div>
-              <svg className="w-4 h-4 text-stone-300 group-hover:text-stone-400 transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 text-stone-300 group-hover:text-stone-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
               </svg>
             </Link>
           ))}
-        </div>
 
-        {/* Knowledge Base */}
-        <div className="mb-4">
-          <h2 className="text-3xl font-light text-stone-800 mb-3" style={{ fontFamily: 'var(--font-cormorant)' }}>
-            Knowledge Base
-          </h2>
+          {/* System Architecture Link */}
+          <Link
+            href="/admin/system"
+            className="flex items-center gap-4 p-4 bg-white rounded-lg hover:bg-stone-50 transition-colors group"
+          >
+            <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center flex-shrink-0">
+              <Network className="w-5 h-5 text-stone-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-medium text-stone-700 group-hover:text-stone-900">
+                System Architecture
+              </h3>
+              <p className="text-xs text-stone-400 mt-0.5">
+                View the agentic system design and architectural overview
+              </p>
+            </div>
+            <svg className="w-4 h-4 text-stone-300 group-hover:text-stone-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
         </div>
-
-        {/* System Architecture Link */}
-        <Link
-          href="/admin/system"
-          className="flex items-center gap-4 p-4 bg-white rounded-lg hover:bg-stone-50 transition-colors group"
-        >
-          <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center flex-shrink-0">
-            <Network className="w-5 h-5 text-stone-400" />
-          </div>
-          <div className="flex-1">
-            <h3 className="text-sm font-medium text-stone-700 group-hover:text-stone-900">
-              System Architecture
-            </h3>
-            <p className="text-xs text-stone-400 mt-0.5">
-              View the agentic system design and architectural overview
-            </p>
-          </div>
-          <svg className="w-4 h-4 text-stone-300 group-hover:text-stone-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
-          </svg>
-        </Link>
 
         {/* Quick Stats */}
         <div className="mt-12 grid grid-cols-3 gap-6">

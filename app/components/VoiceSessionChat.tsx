@@ -549,6 +549,22 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default', eleve
         await elevenLabsConversation.startSession({
           agentId: elevenLabsAgentId || process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || '',
         });
+
+        // If contextData has documentContent, send it as a contextual update after connection
+        if (contextDataRef.current?.documentContent) {
+          // Small delay to ensure connection is established
+          setTimeout(() => {
+            const contextUpdate = `[DOCUMENT CONTEXT]
+Title: ${contextDataRef.current?.documentTitle}
+
+${contextDataRef.current?.documentContent}
+
+Use this document content to answer the user's questions.`;
+
+            console.log('📚 Sending document context via contextual update');
+            elevenLabsConversation.sendContextualUpdate(contextUpdate);
+          }, 500);
+        }
       }
     } catch (error) {
       console.error('Failed to start call:', error);
