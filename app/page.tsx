@@ -148,7 +148,7 @@ export default function WelcomePage() {
                     href={portal.href}
                     className="flex items-center gap-4 p-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/30 rounded-xl transition-all group"
                   >
-                    <portal.icon className="flex-shrink-0 w-9 h-9 text-amber-400" strokeWidth={1.5} />
+                    <portal.icon className="flex-shrink-0 w-9 h-9 text-amber-400" strokeWidth={1} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-white group-hover:text-amber-100 transition-colors">
                         {portal.title}
