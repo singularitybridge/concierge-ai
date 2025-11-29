@@ -339,6 +339,27 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default', eleve
         const event = new CustomEvent('shop-close-product', {});
         window.dispatchEvent(event);
         return 'Product modal closed';
+      },
+      // Task Management Tools
+      update_status: async (parameters: { status: string }) => {
+        console.log('🔧 ElevenLabs client tool: update_status', parameters);
+        const event = new CustomEvent('task-update-status', { detail: { status: parameters.status } });
+        window.dispatchEvent(event);
+        return `Status updated to ${parameters.status}`;
+      },
+      update_notes: async (parameters: { notes: string; append?: boolean }) => {
+        console.log('🔧 ElevenLabs client tool: update_notes', parameters);
+        const event = new CustomEvent('task-update-notes', {
+          detail: { notes: parameters.notes, append: parameters.append ?? true }
+        });
+        window.dispatchEvent(event);
+        return `Notes updated: ${parameters.notes}`;
+      },
+      add_comment: async (parameters: { comment: string }) => {
+        console.log('🔧 ElevenLabs client tool: add_comment', parameters);
+        const event = new CustomEvent('task-add-comment', { detail: { comment: parameters.comment } });
+        window.dispatchEvent(event);
+        return `Comment added: ${parameters.comment}`;
       }
     },
     onConnect: () => {
@@ -562,6 +583,27 @@ ${contextDataRef.current?.documentContent}
 Use this document content to answer the user's questions.`;
 
             console.log('📚 Sending document context via contextual update');
+            elevenLabsConversation.sendContextualUpdate(contextUpdate);
+          }, 500);
+        }
+
+        // If contextData has taskData, send it as a contextual update for task management
+        if (contextDataRef.current?.taskData) {
+          setTimeout(() => {
+            const taskData = contextDataRef.current?.taskData as Record<string, unknown>;
+            const contextUpdate = `[TASK CONTEXT]
+Title: ${taskData.title}
+Status: ${taskData.status}
+Priority: ${taskData.priority}
+Description: ${taskData.description}
+Notes: ${taskData.notes || 'No notes'}
+Location: ${taskData.location}
+Due: ${taskData.dueDate}
+Assigned To: ${(taskData.assignedTo as Record<string, string>)?.name}
+
+Use this task information to assist the user. You can update the status, notes, or add comments using the available tools.`;
+
+            console.log('📋 Sending task context via contextual update');
             elevenLabsConversation.sendContextualUpdate(contextUpdate);
           }, 500);
         }
