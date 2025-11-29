@@ -8,7 +8,7 @@ export function useAuth() {
   const router = useRouter();
 
   useEffect(() => {
-    const auth = localStorage.getItem('onsen_authenticated');
+    const auth = localStorage.getItem('niseko_authenticated');
     if (auth === 'true') {
       setIsAuthenticated(true);
     } else {
@@ -18,7 +18,10 @@ export function useAuth() {
   }, [router]);
 
   const logout = () => {
+    localStorage.removeItem('niseko_authenticated');
+    localStorage.removeItem('niseko_role');
     localStorage.removeItem('onsen_authenticated');
+    localStorage.removeItem('guest_authenticated');
     router.push('/login');
   };
 
