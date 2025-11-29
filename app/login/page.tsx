@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { KeyRound, Loader2 } from 'lucide-react';
@@ -11,13 +11,21 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  // Check if already authenticated
+  useEffect(() => {
+    const authenticated = localStorage.getItem('niseko_authenticated');
+    if (authenticated === 'true') {
+      router.push('/');
+    }
+  }, [router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/auth/verify', {
+      const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: accessCode }),
@@ -26,10 +34,18 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (data.success) {
-        localStorage.setItem('onsen_authenticated', 'true');
-        router.push('/admin');
+        // Store unified auth state
+        localStorage.setItem('niseko_authenticated', 'true');
+        localStorage.setItem('niseko_role', data.role);
+        // Keep legacy keys for backwards compatibility
+        if (data.role === 'staff') {
+          localStorage.setItem('onsen_authenticated', 'true');
+        } else {
+          localStorage.setItem('guest_authenticated', 'true');
+        }
+        router.push('/');
       } else {
-        setError('Invalid access code');
+        setError(data.error || 'Invalid access code');
       }
     } catch {
       setError('Something went wrong');
@@ -61,7 +77,7 @@ export default function LoginPage() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             <div className="absolute bottom-4 left-4 right-4">
-              <p className="text-xs uppercase tracking-[0.2em] text-white/80">Staff Portal</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-white/80">Welcome</p>
             </div>
           </div>
 
@@ -105,7 +121,7 @@ export default function LoginPage() {
 
           {/* Footer */}
           <p className="mt-8 text-center text-xs text-stone-400">
-            Property Management System
+            Staff &amp; Guest Access
           </p>
         </div>
       </div>
