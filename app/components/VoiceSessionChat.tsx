@@ -360,6 +360,79 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default', eleve
         const event = new CustomEvent('task-add-comment', { detail: { comment: parameters.comment } });
         window.dispatchEvent(event);
         return `Comment added: ${parameters.comment}`;
+      },
+      // Guest Services Tools
+      show_guest_card: async (parameters: { guestId: string }) => {
+        console.log('🔧 ElevenLabs client tool: show_guest_card', parameters);
+        const event = new CustomEvent('guest-show-card', { detail: { guestId: parameters.guestId } });
+        window.dispatchEvent(event);
+        return `Showing guest card for ${parameters.guestId}`;
+      },
+      show_request_card: async (parameters: { requestId: string }) => {
+        console.log('🔧 ElevenLabs client tool: show_request_card', parameters);
+        const event = new CustomEvent('guest-show-request', { detail: { requestId: parameters.requestId } });
+        window.dispatchEvent(event);
+        return `Showing request ${parameters.requestId}`;
+      },
+      close_modal: async () => {
+        console.log('🔧 ElevenLabs client tool: close_modal');
+        const event = new CustomEvent('guest-close-modal', {});
+        window.dispatchEvent(event);
+        return 'Modal closed';
+      },
+      filter_view: async (parameters: { view: string }) => {
+        console.log('🔧 ElevenLabs client tool: filter_view', parameters);
+        const event = new CustomEvent('guest-filter-view', { detail: { view: parameters.view } });
+        window.dispatchEvent(event);
+        return `Switched to ${parameters.view} view`;
+      },
+      send_message: async (parameters: { guestId: string; message: string; channel?: string }) => {
+        console.log('🔧 ElevenLabs client tool: send_message', parameters);
+        const event = new CustomEvent('guest-send-message', {
+          detail: {
+            guestId: parameters.guestId,
+            message: parameters.message,
+            channel: parameters.channel || 'sms'
+          }
+        });
+        window.dispatchEvent(event);
+        return `Message sent to ${parameters.guestId}: ${parameters.message}`;
+      },
+      offer_pickup: async (parameters: { guestId: string; pickupType?: string; scheduledTime?: string }) => {
+        console.log('🔧 ElevenLabs client tool: offer_pickup', parameters);
+        const event = new CustomEvent('guest-offer-pickup', {
+          detail: {
+            guestId: parameters.guestId,
+            pickupType: parameters.pickupType || 'airport',
+            scheduledTime: parameters.scheduledTime
+          }
+        });
+        window.dispatchEvent(event);
+        return `Pickup offer sent to ${parameters.guestId}`;
+      },
+      add_guest_note: async (parameters: { guestId: string; note: string; category?: string }) => {
+        console.log('🔧 ElevenLabs client tool: add_guest_note', parameters);
+        const event = new CustomEvent('guest-add-note', {
+          detail: {
+            guestId: parameters.guestId,
+            note: parameters.note,
+            category: parameters.category || 'general'
+          }
+        });
+        window.dispatchEvent(event);
+        return `Note added to ${parameters.guestId}: ${parameters.note}`;
+      },
+      update_request_status: async (parameters: { requestId: string; status: string; note?: string }) => {
+        console.log('🔧 ElevenLabs client tool: update_request_status', parameters);
+        const event = new CustomEvent('guest-update-request', {
+          detail: {
+            requestId: parameters.requestId,
+            status: parameters.status,
+            note: parameters.note
+          }
+        });
+        window.dispatchEvent(event);
+        return `Request ${parameters.requestId} updated to ${parameters.status}`;
       }
     },
     onConnect: () => {
@@ -604,6 +677,31 @@ Assigned To: ${(taskData.assignedTo as Record<string, string>)?.name}
 Use this task information to assist the user. You can update the status, notes, or add comments using the available tools.`;
 
             console.log('📋 Sending task context via contextual update');
+            elevenLabsConversation.sendContextualUpdate(contextUpdate);
+          }, 500);
+        }
+
+        // If contextData has guestServicesData, send it as a contextual update
+        if (contextDataRef.current?.guestServicesData) {
+          setTimeout(() => {
+            const data = contextDataRef.current?.guestServicesData as Record<string, unknown>;
+            const contextUpdate = `[GUEST SERVICES CONTEXT]
+
+TODAY'S ARRIVALS:
+${JSON.stringify(data.arrivals, null, 2)}
+
+TODAY'S DEPARTURES:
+${JSON.stringify(data.departures, null, 2)}
+
+CURRENT IN-HOUSE GUESTS:
+${JSON.stringify(data.currentGuests, null, 2)}
+
+ACTIVE SERVICE REQUESTS:
+${JSON.stringify(data.requests, null, 2)}
+
+Use this data to answer questions about guests. When asked about a specific guest, use show_guest_card with their ID (lowercase name without spaces, e.g., "tanaka" for Tanaka Family). You can send messages, offer pickup, add notes, and update request statuses.`;
+
+            console.log('🏨 Sending guest services context via contextual update');
             elevenLabsConversation.sendContextualUpdate(contextUpdate);
           }, 500);
         }
