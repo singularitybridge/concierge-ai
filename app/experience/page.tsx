@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 import {
   LogOut, Loader2, Calendar, MapPin, Clock, Sparkles, ChevronRight,
@@ -97,21 +98,25 @@ export default function ExperiencePage() {
   const [registration, setRegistration] = useState<GuestRegistration>(emptyRegistration);
   const [infoPanel, setInfoPanel] = useState<InfoPanelType>(null);
   const [isComplete, setIsComplete] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const auth = localStorage.getItem('guest_authenticated');
+    const auth = localStorage.getItem('niseko_authenticated');
     if (auth === 'true') {
       setIsAuthenticated(true);
+      setMounted(true);
     } else {
       setIsAuthenticated(false);
-      router.push('/register');
+      router.push('/login');
     }
   }, [router]);
 
   const handleLogout = () => {
+    localStorage.removeItem('niseko_authenticated');
+    localStorage.removeItem('niseko_role');
     localStorage.removeItem('guest_authenticated');
-    router.push('/');
+    router.push('/login');
   };
 
   // Count filled fields for progress
@@ -179,8 +184,8 @@ export default function ExperiencePage() {
 
   if (isAuthenticated === null) {
     return (
-      <div className="min-h-screen bg-stone-100 flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-stone-400" />
+      <div className="min-h-screen bg-stone-900 flex items-center justify-center">
+        <div className="text-white/50 text-sm">Loading...</div>
       </div>
     );
   }
@@ -190,200 +195,250 @@ export default function ExperiencePage() {
   }
 
   return (
-    <div className="flex h-screen bg-stone-100">
-      {/* Left: Registration Experience */}
-      <div className="flex-[2] min-w-0 flex flex-col">
-        {/* Hero Section */}
-        <div className="relative h-44 flex-shrink-0">
-          <Image
-            src="/hotel3.jpg"
-            alt="The 1898 Niseko"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Full Page Background */}
+      <Image
+        src="/hotel3.jpg"
+        alt="The 1898 Niseko"
+        fill
+        className="object-cover"
+        priority
+      />
 
-          {/* Logout */}
-          <button
-            onClick={handleLogout}
-            className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-sm rounded-full text-stone-600 hover:bg-white transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
+      {/* Sophisticated Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-stone-900/60" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
 
-          {/* Event Header */}
-          <div className="absolute bottom-4 left-6 right-6">
-            <div className="flex items-center gap-2 mb-1">
-              <Sparkles className="w-3 h-3 text-amber-400" />
-              <p className="text-xs uppercase tracking-widest text-amber-400">You're Invited</p>
-            </div>
-            <h1 className="text-xl font-light text-white" style={{ fontFamily: 'var(--font-cormorant)' }}>
-              {eventDetails.name}
-            </h1>
+      {/* Logout Button */}
+      <button
+        onClick={handleLogout}
+        className="absolute top-6 right-6 z-20 p-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl border border-white/20 transition-all"
+        title="Logout"
+      >
+        <LogOut className="w-4 h-4 text-white" />
+      </button>
+
+      {/* Content */}
+      <div className={`relative z-10 h-screen flex flex-col transition-opacity duration-1000 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+
+        {/* Top Badge */}
+        <div className="pt-6 text-center flex-shrink-0">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span className="text-xs tracking-[0.2em] text-white/90 font-medium">
+              EXCLUSIVE INVITATION
+            </span>
           </div>
         </div>
 
-        {/* Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-5">
-          {/* Event Details - Compact */}
-          <div className="bg-white rounded-xl p-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <Calendar className="w-4 h-4 text-stone-400" />
-                <span className="text-sm text-stone-700">{eventDetails.date}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Clock className="w-4 h-4 text-stone-400" />
-                <span className="text-sm text-stone-700">{eventDetails.time}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <MapPin className="w-4 h-4 text-stone-400" />
-                <span className="text-sm text-stone-700">Niseko, Hokkaido</span>
+        {/* Brand Header */}
+        <div className="text-center mt-4 mb-6 flex-shrink-0">
+          <Link href="/" className="inline-block">
+            <p className="text-xs uppercase tracking-[0.35em] text-amber-400/90 mb-2 font-medium">
+              Niseko, Hokkaido
+            </p>
+            <h1
+              className="text-3xl md:text-4xl font-light text-white tracking-wide mb-1"
+              style={{ fontFamily: 'var(--font-cormorant)' }}
+            >
+              THE 1898
+            </h1>
+            <p
+              className="text-lg md:text-xl text-white/80 tracking-widest font-light"
+              style={{ fontFamily: 'var(--font-cormorant)' }}
+            >
+              NISEKO
+            </p>
+          </Link>
+        </div>
+
+        {/* Main Content - Two Column Layout */}
+        <div className="flex-1 flex gap-6 px-6 pb-6 min-h-0">
+
+          {/* Left Column - Registration Experience */}
+          <div className="flex-[1.2] min-w-0 flex flex-col gap-4 overflow-y-auto">
+
+            {/* Event Details Card */}
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20 shadow-2xl flex-shrink-0">
+              <h2
+                className="text-xl font-light text-white tracking-wide mb-4"
+                style={{ fontFamily: 'var(--font-cormorant)' }}
+              >
+                {eventDetails.name}
+              </h2>
+              <div className="flex flex-wrap items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-amber-400/70" strokeWidth={1.5} />
+                  <span className="text-sm text-white/70">{eventDetails.date}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-amber-400/70" strokeWidth={1.5} />
+                  <span className="text-sm text-white/70">{eventDetails.time}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-amber-400/70" strokeWidth={1.5} />
+                  <span className="text-sm text-white/70">Niseko, Hokkaido</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Your Registration Card */}
-          <div className={`rounded-xl p-5 transition-all ${isComplete ? 'bg-emerald-50 border border-emerald-200' : 'bg-white'}`}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-medium text-stone-800" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                {isComplete ? 'Registration Complete' : 'Your Registration'}
-              </h2>
-              {!isComplete && filledCount > 0 && (
-                <span className="text-xs text-stone-400">
-                  {filledCount} of {totalFields} details
-                </span>
+            {/* Registration Card */}
+            <div className={`bg-white/10 backdrop-blur-xl rounded-2xl p-5 border shadow-2xl flex-shrink-0 transition-all ${
+              isComplete ? 'border-emerald-500/30' : 'border-white/20'
+            }`}>
+              <div className="flex items-center justify-between mb-4">
+                <h2
+                  className="text-xl font-light text-white tracking-wide"
+                  style={{ fontFamily: 'var(--font-cormorant)' }}
+                >
+                  {isComplete ? 'Registration Complete' : 'Your Registration'}
+                </h2>
+                {!isComplete && filledCount > 0 && (
+                  <span className="text-xs text-amber-400/80">
+                    {filledCount} of {totalFields} details
+                  </span>
+                )}
+                {isComplete && (
+                  <div className="flex items-center gap-1.5 text-emerald-400">
+                    <Check className="w-4 h-4" />
+                    <span className="text-xs font-medium">Confirmed</span>
+                  </div>
+                )}
+              </div>
+
+              {isComplete ? (
+                <div className="text-center py-6">
+                  <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/30">
+                    <Check className="w-8 h-8 text-emerald-400" />
+                  </div>
+                  <p className="text-base text-white mb-2">
+                    Thank you, {registration.name || 'Guest'}!
+                  </p>
+                  <p className="text-sm text-white/50">
+                    We look forward to welcoming you on December 10th.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  {registrationFields.map(({ key, label, icon: Icon }) => {
+                    const value = registration[key as keyof GuestRegistration];
+                    const hasValue = value && value.trim() !== '';
+
+                    return (
+                      <div
+                        key={key}
+                        className={`flex items-start gap-3 p-3 rounded-xl transition-all ${
+                          hasValue
+                            ? 'bg-white/10 border border-amber-400/20'
+                            : 'bg-white/5 border border-white/10'
+                        }`}
+                      >
+                        <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
+                          hasValue ? 'text-amber-400' : 'text-white/30'
+                        }`} strokeWidth={1.5} />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[10px] uppercase tracking-wide text-white/40 mb-0.5">
+                            {label}
+                          </p>
+                          <p className={`text-sm truncate ${
+                            hasValue ? 'text-white' : 'text-white/30'
+                          }`}>
+                            {hasValue ? value : '—'}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
-              {isComplete && (
-                <div className="flex items-center gap-1.5 text-emerald-600">
-                  <Check className="w-4 h-4" />
-                  <span className="text-xs font-medium">Confirmed</span>
+
+              {/* Special Remarks */}
+              {!isComplete && registration.remarks && (
+                <div className="mt-3 p-3 rounded-xl bg-white/10 border border-amber-400/20">
+                  <div className="flex items-start gap-3">
+                    <MessageSquare className="w-4 h-4 mt-0.5 text-amber-400 flex-shrink-0" strokeWidth={1.5} />
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wide text-white/40 mb-0.5">
+                        Special Requests
+                      </p>
+                      <p className="text-sm text-white">{registration.remarks}</p>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
 
-            {isComplete ? (
-              <div className="text-center py-4">
-                <p className="text-sm text-emerald-700 mb-2">
-                  Thank you, {registration.name || 'Guest'}!
+            {/* Dynamic Info Panel */}
+            {infoPanel && hotelInfo[infoPanel] && (
+              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-300 flex-shrink-0">
+                <div className="flex items-center justify-between mb-3">
+                  <h3
+                    className="text-lg font-light text-white"
+                    style={{ fontFamily: 'var(--font-cormorant)' }}
+                  >
+                    {hotelInfo[infoPanel].title}
+                  </h3>
+                  <button
+                    onClick={() => setInfoPanel(null)}
+                    className="p-1.5 text-white/40 hover:text-white/70 bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <p className="text-xs text-white/50 mb-4 leading-relaxed">
+                  {hotelInfo[infoPanel].description}
                 </p>
-                <p className="text-xs text-emerald-600/70">
-                  We look forward to welcoming you on December 10th.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-3">
-                {registrationFields.map(({ key, label, icon: Icon }) => {
-                  const value = registration[key as keyof GuestRegistration];
-                  const hasValue = value && value.trim() !== '';
-
-                  return (
-                    <div
-                      key={key}
-                      className={`flex items-start gap-2.5 p-2.5 rounded-lg transition-all ${
-                        hasValue
-                          ? 'bg-stone-50'
-                          : 'bg-stone-50/50'
-                      }`}
-                    >
-                      <Icon className={`w-3.5 h-3.5 mt-0.5 flex-shrink-0 ${
-                        hasValue ? 'text-stone-600' : 'text-stone-300'
-                      }`} />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[10px] uppercase tracking-wide text-stone-400 mb-0.5">
-                          {label}
-                        </p>
-                        <p className={`text-sm truncate ${
-                          hasValue ? 'text-stone-800' : 'text-stone-300'
-                        }`}>
-                          {hasValue ? value : '—'}
-                        </p>
+                <div className="space-y-2.5">
+                  {hotelInfo[infoPanel].items.map((item) => (
+                    <div key={item.name} className="flex items-start gap-3 p-2 rounded-lg bg-white/5">
+                      <ChevronRight className="w-3.5 h-3.5 text-amber-400/50 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium text-white/90">{item.name}</p>
+                        <p className="text-xs text-white/50 leading-relaxed">{item.description}</p>
                       </div>
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
             )}
 
-            {/* Special Remarks - Full width if has value */}
-            {!isComplete && registration.remarks && (
-              <div className="mt-3 p-2.5 rounded-lg bg-stone-50">
-                <div className="flex items-start gap-2.5">
-                  <MessageSquare className="w-3.5 h-3.5 mt-0.5 text-stone-600 flex-shrink-0" />
-                  <div>
-                    <p className="text-[10px] uppercase tracking-wide text-stone-400 mb-0.5">
-                      Special Requests
-                    </p>
-                    <p className="text-sm text-stone-800">{registration.remarks}</p>
-                  </div>
-                </div>
+            {/* Hint when no panel */}
+            {!infoPanel && !isComplete && (
+              <div className="text-center py-2 flex-shrink-0">
+                <p className="text-xs text-white/30">
+                  Ask about suites, dining, or directions anytime
+                </p>
               </div>
             )}
           </div>
 
-          {/* Dynamic Info Panel - Shows hotel info when relevant */}
-          {infoPanel && hotelInfo[infoPanel] && (
-            <div className="bg-white rounded-xl p-5 animate-in fade-in slide-in-from-top-2 duration-300">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-medium text-stone-800">
-                  {hotelInfo[infoPanel].title}
-                </h3>
-                <button
-                  onClick={() => setInfoPanel(null)}
-                  className="p-1 text-stone-400 hover:text-stone-600 transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <p className="text-xs text-stone-500 mb-4 leading-relaxed">
-                {hotelInfo[infoPanel].description}
-              </p>
-              <div className="space-y-2.5">
-                {hotelInfo[infoPanel].items.map((item) => (
-                  <div key={item.name} className="flex items-start gap-2.5">
-                    <ChevronRight className="w-3.5 h-3.5 text-stone-300 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-sm font-medium text-stone-700">{item.name}</p>
-                      <p className="text-xs text-stone-500 leading-relaxed">{item.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* Right Column - Voice Chat */}
+          <div className="flex-[0.8] min-w-0 flex flex-col">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl flex-1 overflow-hidden">
+              <VoiceSessionChat
+                agentId="registration-concierge"
+                sessionId="grand-opening-rsvp"
+                elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID}
+                title="Takeshi"
+                avatar="/avatars/registration-avatar.jpg"
+                welcomeMessage="Good evening! I'm Takeshi, and I'm delighted you're considering joining us for our Grand Opening. Let me help you register — it would be my pleasure to assist with any questions about the celebration."
+                suggestions={[
+                  "I'd like to register",
+                  "Tell me about the suites",
+                  "What dining options are available?",
+                  "How do I get there?"
+                ]}
+                contextData={{
+                  event: eventDetails,
+                  registration,
+                  infoPanel,
+                  isComplete
+                }}
+                variant="dark"
+              />
             </div>
-          )}
-
-          {/* Subtle hint when no panel is shown */}
-          {!infoPanel && !isComplete && (
-            <p className="text-center text-xs text-stone-400 py-2">
-              Ask about suites, dining, or directions anytime
-            </p>
-          )}
+          </div>
         </div>
-      </div>
-
-      {/* Right: Voice Chat */}
-      <div className="flex-[1] min-w-0 p-6">
-        <VoiceSessionChat
-          agentId="registration-concierge"
-          sessionId="grand-opening-rsvp"
-          elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID}
-          title="Takeshi"
-          avatar="/avatars/registration-avatar.jpg"
-          welcomeMessage="Good evening! I'm Takeshi, and I'm delighted you're considering joining us for our Grand Opening. Let me help you register — it would be my pleasure to assist with any questions about the celebration."
-          suggestions={[
-            "I'd like to register",
-            "Tell me about the suites",
-            "What dining options are available?",
-            "How do I get there?"
-          ]}
-          contextData={{
-            event: eventDetails,
-            registration,
-            infoPanel,
-            isComplete
-          }}
-        />
       </div>
     </div>
   );

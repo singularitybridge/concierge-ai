@@ -26,9 +26,11 @@ interface VoiceSessionChatProps {
   suggestions?: string[]; // Suggestions to show before chat starts
   avatar?: string; // Avatar image path
   welcomeMessage?: string; // Welcome/intro message about the agent
+  variant?: 'light' | 'dark'; // Visual variant: light (default) or dark (glass-morphism)
 }
 
-export default function VoiceSessionChat({ agentId, sessionId = 'default', elevenLabsAgentId, contextData, title, subtitle, suggestions, avatar, welcomeMessage }: VoiceSessionChatProps) {
+export default function VoiceSessionChat({ agentId, sessionId = 'default', elevenLabsAgentId, contextData, title, subtitle, suggestions, avatar, welcomeMessage, variant = 'light' }: VoiceSessionChatProps) {
+  const isDark = variant === 'dark';
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -857,12 +859,16 @@ Use this data to answer questions about guests. When asked about a specific gues
   };
 
   return (
-    <div className="h-full flex flex-col bg-white rounded-2xl shadow-sm overflow-hidden">
+    <div className={`h-full flex flex-col overflow-hidden ${
+      isDark ? 'bg-transparent' : 'bg-white rounded-2xl shadow-sm'
+    }`}>
       {/* Header - Always visible */}
-      <div className="px-5 py-4 border-b border-stone-100">
+      <div className={`px-5 py-4 ${isDark ? 'border-b border-white/10' : 'border-b border-stone-100'}`}>
         <div className="flex items-center gap-4">
           {/* Avatar */}
-          <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-stone-100">
+          <div className={`w-14 h-14 rounded-full overflow-hidden flex-shrink-0 ${
+            isDark ? 'ring-2 ring-white/20' : 'ring-2 ring-stone-100'
+          }`}>
             <img
               src={avatar || '/avatars/assistant-avatar.jpg'}
               alt={title || 'Concierge'}
@@ -871,23 +877,27 @@ Use this data to answer questions about guests. When asked about a specific gues
           </div>
           {/* Name & Status */}
           <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-medium text-stone-800" style={{ fontFamily: 'var(--font-cormorant)' }}>
+            <h2 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-stone-800'}`} style={{ fontFamily: 'var(--font-cormorant)' }}>
               {title || 'Concierge'}
             </h2>
             {isCallActive ? (
               <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-xs text-green-600">Connected</span>
+                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                <span className={`text-xs ${isDark ? 'text-emerald-400' : 'text-green-600'}`}>Connected</span>
               </div>
             ) : (
-              <p className="text-xs text-stone-400">AI Assistant</p>
+              <p className={`text-xs ${isDark ? 'text-white/50' : 'text-stone-400'}`}>AI Assistant</p>
             )}
           </div>
           {/* Clear Button - Only when messages exist */}
           {messages.length > 0 && (
             <button
               onClick={clearChat}
-              className="p-2 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+              className={`p-2 rounded-full transition-colors ${
+                isDark
+                  ? 'text-white/40 hover:text-red-400 hover:bg-white/10'
+                  : 'text-stone-400 hover:text-red-500 hover:bg-red-50'
+              }`}
               aria-label="Clear chat"
             >
               <Trash2 className="w-4 h-4" />
@@ -901,19 +911,23 @@ Use this data to answer questions about guests. When asked about a specific gues
         {messages.length === 0 && !isCallActive && (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             {/* Welcome Message */}
-            <p className="text-sm text-stone-600 leading-relaxed max-w-[280px]">
+            <p className={`text-sm leading-relaxed max-w-[280px] ${isDark ? 'text-white/70' : 'text-stone-600'}`}>
               {welcomeMessage || 'I\'m here to help. Tap below to start a conversation.'}
             </p>
 
             {/* Suggestions */}
             {suggestions && suggestions.length > 0 && (
-              <div className="mt-8 w-full">
-                <p className="text-[10px] uppercase tracking-wider text-stone-400 mb-3">Try saying</p>
+              <div className="mt-6 w-full">
+                <p className={`text-[10px] uppercase tracking-wider mb-3 ${isDark ? 'text-white/40' : 'text-stone-400'}`}>Try saying</p>
                 <div className="space-y-2">
                   {suggestions.map((suggestion, idx) => (
                     <div
                       key={idx}
-                      className="px-4 py-2.5 text-sm text-stone-600 bg-stone-50 rounded-xl text-left"
+                      className={`px-4 py-2.5 text-sm rounded-xl text-left ${
+                        isDark
+                          ? 'text-white/70 bg-white/5 border border-white/10'
+                          : 'text-stone-600 bg-stone-50'
+                      }`}
                     >
                       "{suggestion}"
                     </div>
@@ -926,7 +940,11 @@ Use this data to answer questions about guests. When asked about a specific gues
 
         {messages.length === 0 && isCallActive && (
           <div className="text-center py-8">
-            <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1.5 rounded-full text-xs font-medium">
+            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
+              isDark
+                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                : 'bg-green-50 text-green-700'
+            }`}>
               <Mic className="w-3.5 h-3.5 animate-pulse" />
               <span>Listening...</span>
             </div>
@@ -941,13 +959,17 @@ Use this data to answer questions about guests. When asked about a specific gues
             <div
               className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
                 msg.role === 'user'
-                  ? 'bg-stone-800 text-white'
-                  : 'bg-white text-stone-800 shadow-sm'
+                  ? isDark
+                    ? 'bg-amber-500/20 text-white border border-amber-500/30'
+                    : 'bg-stone-800 text-white'
+                  : isDark
+                    ? 'bg-white/10 text-white border border-white/10'
+                    : 'bg-white text-stone-800 shadow-sm'
               }`}
             >
               <p className="text-sm leading-relaxed">{msg.content}</p>
               <p className={`text-xs mt-1 ${
-                msg.role === 'user' ? 'text-stone-400' : 'text-stone-400'
+                isDark ? 'text-white/40' : 'text-stone-400'
               }`}>
                 {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </p>
@@ -959,14 +981,18 @@ Use this data to answer questions about guests. When asked about a specific gues
       </div>
 
       {/* Bottom Controls */}
-      <div className="p-4 border-t border-stone-100">
+      <div className={`p-4 ${isDark ? 'border-t border-white/10' : 'border-t border-stone-100'}`}>
         {!isCallActive ? (
           /* Speak Button - Initial State */
           <button
             id="voice-call-button"
             onClick={startCall}
             disabled={isVapiLoading}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-stone-800 text-white hover:bg-stone-700 rounded-full transition-colors disabled:opacity-50"
+            className={`w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-xl transition-all disabled:opacity-50 ${
+              isDark
+                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-400 hover:to-amber-500 shadow-lg'
+                : 'bg-stone-800 text-white hover:bg-stone-700 rounded-full'
+            }`}
           >
             {isVapiLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -987,12 +1013,18 @@ Use this data to answer questions about guests. When asked about a specific gues
               onKeyPress={handleKeyPress}
               placeholder="Type your message..."
               disabled={isLoading}
-              className="flex-1 px-4 py-2 bg-white border border-stone-200 rounded-full text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-300 disabled:opacity-50"
+              className={`flex-1 px-4 py-2 rounded-full text-sm focus:outline-none disabled:opacity-50 ${
+                isDark
+                  ? 'bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:ring-2 focus:ring-amber-400/50'
+                  : 'bg-white border border-stone-200 text-stone-800 placeholder:text-stone-400 focus:ring-2 focus:ring-stone-300'
+              }`}
             />
             <button
               onClick={sendMessage}
               disabled={isLoading || !input.trim()}
-              className="p-2 text-stone-600 hover:text-stone-800 disabled:opacity-30 transition-colors"
+              className={`p-2 disabled:opacity-30 transition-colors ${
+                isDark ? 'text-white/60 hover:text-white' : 'text-stone-600 hover:text-stone-800'
+              }`}
               aria-label="Send message"
             >
               <Send className="w-4 h-4" />
@@ -1000,7 +1032,7 @@ Use this data to answer questions about guests. When asked about a specific gues
             <button
               id="voice-call-button"
               onClick={endCall}
-              className="p-2 text-red-500 hover:text-red-600 transition-colors"
+              className="p-2 text-red-400 hover:text-red-300 transition-colors"
               aria-label="End call"
             >
               <PhoneOff className="w-4 h-4" />
