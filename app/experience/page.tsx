@@ -194,6 +194,14 @@ export default function ExperiencePage() {
     return null;
   }
 
+  // Navigation menu items
+  const menuItems = [
+    { label: 'Grand Opening', href: '/experience', active: true },
+    { label: 'Guest Portal', href: '/guest' },
+    { label: 'Staff Portal', href: '/admin' },
+    { label: 'Shop', href: '#', disabled: true },
+  ];
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Full Page Background */}
@@ -209,78 +217,79 @@ export default function ExperiencePage() {
       <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-stone-900/60" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
 
-      {/* Logout Button */}
-      <button
-        onClick={handleLogout}
-        className="absolute top-6 right-6 z-20 p-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl border border-white/20 transition-all"
-        title="Logout"
-      >
-        <LogOut className="w-4 h-4 text-white" />
-      </button>
-
       {/* Content */}
       <div className={`relative z-10 h-screen flex flex-col transition-opacity duration-1000 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
 
-        {/* Top Badge */}
-        <div className="pt-6 text-center flex-shrink-0">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
+        {/* Top Navigation Bar */}
+        <nav className="flex items-center justify-between px-8 py-4 flex-shrink-0">
+          {/* Left - Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-sm" style={{ fontFamily: 'var(--font-cormorant)' }}>18</span>
+            </div>
+            <div>
+              <h1
+                className="text-xl font-light text-white tracking-wide leading-tight group-hover:text-amber-200 transition-colors"
+                style={{ fontFamily: 'var(--font-cormorant)' }}
+              >
+                THE 1898
+              </h1>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-white/50">Niseko</p>
+            </div>
+          </Link>
+
+          {/* Center - Menu Items */}
+          <div className="flex items-center gap-1 bg-white/5 backdrop-blur-md rounded-full px-2 py-1.5 border border-white/10">
+            {menuItems.map((item) => (
+              <Link
+                key={item.label}
+                href={item.disabled ? '#' : item.href}
+                className={`px-4 py-2 rounded-full text-sm transition-all ${
+                  item.active
+                    ? 'bg-white/15 text-white font-medium'
+                    : item.disabled
+                      ? 'text-white/30 cursor-not-allowed'
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
+                onClick={item.disabled ? (e) => e.preventDefault() : undefined}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Right - Logout */}
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
+          >
+            <span className="text-sm">Logout</span>
+            <LogOut className="w-4 h-4" />
+          </button>
+        </nav>
+
+        {/* Page Title */}
+        <div className="text-center py-4 flex-shrink-0">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-3">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             <span className="text-xs tracking-[0.2em] text-white/90 font-medium">
               EXCLUSIVE INVITATION
             </span>
           </div>
-        </div>
-
-        {/* Brand Header */}
-        <div className="text-center mt-4 mb-6 flex-shrink-0">
-          <Link href="/" className="inline-block">
-            <p className="text-xs uppercase tracking-[0.35em] text-amber-400/90 mb-2 font-medium">
-              Niseko, Hokkaido
-            </p>
-            <h1
-              className="text-3xl md:text-4xl font-light text-white tracking-wide mb-1"
-              style={{ fontFamily: 'var(--font-cormorant)' }}
-            >
-              THE 1898
-            </h1>
-            <p
-              className="text-lg md:text-xl text-white/80 tracking-widest font-light"
-              style={{ fontFamily: 'var(--font-cormorant)' }}
-            >
-              NISEKO
-            </p>
-          </Link>
+          <h2
+            className="text-2xl font-light text-white tracking-wide"
+            style={{ fontFamily: 'var(--font-cormorant)' }}
+          >
+            Grand Opening Celebration
+          </h2>
+          <p className="text-sm text-white/50 mt-1">December 10, 2025 • 4:00 PM</p>
         </div>
 
         {/* Main Content - Two Column Layout */}
-        <div className="flex-1 flex gap-6 px-6 pb-6 min-h-0">
+        <div className="flex-1 flex gap-6 px-8 pb-6 min-h-0">
 
           {/* Left Column - Registration Experience */}
-          <div className="flex-[1.2] min-w-0 flex flex-col gap-4 overflow-y-auto">
-
-            {/* Event Details Card */}
-            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20 shadow-2xl flex-shrink-0">
-              <h2
-                className="text-xl font-light text-white tracking-wide mb-4"
-                style={{ fontFamily: 'var(--font-cormorant)' }}
-              >
-                {eventDetails.name}
-              </h2>
-              <div className="flex flex-wrap items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-amber-400/70" strokeWidth={1.5} />
-                  <span className="text-sm text-white/70">{eventDetails.date}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-amber-400/70" strokeWidth={1.5} />
-                  <span className="text-sm text-white/70">{eventDetails.time}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-amber-400/70" strokeWidth={1.5} />
-                  <span className="text-sm text-white/70">Niseko, Hokkaido</span>
-                </div>
-              </div>
-            </div>
+          <div className="flex-1 min-w-0 flex flex-col gap-4 overflow-y-auto">
 
             {/* Registration Card */}
             <div className={`bg-white/10 backdrop-blur-xl rounded-2xl p-5 border shadow-2xl flex-shrink-0 transition-all ${
@@ -413,7 +422,7 @@ export default function ExperiencePage() {
           </div>
 
           {/* Right Column - Voice Chat */}
-          <div className="flex-[0.8] min-w-0 flex flex-col">
+          <div className="flex-1 min-w-0 flex flex-col max-w-md">
             <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl flex-1 overflow-hidden">
               <VoiceSessionChat
                 agentId="registration-concierge"
