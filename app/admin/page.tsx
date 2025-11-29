@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, TrendingUp, Users, Wrench, Network, Cpu, ChevronRight, Plus, X, Loader2, LogOut, BookOpen, Shield, Sparkles, ClipboardList } from 'lucide-react';
+import { TrendingUp, Users, Wrench, Network, Cpu, Plus, X, Loader2, LogOut, BookOpen, Shield, Sparkles, ClipboardList, Building2 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 const tasks = [
@@ -105,11 +105,18 @@ export default function AdminPage() {
   const [taskInput, setTaskInput] = useState('');
   const [isAssigning, setIsAssigning] = useState(false);
   const [assignedAgent, setAssignedAgent] = useState<{ name: string; title: string } | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      setMounted(true);
+    }
+  }, [isAuthenticated]);
 
   if (isAuthenticated === null) {
     return (
-      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-stone-400" />
+      <div className="min-h-screen bg-stone-900 flex items-center justify-center">
+        <div className="text-white/50 text-sm">Loading...</div>
       </div>
     );
   }
@@ -149,214 +156,291 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      {/* Header */}
-      <div className="bg-white border-b border-stone-100">
-        <div className="max-w-3xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link
-                href="/"
-                className="p-2 text-stone-400 hover:text-stone-600 rounded-full transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-light text-stone-800 tracking-wide" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                  THE 1898 NISEKO
-                </h1>
-                <p className="text-xs text-stone-400 uppercase tracking-widest mt-1">Property Management</p>
-              </div>
-            </div>
-            <button
-              onClick={logout}
-              className="p-2 text-stone-400 hover:text-stone-600 rounded-full transition-colors"
-              title="Logout"
-            >
-              <LogOut className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Full Page Background */}
+      <Image
+        src="/hotel3.jpg"
+        alt="The 1898 Niseko"
+        fill
+        className="object-cover"
+        priority
+      />
+
+      {/* Sophisticated Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-stone-900/60" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+
+      {/* Logout Button */}
+      <button
+        onClick={logout}
+        className="absolute top-6 right-6 z-20 p-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl border border-white/20 transition-all"
+        title="Logout"
+      >
+        <LogOut className="w-4 h-4 text-white" />
+      </button>
 
       {/* Content */}
-      <div className="max-w-3xl mx-auto px-6 py-12">
-        {/* Your Team */}
-        <div className="mb-10">
-          <h2 className="text-3xl font-light text-stone-800 mb-3" style={{ fontFamily: 'var(--font-cormorant)' }}>
-            Your Team
-          </h2>
-          <p className="text-sm text-stone-500">
-            AI assistants dedicated to managing your property
-          </p>
-        </div>
+      <div className={`relative z-10 min-h-screen flex flex-col transition-opacity duration-1000 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
 
-        {/* Agent Cards */}
-        <div className="space-y-3 mb-12">
-          {agents.map((agent) => (
-            <Link
-              key={agent.id}
-              href={`/agents/${agent.id}`}
-              className="flex items-center gap-4 p-4 bg-white rounded-lg hover:bg-stone-50 transition-colors group"
-            >
-              <div className="relative w-12 h-12 rounded-full overflow-hidden bg-stone-200 flex-shrink-0">
-                <Image
-                  src={agent.avatar}
-                  alt={agent.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-stone-800 group-hover:text-stone-900">
-                  {agent.name}
-                </h3>
-                <p className="text-xs text-stone-500">
-                  {agent.title}
-                </p>
-                <p className="text-xs text-stone-400 mt-1 truncate">
-                  {agent.description}
-                </p>
-              </div>
-              <svg className="w-4 h-4 text-stone-300 group-hover:text-stone-400 transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-          ))}
-        </div>
-
-        {/* Active Tasks */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-3xl font-light text-stone-800" style={{ fontFamily: 'var(--font-cormorant)' }}>
-              Active Tasks
-            </h2>
-            <button
-              onClick={() => setShowModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-stone-600 hover:text-stone-800 bg-white rounded-full hover:bg-stone-50 transition-colors"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Add Task
-            </button>
-          </div>
-          <p className="text-sm text-stone-500 mb-6">
-            Current priorities being handled by your team
-          </p>
-          <div className="space-y-2">
-            {tasks.map((task) => (
-              <Link
-                key={task.id}
-                href={`/tasks/${task.id}`}
-                className="flex items-center justify-between p-4 bg-white rounded-lg hover:bg-stone-50 transition-colors group"
-              >
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-medium text-stone-800 group-hover:text-stone-900">
-                    {task.title}
-                  </h3>
-                  <p className="text-xs text-stone-400 mt-0.5">
-                    {task.description}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 ml-4">
-                  <span className="text-xs text-stone-500">{task.assignedTo}</span>
-                  <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-400" />
-                </div>
-              </Link>
-            ))}
+        {/* Top Badge */}
+        <div className="pt-8 md:pt-10 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
+            <Building2 className="w-3.5 h-3.5 text-amber-400" />
+            <span className="text-xs tracking-[0.2em] text-white/90 font-medium">
+              PROPERTY MANAGEMENT
+            </span>
           </div>
         </div>
 
-        {/* Knowledge Base */}
-        <div className="mb-6">
-          <h2 className="text-3xl font-light text-stone-800 mb-3" style={{ fontFamily: 'var(--font-cormorant)' }}>
-            Knowledge Base
-          </h2>
-          <p className="text-sm text-stone-500">
-            Standard operating procedures and reference materials
-          </p>
-        </div>
-
-        {/* Knowledge Base Documents */}
-        <div className="space-y-3 mb-6">
-          {knowledgeBaseDocs.map((doc) => (
-            <Link
-              key={doc.id}
-              href={`/docs/${doc.id}`}
-              className="flex items-center gap-4 p-4 bg-white rounded-lg hover:bg-stone-50 transition-colors group"
+        {/* Header */}
+        <div className="text-center mt-6 mb-8">
+          <Link href="/" className="inline-block">
+            <p className="text-xs uppercase tracking-[0.35em] text-amber-400/90 mb-3 font-medium">
+              Niseko, Hokkaido
+            </p>
+            <h1
+              className="text-4xl md:text-5xl font-light text-white tracking-wide mb-2"
+              style={{ fontFamily: 'var(--font-cormorant)' }}
             >
-              <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center flex-shrink-0">
-                <doc.icon className="w-5 h-5 text-stone-400" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-sm font-medium text-stone-700 group-hover:text-stone-900">
-                  {doc.title}
-                </h3>
-                <p className="text-xs text-stone-400 mt-0.5">
-                  {doc.description}
-                </p>
-              </div>
-              <svg className="w-4 h-4 text-stone-300 group-hover:text-stone-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-          ))}
-
-          {/* System Architecture Link */}
-          <Link
-            href="/admin/system"
-            className="flex items-center gap-4 p-4 bg-white rounded-lg hover:bg-stone-50 transition-colors group"
-          >
-            <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center flex-shrink-0">
-              <Network className="w-5 h-5 text-stone-400" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-sm font-medium text-stone-700 group-hover:text-stone-900">
-                System Architecture
-              </h3>
-              <p className="text-xs text-stone-400 mt-0.5">
-                View the agentic system design and architectural overview
-              </p>
-            </div>
-            <svg className="w-4 h-4 text-stone-300 group-hover:text-stone-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
-            </svg>
+              THE 1898
+            </h1>
+            <p
+              className="text-xl md:text-2xl text-white/80 tracking-widest font-light"
+              style={{ fontFamily: 'var(--font-cormorant)' }}
+            >
+              NISEKO
+            </p>
           </Link>
         </div>
 
-        {/* Quick Stats */}
-        <div className="mt-12 grid grid-cols-3 gap-6">
-          <div className="text-center">
-            <p className="text-3xl font-light text-stone-700">6</p>
-            <p className="text-xs text-stone-400 mt-1">Total Suites</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-light text-stone-700">83%</p>
-            <p className="text-xs text-stone-400 mt-1">Occupancy</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-light text-stone-700">12</p>
-            <p className="text-xs text-stone-400 mt-1">Pending Tasks</p>
+        {/* Main Content */}
+        <div className="flex-1 px-6 pb-8 overflow-y-auto">
+          <div className="max-w-4xl mx-auto">
+
+            {/* Two Column Layout */}
+            <div className="grid md:grid-cols-2 gap-6">
+
+              {/* Left Column - Team & Tasks */}
+              <div className="space-y-6">
+
+                {/* Your Team Card */}
+                <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20 shadow-2xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2
+                      className="text-xl font-light text-white tracking-wide"
+                      style={{ fontFamily: 'var(--font-cormorant)' }}
+                    >
+                      Your AI Team
+                    </h2>
+                    <span className="text-xs text-amber-400/80">{agents.length} agents</span>
+                  </div>
+
+                  <div className="space-y-2">
+                    {agents.map((agent) => (
+                      <Link
+                        key={agent.id}
+                        href={`/agents/${agent.id}`}
+                        className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/30 rounded-xl transition-all group"
+                      >
+                        <div className="relative w-10 h-10 rounded-full overflow-hidden bg-white/10 flex-shrink-0 ring-2 ring-white/10 group-hover:ring-amber-400/30 transition-all">
+                          <Image
+                            src={agent.avatar}
+                            alt={agent.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-white group-hover:text-amber-100 transition-colors">
+                            {agent.name}
+                          </p>
+                          <p className="text-xs text-white/50 truncate">
+                            {agent.title}
+                          </p>
+                        </div>
+                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-amber-400/20 transition-colors">
+                          <svg className="w-3 h-3 text-white/40 group-hover:text-amber-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Active Tasks Card */}
+                <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20 shadow-2xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2
+                      className="text-xl font-light text-white tracking-wide"
+                      style={{ fontFamily: 'var(--font-cormorant)' }}
+                    >
+                      Active Tasks
+                    </h2>
+                    <button
+                      onClick={() => setShowModal(true)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-amber-400 hover:text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 rounded-full transition-colors border border-amber-400/20"
+                    >
+                      <Plus className="w-3 h-3" />
+                      Add
+                    </button>
+                  </div>
+
+                  <div className="space-y-2">
+                    {tasks.map((task) => (
+                      <Link
+                        key={task.id}
+                        href={`/tasks/${task.id}`}
+                        className="block p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/30 rounded-xl transition-all group"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-white group-hover:text-amber-100 transition-colors">
+                              {task.title}
+                            </p>
+                            <p className="text-xs text-white/40 mt-0.5">
+                              {task.description}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="mt-2 flex items-center gap-2">
+                          <span className="text-xs text-amber-400/70 bg-amber-400/10 px-2 py-0.5 rounded-full">
+                            {task.assignedTo}
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column - Knowledge Base & Stats */}
+              <div className="space-y-6">
+
+                {/* Knowledge Base Card */}
+                <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20 shadow-2xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2
+                      className="text-xl font-light text-white tracking-wide"
+                      style={{ fontFamily: 'var(--font-cormorant)' }}
+                    >
+                      Knowledge Base
+                    </h2>
+                    <span className="text-xs text-amber-400/80">{knowledgeBaseDocs.length + 1} docs</span>
+                  </div>
+
+                  <div className="space-y-2">
+                    {knowledgeBaseDocs.map((doc) => (
+                      <Link
+                        key={doc.id}
+                        href={`/docs/${doc.id}`}
+                        className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/30 rounded-xl transition-all group"
+                      >
+                        <doc.icon className="flex-shrink-0 w-5 h-5 text-amber-400/70 group-hover:text-amber-400 transition-colors" strokeWidth={1.5} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-white group-hover:text-amber-100 transition-colors">
+                            {doc.title}
+                          </p>
+                          <p className="text-xs text-white/40 truncate">
+                            {doc.description}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+
+                    {/* System Architecture Link */}
+                    <Link
+                      href="/admin/system"
+                      className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/30 rounded-xl transition-all group"
+                    >
+                      <Network className="flex-shrink-0 w-5 h-5 text-amber-400/70 group-hover:text-amber-400 transition-colors" strokeWidth={1.5} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-white group-hover:text-amber-100 transition-colors">
+                          System Architecture
+                        </p>
+                        <p className="text-xs text-white/40 truncate">
+                          Agentic system design overview
+                        </p>
+                      </div>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Property Stats Card */}
+                <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20 shadow-2xl">
+                  <h2
+                    className="text-xl font-light text-white tracking-wide mb-4"
+                    style={{ fontFamily: 'var(--font-cormorant)' }}
+                  >
+                    Property Overview
+                  </h2>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+                      <p className="text-2xl font-light text-amber-400">6</p>
+                      <p className="text-xs text-white/50 mt-1">Suites</p>
+                    </div>
+                    <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+                      <p className="text-2xl font-light text-amber-400">83%</p>
+                      <p className="text-xs text-white/50 mt-1">Occupancy</p>
+                    </div>
+                    <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+                      <p className="text-2xl font-light text-amber-400">12</p>
+                      <p className="text-xs text-white/50 mt-1">Tasks</p>
+                    </div>
+                  </div>
+
+                  {/* Quick Actions */}
+                  <div className="mt-4 pt-4 border-t border-white/10">
+                    <p className="text-xs text-white/40 mb-3">Quick Actions</p>
+                    <div className="flex gap-2">
+                      <button className="flex-1 px-3 py-2 text-xs text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors border border-white/10">
+                        View Reports
+                      </button>
+                      <button className="flex-1 px-3 py-2 text-xs text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors border border-white/10">
+                        Analytics
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="mt-8 text-center">
+              <p className="text-xs text-white/40 mb-2">AI-Powered Property Management</p>
+              <div className="flex items-center justify-center gap-3 text-xs text-white/30">
+                <span>Real-time Sync</span>
+                <span className="w-1 h-1 rounded-full bg-white/30" />
+                <span>Smart Delegation</span>
+                <span className="w-1 h-1 rounded-full bg-white/30" />
+                <span>24/7 Operations</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Add Task Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 relative">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-stone-900/95 backdrop-blur-xl rounded-2xl max-w-md w-full p-6 relative border border-white/20 shadow-2xl">
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 text-stone-400 hover:text-stone-600"
+              className="absolute top-4 right-4 p-2 text-white/40 hover:text-white/60 bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
 
             {!assignedAgent ? (
               <>
-                <h3 className="text-xl font-light text-stone-800 mb-2" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                  How can we help you today?
+                <h3
+                  className="text-2xl font-light text-white mb-2"
+                  style={{ fontFamily: 'var(--font-cormorant)' }}
+                >
+                  How can we help?
                 </h3>
-                <p className="text-sm text-stone-500 mb-6">
+                <p className="text-sm text-white/50 mb-6">
                   Describe what you need and we'll assign the right team member
                 </p>
 
@@ -364,14 +448,14 @@ export default function AdminPage() {
                   value={taskInput}
                   onChange={(e) => setTaskInput(e.target.value)}
                   placeholder="e.g., Check room rates for next weekend..."
-                  className="w-full p-3 border border-stone-200 rounded-lg text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-300 resize-none h-24 mb-4"
+                  className="w-full p-4 bg-white/5 border border-white/20 rounded-xl text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50 resize-none h-28 mb-4"
                   disabled={isAssigning}
                 />
 
                 <button
                   onClick={handleSubmitTask}
                   disabled={!taskInput.trim() || isAssigning}
-                  className="w-full py-2.5 bg-stone-800 text-white text-sm rounded-lg hover:bg-stone-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-sm font-medium rounded-xl hover:from-amber-400 hover:to-amber-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg"
                 >
                   {isAssigning ? (
                     <>
@@ -379,30 +463,33 @@ export default function AdminPage() {
                       Finding the right person...
                     </>
                   ) : (
-                    'Submit'
+                    'Submit Task'
                   )}
                 </button>
               </>
             ) : (
               <div className="text-center py-4">
-                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/30">
+                  <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-medium text-stone-800 mb-1">
+                <h3
+                  className="text-xl font-light text-white mb-1"
+                  style={{ fontFamily: 'var(--font-cormorant)' }}
+                >
                   Task Assigned
                 </h3>
-                <p className="text-sm text-stone-500 mb-4">
+                <p className="text-sm text-white/50 mb-4">
                   We've assigned this to
                 </p>
-                <div className="p-4 bg-stone-50 rounded-lg mb-6">
-                  <p className="font-medium text-stone-800">{assignedAgent.name}</p>
-                  <p className="text-xs text-stone-500">{assignedAgent.title}</p>
+                <div className="p-4 bg-white/5 rounded-xl mb-6 border border-white/10">
+                  <p className="font-medium text-amber-400">{assignedAgent.name}</p>
+                  <p className="text-xs text-white/50">{assignedAgent.title}</p>
                 </div>
                 <button
                   onClick={closeModal}
-                  className="px-6 py-2 text-sm text-stone-600 hover:text-stone-800 transition-colors"
+                  className="px-6 py-2.5 text-sm text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/10"
                 >
                   Done
                 </button>
