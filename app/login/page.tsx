@@ -164,18 +164,11 @@ export default function LoginPage() {
                 </button>
               </form>
 
-              {/* Access Type Indicator */}
+              {/* Access Indicator */}
               <div className="mt-6 pt-5 border-t border-white/10">
-                <div className="flex items-center justify-center gap-6 text-xs text-white/50">
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    Guest Access
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                    Staff Access
-                  </span>
-                </div>
+                <p className="text-xs text-white/40 text-center">
+                  Secure demo access
+                </p>
               </div>
             </div>
 

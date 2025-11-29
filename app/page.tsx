@@ -9,18 +9,15 @@ import { LogOut } from 'lucide-react';
 export default function WelcomePage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userRole, setUserRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const authenticated = localStorage.getItem('niseko_authenticated');
-    const role = localStorage.getItem('niseko_role');
 
     if (authenticated !== 'true') {
       router.push('/login');
     } else {
       setIsAuthenticated(true);
-      setUserRole(role);
       setIsLoading(false);
     }
   }, [router]);
@@ -78,9 +75,8 @@ export default function WelcomePage() {
             </h1>
             <div className="w-16 h-px bg-white/40 mx-auto mb-6" />
             <p className="text-sm text-white/70 max-w-sm mx-auto leading-relaxed">
-              {userRole === 'staff'
-                ? 'Welcome back. Access your staff tools below.'
-                : 'Experience the harmony of century-old Japanese hospitality enhanced by thoughtful technology.'}
+              Experience the harmony of century-old Japanese hospitality
+              enhanced by thoughtful technology.
             </p>
           </div>
 
@@ -100,14 +96,12 @@ export default function WelcomePage() {
               <p className="text-sm text-stone-800">Guest Portal</p>
             </Link>
 
-            {userRole === 'staff' && (
-              <Link
-                href="/admin"
-                className="block p-3 bg-white/70 backdrop-blur-sm rounded-lg hover:bg-white/90 transition-colors text-center"
-              >
-                <p className="text-sm text-stone-800">Staff Portal</p>
-              </Link>
-            )}
+            <Link
+              href="/admin"
+              className="block p-3 bg-white/70 backdrop-blur-sm rounded-lg hover:bg-white/90 transition-colors text-center"
+            >
+              <p className="text-sm text-stone-800">Staff Portal</p>
+            </Link>
 
             <Link
               href="/shop"
@@ -119,7 +113,7 @@ export default function WelcomePage() {
 
           {/* Footer */}
           <p className="mt-10 text-center text-xs text-white/50">
-            {userRole === 'staff' ? 'Staff Access' : 'Guest Access'}
+            Demo Access
           </p>
         </div>
       </div>
