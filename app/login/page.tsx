@@ -54,7 +54,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="h-screen relative overflow-hidden">
       {/* Full Page Background */}
       <Image
         src="/hotel3.jpg"
@@ -69,10 +69,10 @@ export default function LoginPage() {
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
 
       {/* Content */}
-      <div className={`relative z-10 min-h-screen flex flex-col transition-opacity duration-1000 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`relative z-10 h-full flex flex-col transition-opacity duration-1000 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
 
         {/* Top Badge */}
-        <div className="pt-8 md:pt-12 text-center">
+        <div className="pt-6 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             <span className="text-xs tracking-[0.2em] text-white/90 font-medium">
@@ -82,11 +82,11 @@ export default function LoginPage() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 flex items-center justify-center px-6 py-8">
+        <div className="flex-1 flex items-center justify-center px-6 py-4">
           <div className="w-full max-w-md">
 
             {/* Brand Section */}
-            <div className="text-center mb-10">
+            <div className="text-center mb-6">
               <p className="text-xs uppercase tracking-[0.35em] text-amber-400/90 mb-4 font-medium">
                 Niseko, Hokkaido
               </p>
@@ -104,7 +104,7 @@ export default function LoginPage() {
               </p>
 
               {/* Decorative Line */}
-              <div className="flex items-center justify-center gap-4 my-8">
+              <div className="flex items-center justify-center gap-4 my-4">
                 <div className="w-12 h-px bg-gradient-to-r from-transparent to-amber-400/60" />
                 <div className="w-2 h-2 rotate-45 border border-amber-400/60" />
                 <div className="w-12 h-px bg-gradient-to-l from-transparent to-amber-400/60" />
@@ -118,16 +118,16 @@ export default function LoginPage() {
             </div>
 
             {/* Login Card */}
-            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/20 shadow-2xl">
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-400/20 mb-4">
-                  <Shield className="w-5 h-5 text-amber-400" />
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-2xl">
+              <div className="text-center mb-4">
+                <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-amber-400/20 mb-3">
+                  <Shield className="w-4 h-4 text-amber-400" />
                 </div>
                 <h2 className="text-lg font-medium text-white mb-1">Welcome</h2>
                 <p className="text-sm text-white/60">Enter your access code to continue</p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <div className="relative">
                     <input
@@ -165,7 +165,7 @@ export default function LoginPage() {
               </form>
 
               {/* Access Indicator */}
-              <div className="mt-6 pt-5 border-t border-white/10">
+              <div className="mt-4 pt-4 border-t border-white/10">
                 <p className="text-xs text-white/40 text-center">
                   Secure demo access
                 </p>
@@ -173,8 +173,8 @@ export default function LoginPage() {
             </div>
 
             {/* Demo Note for Investors */}
-            <div className="mt-8 text-center">
-              <p className="text-xs text-white/40 mb-2">Interactive Demo Environment</p>
+            <div className="mt-4 text-center">
+              <p className="text-xs text-white/40 mb-1">Interactive Demo Environment</p>
               <div className="flex items-center justify-center gap-3 text-xs text-white/30">
                 <span>Voice AI</span>
                 <span className="w-1 h-1 rounded-full bg-white/30" />
@@ -187,7 +187,7 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <div className="pb-8 text-center">
+        <div className="pb-4 text-center">
           <p className="text-xs text-white/30 tracking-wide">
             Powered by ElevenLabs Conversational AI
           </p>

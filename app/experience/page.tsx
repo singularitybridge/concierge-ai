@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-  LogOut, Loader2, Calendar, MapPin, Clock, Sparkles, ChevronRight,
+  LogOut, ChevronRight,
   User, Building2, Mail, Phone, Users, Car, UtensilsCrossed, BedDouble, MessageSquare, Check, X
 } from 'lucide-react';
 import VoiceSessionChat from '../components/VoiceSessionChat';
@@ -199,7 +199,7 @@ export default function ExperiencePage() {
     { label: 'Grand Opening', href: '/experience', active: true },
     { label: 'Guest Portal', href: '/guest' },
     { label: 'Staff Portal', href: '/admin' },
-    { label: 'Shop', href: '#', disabled: true },
+    { label: 'Shop', href: '/shop' },
   ];
 
   return (
@@ -243,15 +243,12 @@ export default function ExperiencePage() {
             {menuItems.map((item) => (
               <Link
                 key={item.label}
-                href={item.disabled ? '#' : item.href}
+                href={item.href}
                 className={`px-4 py-2 rounded-full text-sm transition-all ${
                   item.active
                     ? 'bg-white/15 text-white font-medium'
-                    : item.disabled
-                      ? 'text-white/30 cursor-not-allowed'
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
                 }`}
-                onClick={item.disabled ? (e) => e.preventDefault() : undefined}
               >
                 {item.label}
               </Link>
@@ -268,43 +265,35 @@ export default function ExperiencePage() {
           </button>
         </nav>
 
-        {/* Page Title */}
-        <div className="text-center py-4 flex-shrink-0">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-xs tracking-[0.2em] text-white/90 font-medium">
-              EXCLUSIVE INVITATION
-            </span>
-          </div>
-          <h2
-            className="text-2xl font-light text-white tracking-wide"
-            style={{ fontFamily: 'var(--font-cormorant)' }}
-          >
-            Grand Opening Celebration
-          </h2>
-          <p className="text-sm text-white/50 mt-1">December 10, 2025 • 4:00 PM</p>
-        </div>
-
         {/* Main Content - Two Column Layout */}
         <div className="flex-1 flex gap-6 px-8 pb-6 min-h-0">
 
           {/* Left Column - Registration Experience */}
-          <div className="flex-1 min-w-0 flex flex-col gap-4 overflow-y-auto">
+          <div className="flex-1 min-w-0 flex flex-col overflow-y-auto">
 
-            {/* Registration Card */}
-            <div className={`bg-white/10 backdrop-blur-xl rounded-2xl p-5 border shadow-2xl flex-shrink-0 transition-all ${
+            {/* Registration Card - Full Height */}
+            <div className={`bg-white/10 backdrop-blur-xl rounded-2xl p-6 border shadow-2xl flex-1 flex flex-col transition-all ${
               isComplete ? 'border-emerald-500/30' : 'border-white/20'
             }`}>
-              <div className="flex items-center justify-between mb-4">
+              {/* Event Title Header */}
+              <div className="mb-6">
                 <h2
-                  className="text-xl font-light text-white tracking-wide"
+                  className="text-4xl font-light text-white tracking-wide"
                   style={{ fontFamily: 'var(--font-cormorant)' }}
                 >
-                  {isComplete ? 'Registration Complete' : 'Your Registration'}
+                  Grand Opening Celebration
                 </h2>
+                <p className="text-base text-white/50 mt-2">December 10, 2025 • 4:00 PM</p>
+              </div>
+
+              {/* Registration Status */}
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm uppercase tracking-wider text-white/60">
+                  {isComplete ? 'Registration Confirmed' : 'Your Details'}
+                </h3>
                 {!isComplete && filledCount > 0 && (
                   <span className="text-xs text-amber-400/80">
-                    {filledCount} of {totalFields} details
+                    {filledCount} of {totalFields} completed
                   </span>
                 )}
                 {isComplete && (
@@ -316,19 +305,22 @@ export default function ExperiencePage() {
               </div>
 
               {isComplete ? (
-                <div className="text-center py-6">
-                  <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/30">
-                    <Check className="w-8 h-8 text-emerald-400" />
+                <div className="flex-1 flex flex-col items-center justify-center py-8">
+                  <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-500/30">
+                    <Check className="w-10 h-10 text-emerald-400" />
                   </div>
-                  <p className="text-base text-white mb-2">
+                  <p className="text-xl text-white mb-2" style={{ fontFamily: 'var(--font-cormorant)' }}>
                     Thank you, {registration.name || 'Guest'}!
                   </p>
-                  <p className="text-sm text-white/50">
-                    We look forward to welcoming you on December 10th.
+                  <p className="text-sm text-white/50 mb-4">
+                    Your registration has been confirmed for December 10th.
+                  </p>
+                  <p className="text-xs text-white/40 max-w-sm text-center">
+                    A confirmation email with event details and arrival instructions will be sent to your registered email address.
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3 flex-1 content-start">
                   {registrationFields.map(({ key, label, icon: Icon }) => {
                     const value = registration[key as keyof GuestRegistration];
                     const hasValue = value && value.trim() !== '';
@@ -375,50 +367,41 @@ export default function ExperiencePage() {
                   </div>
                 </div>
               )}
-            </div>
 
-            {/* Dynamic Info Panel */}
-            {infoPanel && hotelInfo[infoPanel] && (
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-300 flex-shrink-0">
-                <div className="flex items-center justify-between mb-3">
-                  <h3
-                    className="text-lg font-light text-white"
-                    style={{ fontFamily: 'var(--font-cormorant)' }}
-                  >
-                    {hotelInfo[infoPanel].title}
-                  </h3>
-                  <button
-                    onClick={() => setInfoPanel(null)}
-                    className="p-1.5 text-white/40 hover:text-white/70 bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-                <p className="text-xs text-white/50 mb-4 leading-relaxed">
-                  {hotelInfo[infoPanel].description}
-                </p>
-                <div className="space-y-2.5">
-                  {hotelInfo[infoPanel].items.map((item) => (
-                    <div key={item.name} className="flex items-start gap-3 p-2 rounded-lg bg-white/5">
-                      <ChevronRight className="w-3.5 h-3.5 text-amber-400/50 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="text-sm font-medium text-white/90">{item.name}</p>
-                        <p className="text-xs text-white/50 leading-relaxed">{item.description}</p>
+              {/* Dynamic Info Panel - Inside Card */}
+              {infoPanel && hotelInfo[infoPanel] && (
+                <div className="mt-4 p-4 rounded-xl bg-white/5 border border-white/10 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3
+                      className="text-lg font-light text-white"
+                      style={{ fontFamily: 'var(--font-cormorant)' }}
+                    >
+                      {hotelInfo[infoPanel].title}
+                    </h3>
+                    <button
+                      onClick={() => setInfoPanel(null)}
+                      className="p-1.5 text-white/40 hover:text-white/70 bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-white/50 mb-4 leading-relaxed">
+                    {hotelInfo[infoPanel].description}
+                  </p>
+                  <div className="space-y-2.5">
+                    {hotelInfo[infoPanel].items.map((item) => (
+                      <div key={item.name} className="flex items-start gap-3 p-2 rounded-lg bg-white/5">
+                        <ChevronRight className="w-3.5 h-3.5 text-amber-400/50 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium text-white/90">{item.name}</p>
+                          <p className="text-xs text-white/50 leading-relaxed">{item.description}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-
-            {/* Hint when no panel */}
-            {!infoPanel && !isComplete && (
-              <div className="text-center py-2 flex-shrink-0">
-                <p className="text-xs text-white/30">
-                  Ask about suites, dining, or directions anytime
-                </p>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           {/* Right Column - Voice Chat */}
@@ -430,12 +413,12 @@ export default function ExperiencePage() {
                 elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID}
                 title="Takeshi"
                 avatar="/avatars/registration-avatar.jpg"
-                welcomeMessage="Good evening! I'm Takeshi, and I'm delighted you're considering joining us for our Grand Opening. Let me help you register — it would be my pleasure to assist with any questions about the celebration."
+                welcomeMessage="Good evening! I'm Takeshi, your personal concierge for The 1898 Niseko. I'd be delighted to help you secure your place at our Grand Opening celebration and answer any questions about the property, investment opportunities, or our exclusive membership programs."
                 suggestions={[
-                  "I'd like to register",
-                  "Tell me about the suites",
-                  "What dining options are available?",
-                  "How do I get there?"
+                  "Register for the event",
+                  "Tell me about the investment",
+                  "What amenities are included?",
+                  "Membership benefits?"
                 ]}
                 contextData={{
                   event: eventDetails,

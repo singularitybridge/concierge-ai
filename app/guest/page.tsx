@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import {
-  LogOut, Loader2, Calendar, MapPin, Utensils, Snowflake,
-  Waves, Clock, ChevronRight, Sparkles, Check,
+  LogOut, Calendar, MapPin, Utensils, Snowflake,
+  Waves, Clock, ChevronRight, Check,
   Wine, Mountain, Car, Shirt, PawPrint, Plane, Coffee, Sparkle
 } from 'lucide-react';
 import VoiceSessionChat from '../components/VoiceSessionChat';
@@ -93,15 +94,17 @@ export default function GuestPage() {
   const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
   const [schedule, setSchedule] = useState<Activity[]>(activities);
   const [activeAction, setActiveAction] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const auth = localStorage.getItem('guest_authenticated');
+    const auth = localStorage.getItem('niseko_authenticated');
     if (auth === 'true') {
       setIsAuthenticated(true);
+      setMounted(true);
     } else {
       setIsAuthenticated(false);
-      router.push('/guest-login');
+      router.push('/login');
     }
   }, [router]);
 
@@ -147,8 +150,9 @@ export default function GuestPage() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('guest_authenticated');
-    router.push('/');
+    localStorage.removeItem('niseko_authenticated');
+    localStorage.removeItem('niseko_role');
+    router.push('/login');
   };
 
   const handleQuickAction = (serviceType: string) => {
@@ -158,10 +162,18 @@ export default function GuestPage() {
     window.dispatchEvent(new CustomEvent('quick-action', { detail: { serviceType } }));
   };
 
+  // Navigation menu items
+  const menuItems = [
+    { label: 'Grand Opening', href: '/experience' },
+    { label: 'Guest Portal', href: '/guest', active: true },
+    { label: 'Staff Portal', href: '/admin' },
+    { label: 'Shop', href: '/shop' },
+  ];
+
   if (isAuthenticated === null) {
     return (
-      <div className="min-h-screen bg-stone-100 flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-stone-400" />
+      <div className="min-h-screen bg-stone-900 flex items-center justify-center">
+        <div className="text-white/50 text-sm">Loading...</div>
       </div>
     );
   }
@@ -171,111 +183,156 @@ export default function GuestPage() {
   }
 
   return (
-    <div className="flex h-screen bg-stone-100">
-      {/* Left: Guest Portal */}
-      <div className="flex-[2] min-w-0 flex flex-col">
-        {/* Hero Section - Fixed at top */}
-        <div className="relative h-48 flex-shrink-0">
-          <Image
-            src="/hotel2.jpg"
-            alt="The 1898 Niseko"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Full Page Background */}
+      <Image
+        src="/hotel2.jpg"
+        alt="The 1898 Niseko"
+        fill
+        className="object-cover"
+        priority
+      />
 
-          {/* Logout */}
+      {/* Sophisticated Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-stone-900/60" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+
+      {/* Content */}
+      <div className={`relative z-10 h-screen flex flex-col transition-opacity duration-1000 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+
+        {/* Top Navigation Bar */}
+        <nav className="flex items-center justify-between px-8 py-4 flex-shrink-0">
+          {/* Left - Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-sm" style={{ fontFamily: 'var(--font-cormorant)' }}>18</span>
+            </div>
+            <div>
+              <h1
+                className="text-xl font-light text-white tracking-wide leading-tight group-hover:text-amber-200 transition-colors"
+                style={{ fontFamily: 'var(--font-cormorant)' }}
+              >
+                THE 1898
+              </h1>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-white/50">Niseko</p>
+            </div>
+          </Link>
+
+          {/* Center - Menu Items */}
+          <div className="flex items-center gap-1 bg-white/5 backdrop-blur-md rounded-full px-2 py-1.5 border border-white/10">
+            {menuItems.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`px-4 py-2 rounded-full text-sm transition-all ${
+                  item.active
+                    ? 'bg-white/15 text-white font-medium'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Right - Logout */}
           <button
             onClick={handleLogout}
-            className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-sm rounded-full text-stone-600 hover:bg-white transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
           >
+            <span className="text-sm">Logout</span>
             <LogOut className="w-4 h-4" />
           </button>
+        </nav>
 
-          {/* Welcome Message */}
-          <div className="absolute bottom-4 left-6 right-6">
-            <div className="flex items-center gap-2 mb-1">
-              <Sparkles className="w-3 h-3 text-amber-400" />
-              <p className="text-xs uppercase tracking-widest text-amber-400">Grand Opening Guest</p>
-            </div>
-            <h1 className="text-xl font-light text-white" style={{ fontFamily: 'var(--font-cormorant)' }}>
-              Welcome, {guestData.name.split(' ')[0]}
-            </h1>
-          </div>
-        </div>
+        {/* Main Content - Two Column Layout */}
+        <div className="flex-1 flex gap-6 px-8 pb-6 min-h-0">
 
-        {/* Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {/* Booking Details Card */}
-            <div className="bg-white rounded-xl p-5">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h2 className="text-lg font-medium text-stone-800" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                    {guestData.room.name}
-                  </h2>
-                  <p className="text-xs text-stone-500">{guestData.room.floor}</p>
-                </div>
-                <span className="text-xs px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full">
-                  Confirmed
-                </span>
+          {/* Left Column - Guest Info - Full Height Card */}
+          <div className="flex-1 min-w-0 flex flex-col">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-2xl flex-1 flex flex-col min-h-0">
+              {/* Welcome Header - Sticky */}
+              <div className="mb-6 flex-shrink-0">
+                <h2
+                  className="text-4xl font-light text-white tracking-wide"
+                  style={{ fontFamily: 'var(--font-cormorant)' }}
+                >
+                  Welcome, {guestData.name.split(' ')[0]}
+                </h2>
+                <p className="text-base text-white/50 mt-2">{guestData.room.name} • {guestData.nights} Nights</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-stone-400" />
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto min-h-0 space-y-4 pr-2">
+                {/* Booking Details Section */}
+                <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+                <div className="flex items-start justify-between mb-4">
                   <div>
-                    <p className="text-xs text-stone-500">Check-in</p>
-                    <p className="text-sm text-stone-800">{guestData.checkIn}</p>
+                    <h3 className="text-lg font-medium text-white" style={{ fontFamily: 'var(--font-cormorant)' }}>
+                      {guestData.room.name}
+                    </h3>
+                    <p className="text-xs text-white/50">{guestData.room.floor}</p>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-stone-400" />
-                  <div>
-                    <p className="text-xs text-stone-500">Check-out</p>
-                    <p className="text-sm text-stone-800">{guestData.checkOut}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {guestData.room.features.map((feature) => (
-                  <span key={feature} className="text-xs px-2 py-1 bg-stone-100 text-stone-600 rounded">
-                    {feature}
+                  <span className="text-xs px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30">
+                    Confirmed
                   </span>
-                ))}
-              </div>
-
-              {/* Pet & Special Requests */}
-              <div className="mt-4 pt-4 border-t border-stone-100 space-y-3">
-                <div className="flex items-center gap-2">
-                  <PawPrint className="w-4 h-4 text-stone-400" />
-                  <p className="text-sm text-stone-700">Traveling with {guestData.pet}</p>
                 </div>
-                {guestData.specialRequests.map((req, idx) => (
-                  <div key={idx} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Plane className="w-4 h-4 text-stone-400" />
-                      <p className="text-sm text-stone-700">{req.type} at {req.time}</p>
-                    </div>
-                    <span className="text-xs px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full">
-                      Confirmed
-                    </span>
-                  </div>
-                ))}
-              </div>
 
-              <div className="mt-4 pt-4 border-t border-stone-100 flex items-center justify-between">
-                <p className="text-xs text-stone-500">
-                  Confirmation: <span className="font-mono text-stone-700">{guestData.confirmationCode}</span>
-                </p>
-                <p className="text-xs text-stone-500">{guestData.nights} nights • {guestData.guests} guest</p>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-amber-400/70" />
+                    <div>
+                      <p className="text-xs text-white/40">Check-in</p>
+                      <p className="text-sm text-white">{guestData.checkIn}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-amber-400/70" />
+                    <div>
+                      <p className="text-xs text-white/40">Check-out</p>
+                      <p className="text-sm text-white">{guestData.checkOut}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {guestData.room.features.map((feature) => (
+                    <span key={feature} className="text-xs px-2 py-1 bg-white/10 text-white/70 rounded border border-white/10">
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Pet & Special Requests */}
+                <div className="mt-4 pt-4 border-t border-white/10 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <PawPrint className="w-4 h-4 text-amber-400/70" />
+                    <p className="text-sm text-white/80">Traveling with {guestData.pet}</p>
+                  </div>
+                  {guestData.specialRequests.map((req, idx) => (
+                    <div key={idx} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Plane className="w-4 h-4 text-amber-400/70" />
+                        <p className="text-sm text-white/80">{req.type} at {req.time}</p>
+                      </div>
+                      <span className="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full">
+                        Confirmed
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between">
+                  <p className="text-xs text-white/40">
+                    Confirmation: <span className="font-mono text-white/70">{guestData.confirmationCode}</span>
+                  </p>
+                  <p className="text-xs text-white/40">{guestData.nights} nights • {guestData.guests} guest</p>
+                </div>
               </div>
-            </div>
 
             {/* Quick Actions */}
             <div>
-              <h3 className="text-xs font-medium text-stone-500 mb-3 uppercase tracking-wider">Quick Actions</h3>
+              <h3 className="text-xs font-medium text-white/50 mb-3 uppercase tracking-wider">Quick Actions</h3>
               <div className="grid grid-cols-4 gap-2">
                 {quickActions.map((action) => {
                   const isActive = activeAction === action.serviceType;
@@ -283,20 +340,20 @@ export default function GuestPage() {
                     <button
                       key={action.label}
                       onClick={() => handleQuickAction(action.serviceType)}
-                      className={`p-3 rounded-lg transition-all text-center group ${
+                      className={`p-3 rounded-xl transition-all text-center group border ${
                         isActive
-                          ? 'bg-stone-800 ring-2 ring-stone-800 ring-offset-2'
-                          : 'bg-white hover:bg-stone-50'
+                          ? 'bg-amber-500/20 border-amber-400/30 ring-2 ring-amber-400/30 ring-offset-2 ring-offset-transparent'
+                          : 'bg-white/10 border-white/10 hover:bg-white/15 hover:border-white/20'
                       }`}
                     >
                       <action.icon className={`w-5 h-5 mx-auto mb-2 transition-colors ${
-                        isActive ? 'text-white' : 'text-stone-400 group-hover:text-stone-600'
+                        isActive ? 'text-amber-400' : 'text-white/50 group-hover:text-white/70'
                       }`} />
                       <p className={`text-xs font-medium transition-colors ${
-                        isActive ? 'text-white' : 'text-stone-700'
+                        isActive ? 'text-amber-400' : 'text-white/80'
                       }`}>{action.label}</p>
                       <p className={`text-[10px] mt-0.5 transition-colors ${
-                        isActive ? 'text-stone-300' : 'text-stone-400'
+                        isActive ? 'text-amber-400/70' : 'text-white/40'
                       }`}>{action.description}</p>
                     </button>
                   );
@@ -307,18 +364,18 @@ export default function GuestPage() {
             {/* Active Service Requests */}
             {serviceRequests.length > 0 && (
               <div>
-                <h3 className="text-xs font-medium text-stone-500 mb-3 uppercase tracking-wider">Active Requests</h3>
+                <h3 className="text-xs font-medium text-white/50 mb-3 uppercase tracking-wider">Active Requests</h3>
                 <div className="space-y-2">
                   {serviceRequests.map((request) => (
-                    <div key={request.id} className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg border border-emerald-100">
-                      <div className="p-2 bg-emerald-100 rounded-lg">
-                        <Check className="w-4 h-4 text-emerald-600" />
+                    <div key={request.id} className="flex items-center gap-3 p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                      <div className="p-2 bg-emerald-500/20 rounded-lg">
+                        <Check className="w-4 h-4 text-emerald-400" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-stone-800 capitalize">{request.type.replace('_', ' ')}</p>
-                        <p className="text-xs text-stone-500">{request.details}</p>
+                        <p className="text-sm font-medium text-white capitalize">{request.type.replace('_', ' ')}</p>
+                        <p className="text-xs text-white/50">{request.details}</p>
                       </div>
-                      <span className="text-xs px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full">
+                      <span className="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full">
                         {request.status}
                       </span>
                     </div>
@@ -329,25 +386,25 @@ export default function GuestPage() {
 
             {/* Upcoming Activities */}
             <div>
-              <h3 className="text-xs font-medium text-stone-500 mb-3 uppercase tracking-wider">Your Schedule</h3>
+              <h3 className="text-xs font-medium text-white/50 mb-3 uppercase tracking-wider">Your Schedule</h3>
               <div className="space-y-2">
                 {schedule.map((activity) => (
                   <div
                     key={activity.id}
-                    className="flex items-center gap-3 p-3 bg-white rounded-lg"
+                    className="flex items-center gap-3 p-3 bg-white/10 rounded-xl border border-white/10"
                   >
-                    <div className="p-2 bg-stone-100 rounded-lg">
-                      <activity.icon className="w-4 h-4 text-stone-600" />
+                    <div className="p-2 bg-white/10 rounded-lg">
+                      <activity.icon className="w-4 h-4 text-amber-400/70" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-stone-800">{activity.title}</p>
+                      <p className="text-sm font-medium text-white">{activity.title}</p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs text-stone-500 flex items-center gap-1">
+                        <span className="text-xs text-white/50 flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {activity.time}
                         </span>
-                        <span className="text-xs text-stone-400">•</span>
-                        <span className="text-xs text-stone-500 flex items-center gap-1">
+                        <span className="text-xs text-white/30">•</span>
+                        <span className="text-xs text-white/50 flex items-center gap-1">
                           <MapPin className="w-3 h-3" />
                           {activity.location}
                         </span>
@@ -355,8 +412,8 @@ export default function GuestPage() {
                     </div>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
                       activity.status === 'confirmed'
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : 'bg-amber-100 text-amber-700'
+                        ? 'bg-emerald-500/20 text-emerald-400'
+                        : 'bg-amber-500/20 text-amber-400'
                     }`}>
                       {activity.status === 'confirmed' ? 'Confirmed' : 'Pending'}
                     </span>
@@ -368,8 +425,8 @@ export default function GuestPage() {
             {/* Experiences */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-medium text-stone-500 uppercase tracking-wider">Niseko Experiences</h3>
-                <button className="text-xs text-stone-500 hover:text-stone-700 flex items-center gap-1">
+                <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">Niseko Experiences</h3>
+                <button className="text-xs text-white/50 hover:text-white/70 flex items-center gap-1">
                   View all <ChevronRight className="w-3 h-3" />
                 </button>
               </div>
@@ -377,41 +434,47 @@ export default function GuestPage() {
                 {experiences.map((exp) => (
                   <button
                     key={exp.title}
-                    className="p-4 bg-white rounded-lg hover:bg-stone-50 transition-colors text-left"
+                    className="p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors text-left"
                   >
-                    <exp.icon className="w-5 h-5 text-stone-400 mb-2" />
-                    <p className="text-sm font-medium text-stone-800">{exp.title}</p>
-                    <p className="text-xs text-stone-500 mt-0.5">{exp.description}</p>
+                    <exp.icon className="w-5 h-5 text-amber-400/70 mb-2" />
+                    <p className="text-sm font-medium text-white">{exp.title}</p>
+                    <p className="text-xs text-white/50 mt-0.5">{exp.description}</p>
                   </button>
                 ))}
               </div>
             </div>
-        </div>
-      </div>
+              </div>{/* End scrollable content */}
+            </div>
+          </div>
 
-      {/* Right: Voice Chat */}
-      <div className="flex-[1] min-w-0 p-6">
-        <VoiceSessionChat
-          agentId="concierge"
-          sessionId="guest-portal"
-          elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_GUEST_AGENT_ID}
-          title="Yuki"
-          avatar="/avatars/guest-avatar.jpg"
-          welcomeMessage="Hello Avi! Welcome to The 1898. I'm Yuki, your personal concierge. It's wonderful to have you with us — how can I make your stay special today?"
-          suggestions={[
-            "Clean my room please",
-            "I'd like room service",
-            "Book an onsen session",
-            "What's good for dinner?"
-          ]}
-          contextData={{
-            guest: guestData,
-            schedule: schedule.map(s => ({ title: s.title, time: s.time, location: s.location, status: s.status })),
-            serviceRequests,
-            experiences,
-            availableServices: quickActions.map(a => ({ label: a.label, description: a.description, type: a.serviceType }))
-          }}
-        />
+          {/* Right Column - Voice Chat */}
+          <div className="flex-1 min-w-0 flex flex-col max-w-md">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl flex-1 overflow-hidden">
+              <VoiceSessionChat
+                agentId="concierge"
+                sessionId="guest-portal"
+                elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_GUEST_AGENT_ID}
+                title="Yuki"
+                avatar="/avatars/guest-avatar.jpg"
+                welcomeMessage="Hello Avi! Welcome to The 1898. I'm Yuki, your personal concierge. It's wonderful to have you with us — how can I make your stay special today?"
+                suggestions={[
+                  "Clean my room please",
+                  "I'd like room service",
+                  "Book an onsen session",
+                  "What's good for dinner?"
+                ]}
+                contextData={{
+                  guest: guestData,
+                  schedule: schedule.map(s => ({ title: s.title, time: s.time, location: s.location, status: s.status })),
+                  serviceRequests,
+                  experiences,
+                  availableServices: quickActions.map(a => ({ label: a.label, description: a.description, type: a.serviceType }))
+                }}
+                variant="dark"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

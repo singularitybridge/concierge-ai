@@ -863,7 +863,7 @@ Use this data to answer questions about guests. When asked about a specific gues
       isDark ? 'bg-transparent' : 'bg-white rounded-2xl shadow-sm'
     }`}>
       {/* Header - Always visible */}
-      <div className={`px-5 py-4 ${isDark ? 'border-b border-white/10' : 'border-b border-stone-100'}`}>
+      <div className={`px-5 py-4 flex-shrink-0 ${isDark ? 'border-b border-white/10' : 'border-b border-stone-100'}`}>
         <div className="flex items-center gap-4">
           {/* Avatar */}
           <div className={`w-14 h-14 rounded-full overflow-hidden flex-shrink-0 ${
@@ -907,7 +907,7 @@ Use this data to answer questions about guests. When asked about a specific gues
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
         {messages.length === 0 && !isCallActive && (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             {/* Welcome Message */}
@@ -981,7 +981,7 @@ Use this data to answer questions about guests. When asked about a specific gues
       </div>
 
       {/* Bottom Controls */}
-      <div className={`p-4 ${isDark ? 'border-t border-white/10' : 'border-t border-stone-100'}`}>
+      <div className={`p-4 flex-shrink-0 ${isDark ? 'border-t border-white/10' : 'border-t border-stone-100'}`}>
         {!isCallActive ? (
           /* Speak Button - Initial State */
           <button

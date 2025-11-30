@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { TrendingUp, Users, Wrench, Network, Cpu, Plus, X, Loader2, LogOut, BookOpen, Shield, Sparkles, ClipboardList, Building2 } from 'lucide-react';
+import { TrendingUp, Users, Wrench, Network, Cpu, Plus, X, Loader2, LogOut, BookOpen, Shield, Sparkles, ClipboardList } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 const tasks = [
@@ -38,6 +38,7 @@ const agents = [
     description: 'Reservations, guest profiles, and special requests management',
     icon: Users,
     avatar: '/avatars/guests.jpg',
+    disabled: false,
   },
   {
     id: 'revenue',
@@ -46,6 +47,7 @@ const agents = [
     description: 'Pricing optimization, occupancy analytics, and demand forecasting',
     icon: TrendingUp,
     avatar: '/avatars/revenue.jpg',
+    disabled: true,
   },
   {
     id: 'operations',
@@ -54,6 +56,7 @@ const agents = [
     description: 'Housekeeping, maintenance, and room status coordination',
     icon: Wrench,
     avatar: '/avatars/operations.jpg',
+    disabled: true,
   },
   {
     id: 'architect',
@@ -62,6 +65,7 @@ const agents = [
     description: 'System health, code evolution, and platform orchestration',
     icon: Cpu,
     avatar: '/avatars/architect.jpg',
+    disabled: true,
   },
 ];
 
@@ -155,6 +159,14 @@ export default function AdminPage() {
     setIsAssigning(false);
   };
 
+  // Navigation menu items
+  const menuItems = [
+    { label: 'Grand Opening', href: '/experience' },
+    { label: 'Guest Portal', href: '/guest' },
+    { label: 'Staff Portal', href: '/admin', active: true },
+    { label: 'Shop', href: '/shop' },
+  ];
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Full Page Background */}
@@ -170,61 +182,80 @@ export default function AdminPage() {
       <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-stone-900/60" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
 
-      {/* Logout Button */}
-      <button
-        onClick={logout}
-        className="absolute top-6 right-6 z-20 p-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl border border-white/20 transition-all"
-        title="Logout"
-      >
-        <LogOut className="w-4 h-4 text-white" />
-      </button>
-
       {/* Content */}
-      <div className={`relative z-10 min-h-screen flex flex-col transition-opacity duration-1000 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`relative z-10 h-screen flex flex-col transition-opacity duration-1000 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
 
-        {/* Top Badge */}
-        <div className="pt-8 md:pt-10 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
-            <Building2 className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-xs tracking-[0.2em] text-white/90 font-medium">
-              PROPERTY MANAGEMENT
-            </span>
-          </div>
-        </div>
-
-        {/* Header */}
-        <div className="text-center mt-6 mb-8">
-          <Link href="/" className="inline-block">
-            <p className="text-xs uppercase tracking-[0.35em] text-amber-400/90 mb-3 font-medium">
-              Niseko, Hokkaido
-            </p>
-            <h1
-              className="text-4xl md:text-5xl font-light text-white tracking-wide mb-2"
-              style={{ fontFamily: 'var(--font-cormorant)' }}
-            >
-              THE 1898
-            </h1>
-            <p
-              className="text-xl md:text-2xl text-white/80 tracking-widest font-light"
-              style={{ fontFamily: 'var(--font-cormorant)' }}
-            >
-              NISEKO
-            </p>
+        {/* Top Navigation Bar */}
+        <nav className="flex items-center justify-between px-8 py-4 flex-shrink-0">
+          {/* Left - Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-sm" style={{ fontFamily: 'var(--font-cormorant)' }}>18</span>
+            </div>
+            <div>
+              <h1
+                className="text-xl font-light text-white tracking-wide leading-tight group-hover:text-amber-200 transition-colors"
+                style={{ fontFamily: 'var(--font-cormorant)' }}
+              >
+                THE 1898
+              </h1>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-white/50">Niseko</p>
+            </div>
           </Link>
-        </div>
+
+          {/* Center - Menu Items */}
+          <div className="flex items-center gap-1 bg-white/5 backdrop-blur-md rounded-full px-2 py-1.5 border border-white/10">
+            {menuItems.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`px-4 py-2 rounded-full text-sm transition-all ${
+                  item.active
+                    ? 'bg-white/15 text-white font-medium'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Right - Logout */}
+          <button
+            onClick={logout}
+            className="flex items-center gap-2 px-4 py-2 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
+          >
+            <span className="text-sm">Logout</span>
+            <LogOut className="w-4 h-4" />
+          </button>
+        </nav>
 
         {/* Main Content */}
-        <div className="flex-1 px-6 pb-8 overflow-y-auto">
-          <div className="max-w-4xl mx-auto">
+        <div className="flex-1 flex gap-6 px-8 pb-6 min-h-0">
+          {/* Main Card - Full Height */}
+          <div className="flex-1 min-w-0 flex flex-col">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-2xl flex-1 flex flex-col min-h-0">
+              {/* Title Header - Sticky */}
+              <div className="mb-6 flex-shrink-0">
+                <h2
+                  className="text-4xl font-light text-white tracking-wide"
+                  style={{ fontFamily: 'var(--font-cormorant)' }}
+                >
+                  Staff Portal
+                </h2>
+                <p className="text-base text-white/50 mt-2">Property Management System</p>
+              </div>
 
-            {/* Two Column Layout */}
-            <div className="grid md:grid-cols-2 gap-6">
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto min-h-0 pr-2">
+              {/* Two Column Layout */}
+              <div className="grid md:grid-cols-2 gap-6">
 
               {/* Left Column - Team & Tasks */}
               <div className="space-y-6">
 
                 {/* Your Team Card */}
-                <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20 shadow-2xl">
+                <div className="p-4 bg-white/5 rounded-xl border border-white/10">
                   <div className="flex items-center justify-between mb-4">
                     <h2
                       className="text-xl font-light text-white tracking-wide"
@@ -237,39 +268,66 @@ export default function AdminPage() {
 
                   <div className="space-y-2">
                     {agents.map((agent) => (
-                      <Link
-                        key={agent.id}
-                        href={`/agents/${agent.id}`}
-                        className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/30 rounded-xl transition-all group"
-                      >
-                        <div className="relative w-10 h-10 rounded-full overflow-hidden bg-white/10 flex-shrink-0 ring-2 ring-white/10 group-hover:ring-amber-400/30 transition-all">
-                          <Image
-                            src={agent.avatar}
-                            alt={agent.name}
-                            fill
-                            className="object-cover"
-                          />
+                      agent.disabled ? (
+                        <div
+                          key={agent.id}
+                          className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-xl opacity-60 cursor-not-allowed"
+                        >
+                          <div className="relative w-10 h-10 rounded-full overflow-hidden bg-white/10 flex-shrink-0 ring-2 ring-white/10">
+                            <Image
+                              src={agent.avatar}
+                              alt={agent.name}
+                              fill
+                              className="object-cover opacity-70"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-white/50">
+                              {agent.name}
+                            </p>
+                            <p className="text-xs text-white/30 truncate">
+                              {agent.title}
+                            </p>
+                          </div>
+                          <span className="text-[10px] text-white/40 bg-white/5 px-2 py-0.5 rounded-full">
+                            Coming Soon
+                          </span>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-white group-hover:text-amber-100 transition-colors">
-                            {agent.name}
-                          </p>
-                          <p className="text-xs text-white/50 truncate">
-                            {agent.title}
-                          </p>
-                        </div>
-                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-amber-400/20 transition-colors">
-                          <svg className="w-3 h-3 text-white/40 group-hover:text-amber-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </div>
-                      </Link>
+                      ) : (
+                        <Link
+                          key={agent.id}
+                          href={`/agents/${agent.id}`}
+                          className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/30 rounded-xl transition-all group"
+                        >
+                          <div className="relative w-10 h-10 rounded-full overflow-hidden bg-white/10 flex-shrink-0 ring-2 ring-white/10 group-hover:ring-amber-400/30 transition-all">
+                            <Image
+                              src={agent.avatar}
+                              alt={agent.name}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-white group-hover:text-amber-100 transition-colors">
+                              {agent.name}
+                            </p>
+                            <p className="text-xs text-white/50 truncate">
+                              {agent.title}
+                            </p>
+                          </div>
+                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-amber-400/20 transition-colors">
+                            <svg className="w-3 h-3 text-white/40 group-hover:text-amber-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </div>
+                        </Link>
+                      )
                     ))}
                   </div>
                 </div>
 
                 {/* Active Tasks Card */}
-                <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20 shadow-2xl">
+                <div className="p-4 bg-white/5 rounded-xl border border-white/10">
                   <div className="flex items-center justify-between mb-4">
                     <h2
                       className="text-xl font-light text-white tracking-wide"
@@ -318,7 +376,7 @@ export default function AdminPage() {
               <div className="space-y-6">
 
                 {/* Knowledge Base Card */}
-                <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20 shadow-2xl">
+                <div className="p-4 bg-white/5 rounded-xl border border-white/10">
                   <div className="flex items-center justify-between mb-4">
                     <h2
                       className="text-xl font-light text-white tracking-wide"
@@ -367,7 +425,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* Property Stats Card */}
-                <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20 shadow-2xl">
+                <div className="p-4 bg-white/5 rounded-xl border border-white/10">
                   <h2
                     className="text-xl font-light text-white tracking-wide mb-4"
                     style={{ fontFamily: 'var(--font-cormorant)' }}
@@ -404,18 +462,8 @@ export default function AdminPage() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Footer */}
-            <div className="mt-8 text-center">
-              <p className="text-xs text-white/40 mb-2">AI-Powered Property Management</p>
-              <div className="flex items-center justify-center gap-3 text-xs text-white/30">
-                <span>Real-time Sync</span>
-                <span className="w-1 h-1 rounded-full bg-white/30" />
-                <span>Smart Delegation</span>
-                <span className="w-1 h-1 rounded-full bg-white/30" />
-                <span>24/7 Operations</span>
-              </div>
+              </div>{/* End two column grid */}
+              </div>{/* End scrollable content */}
             </div>
           </div>
         </div>

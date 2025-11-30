@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ArrowLeft, Users, Star, Calendar, Clock, MessageSquare, Plane, Car, Bell, CheckCircle, AlertTriangle, ExternalLink } from 'lucide-react';
+import { Users, Star, MessageSquare, Plane, Car, Bell, CheckCircle, AlertTriangle, ExternalLink, LogOut, ChevronRight } from 'lucide-react';
 import VoiceSessionChat from '../../components/VoiceSessionChat';
 import GuestDetailModal, { GuestData } from '../../components/GuestDetailModal';
+import { useAuth } from '../../hooks/useAuth';
 
 // Service request interface (with taskId for linking to tasks page)
 interface ServiceRequest {
@@ -215,12 +216,28 @@ const requestsData: ServiceRequest[] = [
 type ViewTab = 'guests' | 'arrivals' | 'requests';
 
 export default function GuestsAgentPage() {
+  const { isAuthenticated, logout } = useAuth();
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<ViewTab>('guests');
   const [selectedGuest, setSelectedGuest] = useState<GuestData | null>(null);
   const [guests, setGuests] = useState(guestsData);
   const [requests, setRequests] = useState(requestsData);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
+
+  // Navigation menu items
+  const menuItems = [
+    { label: 'Grand Opening', href: '/experience' },
+    { label: 'Guest Portal', href: '/guest' },
+    { label: 'Staff Portal', href: '/admin', active: true },
+    { label: 'Shop', href: '/shop' },
+  ];
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      setMounted(true);
+    }
+  }, [isAuthenticated]);
 
   // Filter data based on tab
   const arrivals = guests.filter(g => g.status === 'arriving' || g.status === 'vip');
@@ -350,254 +367,325 @@ export default function GuestsAgentPage() {
     requests: pendingRequests.map(r => ({ id: r.id, guest: r.guestName, type: r.type, description: r.description, status: r.status, priority: r.priority }))
   };
 
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen bg-stone-900 flex items-center justify-center">
+        <div className="text-white/50 text-sm">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
-    <div className="flex h-screen bg-stone-100">
-      {/* Left: Guest Management Dashboard */}
-      <div className="flex-[2] min-w-0 overflow-hidden">
-        <div className="flex flex-col h-full bg-white">
-          {/* Hero Image */}
-          <div className="relative h-48 flex-shrink-0">
-            <Image
-              src="/hotel3.jpg"
-              alt="Guest Services"
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+    <div className="h-screen relative overflow-hidden">
+      {/* Full Page Background */}
+      <Image
+        src="/hotel3.jpg"
+        alt="The 1898 Niseko"
+        fill
+        className="object-cover"
+        priority
+      />
 
-            {/* Back Button */}
-            <Link
-              href="/admin"
-              className="absolute top-4 left-4 p-2 bg-white/80 backdrop-blur-sm rounded-full text-stone-600 hover:bg-white transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
+      {/* Sophisticated Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-stone-900/60" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
 
-            {/* Title Overlay */}
-            <div className="absolute bottom-4 left-6 right-6">
-              <div className="flex items-center gap-3 mb-1">
-                <div className="p-2 bg-blue-500 rounded-lg">
-                  <Users className="w-4 h-4 text-white" />
-                </div>
-                <p className="text-xs uppercase tracking-[0.2em] text-white/80">Guest Services</p>
-              </div>
-              <h1 className="text-xl font-light text-white tracking-wide" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                Reservations & Profiles
+      {/* Content */}
+      <div className={`relative z-10 h-screen flex flex-col transition-opacity duration-1000 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+
+        {/* Top Navigation Bar */}
+        <nav className="flex items-center justify-between px-8 py-4 flex-shrink-0">
+          {/* Left - Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-sm" style={{ fontFamily: 'var(--font-cormorant)' }}>18</span>
+            </div>
+            <div>
+              <h1
+                className="text-xl font-light text-white tracking-wide leading-tight group-hover:text-amber-200 transition-colors"
+                style={{ fontFamily: 'var(--font-cormorant)' }}
+              >
+                THE 1898
               </h1>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-white/50">Niseko</p>
             </div>
-          </div>
+          </Link>
 
-          {/* Stats Bar */}
-          <div className="grid grid-cols-4 gap-3 p-4 border-b border-stone-100">
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <div className="flex items-center gap-2 mb-1">
-                <Plane className="w-3.5 h-3.5 text-blue-500" />
-                <span className="text-xs text-blue-700">Arrivals</span>
-              </div>
-              <p className="text-xl font-light text-blue-900">{arrivals.length}</p>
-            </div>
-            <div className="p-3 bg-stone-50 rounded-lg">
-              <div className="flex items-center gap-2 mb-1">
-                <Car className="w-3.5 h-3.5 text-stone-400" />
-                <span className="text-xs text-stone-500">Departures</span>
-              </div>
-              <p className="text-xl font-light text-stone-800">{departures.length}</p>
-            </div>
-            <div className="p-3 bg-emerald-50 rounded-lg">
-              <div className="flex items-center gap-2 mb-1">
-                <Users className="w-3.5 h-3.5 text-emerald-500" />
-                <span className="text-xs text-emerald-700">In-House</span>
-              </div>
-              <p className="text-xl font-light text-emerald-900">{inHouseGuests.length}</p>
-            </div>
-            <div className="p-3 bg-amber-50 rounded-lg">
-              <div className="flex items-center gap-2 mb-1">
-                <Bell className="w-3.5 h-3.5 text-amber-500" />
-                <span className="text-xs text-amber-700">Requests</span>
-              </div>
-              <p className="text-xl font-light text-amber-900">{pendingRequests.length}</p>
-            </div>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex border-b border-stone-100">
-            {(['guests', 'arrivals', 'requests'] as ViewTab[]).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                  activeTab === tab
-                    ? 'text-stone-800 border-b-2 border-stone-800'
-                    : 'text-stone-400 hover:text-stone-600'
+          {/* Center - Menu Items */}
+          <div className="flex items-center gap-1 bg-white/5 backdrop-blur-md rounded-full px-2 py-1.5 border border-white/10">
+            {menuItems.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`px-4 py-2 rounded-full text-sm transition-all ${
+                  item.active
+                    ? 'bg-white/15 text-white font-medium'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
                 }`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
+                {item.label}
+              </Link>
             ))}
           </div>
 
-          {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            {/* Guests Tab */}
-            {activeTab === 'guests' && inHouseGuests.map((guest) => (
-              <div
-                key={guest.id}
-                onClick={() => setSelectedGuest(guest)}
-                className="p-4 bg-stone-50 rounded-xl hover:bg-stone-100 cursor-pointer transition-colors"
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-stone-800">{guest.name}</p>
-                    {guest.status === 'vip' && (
-                      <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                    )}
-                    {guest.loyaltyTier !== 'standard' && (
-                      <span className={`text-xs px-1.5 py-0.5 rounded ${
-                        guest.loyaltyTier === 'platinum' ? 'bg-purple-100 text-purple-600' : 'bg-amber-100 text-amber-600'
-                      }`}>
-                        {guest.loyaltyTier}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-xs text-stone-400">{guest.roomNumber}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-stone-500">{guest.roomType} • {guest.guestCount} guests</span>
-                  <span className="text-stone-400">{guest.checkIn} - {guest.checkOut}</span>
-                </div>
-                {guest.notes && (
-                  <p className="text-xs text-blue-600 mt-2 truncate">{guest.notes}</p>
-                )}
-              </div>
-            ))}
+          {/* Right - Logout */}
+          <button
+            onClick={logout}
+            className="flex items-center gap-2 px-4 py-2 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
+          >
+            <span className="text-sm">Logout</span>
+            <LogOut className="w-4 h-4" />
+          </button>
+        </nav>
 
-            {/* Arrivals Tab */}
-            {activeTab === 'arrivals' && (
-              <>
-                <h3 className="text-xs font-medium text-stone-400 uppercase tracking-wider">Today's Arrivals</h3>
-                {arrivals.map((guest) => (
+        {/* Breadcrumbs */}
+        <div className="px-8 pb-3 flex-shrink-0">
+          <nav className="flex items-center gap-2 text-sm">
+            <Link
+              href="/admin"
+              className="text-white/50 hover:text-white transition-colors"
+            >
+              Staff Portal
+            </Link>
+            <ChevronRight className="w-4 h-4 text-white/30" />
+            <span className="text-white/80">Guest Services</span>
+          </nav>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 flex gap-6 px-8 pb-6 min-h-0">
+          {/* Left: Guest Management Dashboard */}
+          <div className="flex-1 min-w-0 flex flex-col">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl flex-1 flex flex-col min-h-0 overflow-hidden">
+              {/* Header */}
+              <div className="p-6 flex-shrink-0 border-b border-white/10">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
+                    <Users className="w-6 h-6 text-white/60" />
+                  </div>
+                  <div>
+                    <h2
+                      className="text-3xl font-light text-white tracking-wide"
+                      style={{ fontFamily: 'var(--font-cormorant)' }}
+                    >
+                      Reservations & Profiles
+                    </h2>
+                    <p className="text-sm text-white/50 mt-1">Guest Services Dashboard</p>
+                  </div>
+                </div>
+
+                {/* Stats Bar */}
+                <div className="grid grid-cols-4 gap-3">
+                  <div className="p-3 bg-white/5 rounded-xl border border-white/10">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Plane className="w-3.5 h-3.5 text-white/40" />
+                      <span className="text-xs text-white/50">Arrivals</span>
+                    </div>
+                    <p className="text-xl font-light text-white">{arrivals.length}</p>
+                  </div>
+                  <div className="p-3 bg-white/5 rounded-xl border border-white/10">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Car className="w-3.5 h-3.5 text-white/40" />
+                      <span className="text-xs text-white/50">Departures</span>
+                    </div>
+                    <p className="text-xl font-light text-white">{departures.length}</p>
+                  </div>
+                  <div className="p-3 bg-white/5 rounded-xl border border-white/10">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Users className="w-3.5 h-3.5 text-white/40" />
+                      <span className="text-xs text-white/50">In-House</span>
+                    </div>
+                    <p className="text-xl font-light text-white">{inHouseGuests.length}</p>
+                  </div>
+                  <div className="p-3 bg-white/5 rounded-xl border border-white/10">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Bell className="w-3.5 h-3.5 text-white/40" />
+                      <span className="text-xs text-white/50">Requests</span>
+                    </div>
+                    <p className="text-xl font-light text-white">{pendingRequests.length}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tabs */}
+              <div className="flex border-b border-white/10 flex-shrink-0">
+                {(['guests', 'arrivals', 'requests'] as ViewTab[]).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                      activeTab === tab
+                        ? 'text-white border-b-2 border-amber-400'
+                        : 'text-white/40 hover:text-white/70'
+                    }`}
+                  >
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </button>
+                ))}
+              </div>
+
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
+                {/* Guests Tab */}
+                {activeTab === 'guests' && inHouseGuests.map((guest) => (
                   <div
                     key={guest.id}
                     onClick={() => setSelectedGuest(guest)}
-                    className="p-4 bg-blue-50 rounded-xl hover:bg-blue-100 cursor-pointer transition-colors border border-blue-100"
+                    className="p-4 bg-white/5 rounded-xl hover:bg-white/10 cursor-pointer transition-colors border border-white/10"
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium text-stone-800">{guest.name}</p>
+                        <p className="text-sm font-medium text-white">{guest.name}</p>
                         {guest.status === 'vip' && (
-                          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                          <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                        )}
+                        {guest.loyaltyTier !== 'standard' && (
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-white/10 text-white/60 border border-white/10">
+                            {guest.loyaltyTier}
+                          </span>
                         )}
                       </div>
-                      <span className="text-xs font-medium text-blue-600">{guest.arrivalTime}</span>
+                      <span className="text-xs text-white/40">{guest.roomNumber}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-stone-600">{guest.roomType} • Room {guest.roomNumber}</span>
-                      <span className="text-stone-500">{guest.guestCount} guests</span>
+                      <span className="text-white/50">{guest.roomType} • {guest.guestCount} guests</span>
+                      <span className="text-white/40">{guest.checkIn} - {guest.checkOut}</span>
                     </div>
-                    {guest.flightNumber && (
-                      <div className="flex items-center gap-1 mt-2 text-xs text-stone-500">
-                        <Plane className="w-3 h-3" />
-                        <span>{guest.flightNumber}</span>
-                      </div>
-                    )}
-                    {guest.specialRequests && guest.specialRequests.length > 0 && (
-                      <p className="text-xs text-blue-700 mt-2">{guest.specialRequests.join(' • ')}</p>
+                    {guest.notes && (
+                      <p className="text-xs text-white/40 mt-2 truncate italic">{guest.notes}</p>
                     )}
                   </div>
                 ))}
 
-                {departures.length > 0 && (
+                {/* Arrivals Tab */}
+                {activeTab === 'arrivals' && (
                   <>
-                    <h3 className="text-xs font-medium text-stone-400 uppercase tracking-wider mt-6">Today's Departures</h3>
-                    {departures.map((guest) => (
+                    <h3 className="text-xs font-medium text-white/40 uppercase tracking-wider">Today&apos;s Arrivals</h3>
+                    {arrivals.map((guest) => (
                       <div
                         key={guest.id}
                         onClick={() => setSelectedGuest(guest)}
-                        className="p-4 bg-stone-50 rounded-xl hover:bg-stone-100 cursor-pointer transition-colors"
+                        className="p-4 bg-white/5 rounded-xl hover:bg-white/10 cursor-pointer transition-colors border border-white/10"
                       >
                         <div className="flex items-start justify-between mb-2">
-                          <p className="text-sm font-medium text-stone-800">{guest.name}</p>
-                          <span className="text-xs px-2 py-0.5 bg-stone-200 text-stone-600 rounded-full">Departing</span>
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium text-white">{guest.name}</p>
+                            {guest.status === 'vip' && (
+                              <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                            )}
+                          </div>
+                          <span className="text-xs font-medium text-white/70">{guest.arrivalTime}</span>
                         </div>
-                        <div className="flex items-center justify-between text-xs text-stone-500">
-                          <span>Room {guest.roomNumber}</span>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-white/50">{guest.roomType} • Room {guest.roomNumber}</span>
+                          <span className="text-white/40">{guest.guestCount} guests</span>
                         </div>
+                        {guest.flightNumber && (
+                          <div className="flex items-center gap-1 mt-2 text-xs text-white/40">
+                            <Plane className="w-3 h-3" />
+                            <span>{guest.flightNumber}</span>
+                          </div>
+                        )}
+                        {guest.specialRequests && guest.specialRequests.length > 0 && (
+                          <p className="text-xs text-white/40 mt-2 italic">{guest.specialRequests.join(' • ')}</p>
+                        )}
                       </div>
                     ))}
+
+                    {departures.length > 0 && (
+                      <>
+                        <h3 className="text-xs font-medium text-white/40 uppercase tracking-wider mt-6">Today&apos;s Departures</h3>
+                        {departures.map((guest) => (
+                          <div
+                            key={guest.id}
+                            onClick={() => setSelectedGuest(guest)}
+                            className="p-4 bg-white/5 rounded-xl hover:bg-white/10 cursor-pointer transition-colors border border-white/10"
+                          >
+                            <div className="flex items-start justify-between mb-2">
+                              <p className="text-sm font-medium text-white">{guest.name}</p>
+                              <span className="text-xs px-2 py-0.5 bg-white/10 text-white/60 rounded-full">Departing</span>
+                            </div>
+                            <div className="flex items-center justify-between text-xs text-white/50">
+                              <span>Room {guest.roomNumber}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    )}
                   </>
                 )}
-              </>
-            )}
 
-            {/* Requests Tab */}
-            {activeTab === 'requests' && requests.map((req) => (
-              <div
-                key={req.id}
-                onClick={() => navigateToTask(req.taskId)}
-                className={`p-4 rounded-xl cursor-pointer transition-colors ${
-                  req.status === 'completed'
-                    ? 'bg-emerald-50 hover:bg-emerald-100'
-                    : req.priority === 'urgent' || req.priority === 'high'
-                    ? 'bg-amber-50 hover:bg-amber-100 border border-amber-200'
-                    : 'bg-stone-50 hover:bg-stone-100'
-                }`}
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    {req.status === 'completed' ? (
-                      <CheckCircle className="w-4 h-4 text-emerald-500" />
-                    ) : req.priority === 'urgent' ? (
-                      <AlertTriangle className="w-4 h-4 text-red-500" />
-                    ) : (
-                      <MessageSquare className="w-4 h-4 text-stone-400" />
-                    )}
-                    <p className="text-sm font-medium text-stone-800">{req.description}</p>
+                {/* Requests Tab */}
+                {activeTab === 'requests' && requests.map((req) => (
+                  <div
+                    key={req.id}
+                    onClick={() => navigateToTask(req.taskId)}
+                    className="p-4 rounded-xl cursor-pointer transition-colors border bg-white/5 hover:bg-white/10 border-white/10"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        {req.status === 'completed' ? (
+                          <CheckCircle className="w-4 h-4 text-white/50" />
+                        ) : req.priority === 'urgent' ? (
+                          <AlertTriangle className="w-4 h-4 text-amber-400" />
+                        ) : (
+                          <MessageSquare className="w-4 h-4 text-white/40" />
+                        )}
+                        <p className="text-sm font-medium text-white">{req.description}</p>
+                      </div>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        req.status === 'completed' ? 'bg-white/10 text-white/50' :
+                        req.status === 'in-progress' ? 'bg-white/10 text-white/70' :
+                        'bg-white/10 text-white/60'
+                      }`}>
+                        {req.status.replace('-', ' ')}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-white/50">
+                      <span>{req.guestName} • Room {req.roomNumber}</span>
+                      <span>{req.createdAt}</span>
+                    </div>
+                    <div className="flex items-center justify-between mt-2">
+                      {req.assignedTo && (
+                        <p className="text-xs text-white/40">Assigned to {req.assignedTo}</p>
+                      )}
+                      <div className="flex items-center gap-1 text-xs text-white/50 hover:text-white/70 ml-auto">
+                        <span>View task</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </div>
+                    </div>
                   </div>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
-                    req.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
-                    req.status === 'in-progress' ? 'bg-blue-100 text-blue-700' :
-                    'bg-amber-100 text-amber-700'
-                  }`}>
-                    {req.status.replace('-', ' ')}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-xs text-stone-500">
-                  <span>{req.guestName} • Room {req.roomNumber}</span>
-                  <span>{req.createdAt}</span>
-                </div>
-                <div className="flex items-center justify-between mt-2">
-                  {req.assignedTo && (
-                    <p className="text-xs text-stone-400">Assigned to {req.assignedTo}</p>
-                  )}
-                  <div className="flex items-center gap-1 text-xs text-blue-600 ml-auto">
-                    <span>View task</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </div>
-                </div>
+                ))}
               </div>
-            ))}
+            </div>
+          </div>
+
+          {/* Right: Voice Chat */}
+          <div className="w-[400px] flex-shrink-0 flex flex-col min-h-0">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl flex-1 overflow-hidden">
+              <VoiceSessionChat
+                agentId="guest-services"
+                sessionId="guests-management"
+                elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_GUESTSERVICES_AGENT_ID}
+                title="Guest Services"
+                subtitle="AI Assistant"
+                avatar="/avatars/operations-avatar.jpg"
+                welcomeMessage="I can help you check on guests, view arrivals, and manage service requests. Try asking about a specific guest or the pending requests."
+                suggestions={[
+                  "Did the Tanaka family arrive?",
+                  "Show me pending requests",
+                  "Who's checking out today?"
+                ]}
+                contextData={{ guestServicesData }}
+                variant="dark"
+              />
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Right: Voice Chat */}
-      <div className="flex-[1] min-w-0 p-4">
-        <VoiceSessionChat
-          agentId="guest-services"
-          sessionId="guests-management"
-          elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_GUESTSERVICES_AGENT_ID}
-          title="Guest Services"
-          subtitle="AI Assistant"
-          avatar="/avatars/operations-avatar.jpg"
-          welcomeMessage="I can help you check on guests, view arrivals, and manage service requests. Try asking about a specific guest or the pending requests."
-          suggestions={[
-            "Did the Tanaka family arrive?",
-            "Show me pending requests",
-            "Who's checking out today?"
-          ]}
-          contextData={{ guestServicesData }}
-        />
       </div>
 
       {/* Notification Toast */}

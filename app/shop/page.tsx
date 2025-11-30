@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import {
-  ShoppingBag, Plus, Minus, X, Check, Sparkles,
-  Wine, Gift, Heart, ChefHat, Waves, ArrowLeft
+  ShoppingBag, Plus, Minus, X, Check, LogOut,
+  Wine, Gift, Heart, ChefHat, Waves
 } from 'lucide-react';
 import VoiceSessionChat from '../components/VoiceSessionChat';
-import Link from 'next/link';
 
 interface ShopItem {
   id: string;
@@ -89,6 +90,35 @@ export default function HotelBoutiquePage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<ShopItem | null>(null);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+
+  // Check authentication
+  useEffect(() => {
+    const auth = localStorage.getItem('niseko_authenticated');
+    if (auth === 'true') {
+      setIsAuthenticated(true);
+      setMounted(true);
+    } else {
+      setIsAuthenticated(false);
+      router.push('/login');
+    }
+  }, [router]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('niseko_authenticated');
+    localStorage.removeItem('niseko_role');
+    router.push('/login');
+  };
+
+  // Navigation menu items
+  const menuItems = [
+    { label: 'Grand Opening', href: '/experience' },
+    { label: 'Guest Portal', href: '/guest' },
+    { label: 'Staff Portal', href: '/admin' },
+    { label: 'Shop', href: '/shop', active: true },
+  ];
 
   // Cart functions
   const addToCart = (item: ShopItem, quantity: number = 1) => {
@@ -185,234 +215,296 @@ export default function HotelBoutiquePage() {
     };
   }, [cart.length]);
 
-  return (
-    <div className="flex h-screen bg-stone-100">
-      {/* Left: Hotel Boutique */}
-      <div className="flex-[2] min-w-0 flex flex-col">
-        {/* Hero Section */}
-        <div className="relative h-44 flex-shrink-0">
-          <Image
-            src="/hotel3.jpg"
-            alt="The 1898 Boutique"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen bg-stone-900 flex items-center justify-center">
+        <div className="text-white/50 text-sm">Loading...</div>
+      </div>
+    );
+  }
 
-          {/* Back Button */}
-          <Link
-            href="/"
-            className="absolute top-4 left-4 p-2 bg-white/80 backdrop-blur-sm rounded-full text-stone-600 hover:bg-white transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  return (
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Full Page Background */}
+      <Image
+        src="/hotel3.jpg"
+        alt="The 1898 Niseko"
+        fill
+        className="object-cover"
+        priority
+      />
+
+      {/* Sophisticated Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-stone-900/60" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+
+      {/* Content */}
+      <div className={`relative z-10 h-screen flex flex-col transition-opacity duration-1000 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+
+        {/* Top Navigation Bar */}
+        <nav className="flex items-center justify-between px-8 py-4 flex-shrink-0">
+          {/* Left - Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-sm" style={{ fontFamily: 'var(--font-cormorant)' }}>18</span>
+            </div>
+            <div>
+              <h1
+                className="text-xl font-light text-white tracking-wide leading-tight group-hover:text-amber-200 transition-colors"
+                style={{ fontFamily: 'var(--font-cormorant)' }}
+              >
+                THE 1898
+              </h1>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-white/50">Niseko</p>
+            </div>
           </Link>
 
-          {/* Title */}
-          <div className="absolute bottom-4 left-6 right-6">
-            <div className="flex items-center gap-2 mb-1">
-              <Sparkles className="w-3 h-3 text-amber-400" />
-              <p className="text-xs uppercase tracking-widest text-amber-400">Curated Collection</p>
-            </div>
-            <h1 className="text-xl font-light text-white" style={{ fontFamily: 'var(--font-cormorant)' }}>
-              The 1898 Boutique
-            </h1>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-5">
-          {/* Your Order Card */}
-          <div className={`rounded-xl p-5 transition-all ${orderConfirmed ? 'bg-emerald-50 border border-emerald-200' : 'bg-white'}`}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-medium text-stone-800" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                {orderConfirmed ? 'Order Confirmed' : 'Your Order'}
-              </h2>
-              {!orderConfirmed && cart.length > 0 && (
-                <span className="text-xs text-stone-400">
-                  {cart.reduce((sum, ci) => sum + ci.quantity, 0)} items
-                </span>
-              )}
-              {orderConfirmed && (
-                <div className="flex items-center gap-1.5 text-emerald-600">
-                  <Check className="w-4 h-4" />
-                  <span className="text-xs font-medium">Delivered to your suite</span>
-                </div>
-              )}
-            </div>
-
-            {orderConfirmed ? (
-              <div className="text-center py-4">
-                <p className="text-sm text-emerald-700 mb-2">
-                  Thank you for your order!
-                </p>
-                <p className="text-xs text-emerald-600/70">
-                  Your items will be delivered shortly.
-                </p>
-                <button
-                  onClick={clearCart}
-                  className="mt-4 text-xs text-emerald-600 hover:text-emerald-700 underline"
-                >
-                  Start new order
-                </button>
-              </div>
-            ) : cart.length === 0 ? (
-              <div className="text-center py-6">
-                <ShoppingBag className="w-8 h-8 text-stone-300 mx-auto mb-2" />
-                <p className="text-sm text-stone-400">Your order is empty</p>
-                <p className="text-xs text-stone-300 mt-1">Ask about our products or add items below</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {cart.map(ci => (
-                  <div key={ci.item.id} className="flex items-center gap-3 p-2 bg-stone-50 rounded-lg">
-                    <ci.item.icon className="w-4 h-4 text-stone-400 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-stone-800 truncate">{ci.item.name}</p>
-                      <p className="text-xs text-stone-400">{formatPrice(ci.item.price)} each</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => updateQuantity(ci.item.id, ci.quantity - 1)}
-                        className="p-1 text-stone-400 hover:text-stone-600"
-                      >
-                        <Minus className="w-3 h-3" />
-                      </button>
-                      <span className="text-sm font-medium w-4 text-center">{ci.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(ci.item.id, ci.quantity + 1)}
-                        className="p-1 text-stone-400 hover:text-stone-600"
-                      >
-                        <Plus className="w-3 h-3" />
-                      </button>
-                    </div>
-                    <p className="text-sm font-medium text-stone-800 w-20 text-right">
-                      {formatPrice(ci.item.price * ci.quantity)}
-                    </p>
-                  </div>
-                ))}
-
-                <div className="pt-3 border-t border-stone-100 flex items-center justify-between">
-                  <p className="text-sm text-stone-600">Total</p>
-                  <p className="text-lg font-medium text-stone-800">{formatPrice(getCartTotal())}</p>
-                </div>
-
-                <p className="text-xs text-stone-400 text-center">
-                  Charges added to your room bill
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Products List */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-medium text-stone-400 uppercase tracking-wider">Our Selection</h3>
-            {shopItems.map(item => (
-              <div
-                key={item.id}
-                className="bg-white rounded-xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => setSelectedItem(item)}
+          {/* Center - Menu Items */}
+          <div className="flex items-center gap-1 bg-white/5 backdrop-blur-md rounded-full px-2 py-1.5 border border-white/10">
+            {menuItems.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`px-4 py-2 rounded-full text-sm transition-all ${
+                  item.active
+                    ? 'bg-white/15 text-white font-medium'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
               >
-                <div className="flex">
-                  {/* Product Image */}
-                  <div className="relative w-28 h-28 flex-shrink-0">
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      fill
-                      className="object-cover"
-                    />
-                    {item.isService && (
-                      <span className="absolute top-2 left-2 text-[10px] px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded">
-                        Service
-                      </span>
-                    )}
-                  </div>
-                  {/* Product Info */}
-                  <div className="flex-1 min-w-0 p-4">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="text-sm font-medium text-stone-800">{item.name}</p>
-                        <p className="text-xs text-stone-500 mt-0.5 line-clamp-2">{item.description}</p>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        {item.priceLabel && (
-                          <p className="text-[10px] text-stone-400">{item.priceLabel}</p>
-                        )}
-                        <p className="text-sm font-medium text-stone-800">{formatPrice(item.price)}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between mt-3">
-                      <span className="text-xs text-stone-400">
-                        {item.deliveryTime}
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addToCart(item);
-                        }}
-                        className="px-3 py-1.5 text-xs bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors flex items-center gap-1"
-                      >
-                        <Plus className="w-3 h-3" />
-                        Add
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                {item.label}
+              </Link>
             ))}
           </div>
 
-          {/* Hint */}
-          <p className="text-center text-xs text-stone-400 py-2">
-            Ask about any product for more details
-          </p>
-        </div>
-      </div>
+          {/* Right - Logout */}
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
+          >
+            <span className="text-sm">Logout</span>
+            <LogOut className="w-4 h-4" />
+          </button>
+        </nav>
 
-      {/* Right: Voice Chat */}
-      <div className="flex-[1] min-w-0 p-6">
-        <VoiceSessionChat
-          agentId="boutique-concierge"
-          sessionId="hotel-boutique"
-          elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_BOUTIQUE_AGENT_ID}
-          title="Hana"
-          avatar="/avatars/boutique-avatar.jpg"
-          welcomeMessage="Hello! I'm Hana from The 1898 Boutique. I'd love to help you find the perfect Hokkaido treasure — whether it's our famous chocolates, local whisky, or a relaxing spa experience. What catches your eye?"
-          suggestions={[
-            "What do you recommend?",
-            "Tell me about the whisky",
-            "Add the chocolates",
-            "Something relaxing"
-          ]}
-          contextData={{
-            products: shopItems.map(item => ({
-              id: item.id,
-              name: item.name,
-              price: item.price,
-              priceLabel: item.priceLabel,
-              description: item.description,
-              details: item.details,
-              isService: item.isService,
-              deliveryTime: item.deliveryTime
-            })),
-            cart: cart.map(ci => ({
-              id: ci.item.id,
-              name: ci.item.name,
-              quantity: ci.quantity,
-              price: ci.item.price,
-              subtotal: ci.item.price * ci.quantity
-            })),
-            cartTotal: getCartTotal(),
-            orderConfirmed
-          }}
-        />
+        {/* Main Content - Two Column Layout */}
+        <div className="flex-1 flex gap-6 px-8 pb-6 min-h-0">
+
+          {/* Left Column - Shop Content - Full Height Card */}
+          <div className="flex-1 min-w-0 flex flex-col">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-2xl flex-1 flex flex-col min-h-0">
+              {/* Title Header - Sticky */}
+              <div className="mb-6 flex-shrink-0">
+                <h2
+                  className="text-4xl font-light text-white tracking-wide"
+                  style={{ fontFamily: 'var(--font-cormorant)' }}
+                >
+                  Curated Collection
+                </h2>
+                <p className="text-base text-white/50 mt-2">Hokkaido&apos;s Finest Treasures</p>
+              </div>
+
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto min-h-0 space-y-4 pr-2">
+              {/* Your Order Section */}
+              <div className={`rounded-xl p-4 transition-all border ${
+                orderConfirmed
+                  ? 'bg-emerald-500/10 border-emerald-500/30'
+                  : 'bg-white/5 border-white/10'
+              }`}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium text-white" style={{ fontFamily: 'var(--font-cormorant)' }}>
+                    {orderConfirmed ? 'Order Confirmed' : 'Your Order'}
+                  </h3>
+                {!orderConfirmed && cart.length > 0 && (
+                  <span className="text-xs text-white/50">
+                    {cart.reduce((sum, ci) => sum + ci.quantity, 0)} items
+                  </span>
+                )}
+                {orderConfirmed && (
+                  <div className="flex items-center gap-1.5 text-emerald-400">
+                    <Check className="w-4 h-4" />
+                    <span className="text-xs font-medium">Delivered to your suite</span>
+                  </div>
+                )}
+              </div>
+
+              {orderConfirmed ? (
+                <div className="text-center py-4">
+                  <p className="text-sm text-emerald-400 mb-2">
+                    Thank you for your order!
+                  </p>
+                  <p className="text-xs text-emerald-400/70">
+                    Your items will be delivered shortly.
+                  </p>
+                  <button
+                    onClick={clearCart}
+                    className="mt-4 text-xs text-emerald-400 hover:text-emerald-300 underline"
+                  >
+                    Start new order
+                  </button>
+                </div>
+              ) : cart.length === 0 ? (
+                <div className="text-center py-6">
+                  <ShoppingBag className="w-8 h-8 text-white/30 mx-auto mb-2" />
+                  <p className="text-sm text-white/50">Your order is empty</p>
+                  <p className="text-xs text-white/30 mt-1">Ask about our products or add items below</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {cart.map(ci => (
+                    <div key={ci.item.id} className="flex items-center gap-3 p-2 bg-white/5 rounded-xl border border-white/10">
+                      <ci.item.icon className="w-4 h-4 text-amber-400/70 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-white truncate">{ci.item.name}</p>
+                        <p className="text-xs text-white/40">{formatPrice(ci.item.price)} each</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => updateQuantity(ci.item.id, ci.quantity - 1)}
+                          className="p-1 text-white/40 hover:text-white/70"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="text-sm font-medium text-white w-4 text-center">{ci.quantity}</span>
+                        <button
+                          onClick={() => updateQuantity(ci.item.id, ci.quantity + 1)}
+                          className="p-1 text-white/40 hover:text-white/70"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                      </div>
+                      <p className="text-sm font-medium text-white w-20 text-right">
+                        {formatPrice(ci.item.price * ci.quantity)}
+                      </p>
+                    </div>
+                  ))}
+
+                  <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+                    <p className="text-sm text-white/70">Total</p>
+                    <p className="text-lg font-medium text-amber-400">{formatPrice(getCartTotal())}</p>
+                  </div>
+
+                  <p className="text-xs text-white/40 text-center">
+                    Charges added to your room bill
+                  </p>
+                </div>
+              )}
+              </div>
+
+              {/* Products List */}
+              <div className="space-y-3">
+                <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">Our Selection</h3>
+                {shopItems.map(item => (
+                  <div
+                    key={item.id}
+                    className="bg-white/5 rounded-xl overflow-hidden border border-white/10 hover:border-amber-400/30 transition-all cursor-pointer"
+                    onClick={() => setSelectedItem(item)}
+                >
+                  <div className="flex">
+                    {/* Product Image */}
+                    <div className="relative w-28 h-28 flex-shrink-0">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                      />
+                      {item.isService && (
+                        <span className="absolute top-2 left-2 text-[10px] px-1.5 py-0.5 bg-amber-500/20 text-amber-400 rounded border border-amber-500/30">
+                          Service
+                        </span>
+                      )}
+                    </div>
+                    {/* Product Info */}
+                    <div className="flex-1 min-w-0 p-4">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="text-sm font-medium text-white">{item.name}</p>
+                          <p className="text-xs text-white/50 mt-0.5 line-clamp-2">{item.description}</p>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          {item.priceLabel && (
+                            <p className="text-[10px] text-white/40">{item.priceLabel}</p>
+                          )}
+                          <p className="text-sm font-medium text-amber-400">{formatPrice(item.price)}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between mt-3">
+                        <span className="text-xs text-white/40">
+                          {item.deliveryTime}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addToCart(item);
+                          }}
+                          className="px-3 py-1.5 text-xs bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg hover:from-amber-400 hover:to-amber-500 transition-colors flex items-center gap-1"
+                        >
+                          <Plus className="w-3 h-3" />
+                          Add
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+                ))}
+              </div>
+              </div>{/* End scrollable content */}
+            </div>
+          </div>
+
+          {/* Right Column - Voice Chat */}
+          <div className="flex-1 min-w-0 flex flex-col max-w-md">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl flex-1 overflow-hidden">
+              <VoiceSessionChat
+                agentId="boutique-concierge"
+                sessionId="hotel-boutique"
+                elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_BOUTIQUE_AGENT_ID}
+                title="Hana"
+                avatar="/avatars/boutique-avatar.jpg"
+                welcomeMessage="Hello! I'm Hana from The 1898 Boutique. I'd love to help you find the perfect Hokkaido treasure — whether it's our famous chocolates, local whisky, or a relaxing spa experience. What catches your eye?"
+                suggestions={[
+                  "What do you recommend?",
+                  "Tell me about the whisky",
+                  "Add the chocolates",
+                  "Something relaxing"
+                ]}
+                contextData={{
+                  products: shopItems.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    priceLabel: item.priceLabel,
+                    description: item.description,
+                    details: item.details,
+                    isService: item.isService,
+                    deliveryTime: item.deliveryTime
+                  })),
+                  cart: cart.map(ci => ({
+                    id: ci.item.id,
+                    name: ci.item.name,
+                    quantity: ci.quantity,
+                    price: ci.item.price,
+                    subtotal: ci.item.price * ci.quantity
+                  })),
+                  cartTotal: getCartTotal(),
+                  orderConfirmed
+                }}
+                variant="dark"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Item Detail Modal */}
       {selectedItem && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-stone-900/95 backdrop-blur-xl rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-white/20">
             {/* Product Image */}
             <div className="relative h-48 w-full">
               <Image
@@ -421,15 +513,15 @@ export default function HotelBoutiquePage() {
                 fill
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
               <button
                 onClick={() => setSelectedItem(null)}
-                className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-sm rounded-full text-stone-600 hover:bg-white transition-colors"
+                className="absolute top-4 right-4 p-2 bg-white/10 backdrop-blur-sm rounded-full text-white/70 hover:text-white hover:bg-white/20 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
               {selectedItem.isService && (
-                <span className="absolute top-4 left-4 text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded">
+                <span className="absolute top-4 left-4 text-xs px-2 py-1 bg-amber-500/20 text-amber-400 rounded border border-amber-500/30">
                   Service
                 </span>
               )}
@@ -437,26 +529,26 @@ export default function HotelBoutiquePage() {
                 <h3 className="text-xl font-medium text-white" style={{ fontFamily: 'var(--font-cormorant)' }}>
                   {selectedItem.name}
                 </h3>
-                <p className="text-xs text-white/80 mt-1">{selectedItem.deliveryTime}</p>
+                <p className="text-xs text-white/70 mt-1">{selectedItem.deliveryTime}</p>
               </div>
             </div>
 
             <div className="p-6">
-              <p className="text-sm text-stone-600 mb-4">{selectedItem.description}</p>
+              <p className="text-sm text-white/70 mb-4">{selectedItem.description}</p>
 
-              <div className="bg-stone-50 rounded-xl p-4 mb-6">
-                <p className="text-xs font-medium text-stone-800 mb-2">Details</p>
-                <p className="text-sm text-stone-600 leading-relaxed">{selectedItem.details}</p>
+              <div className="bg-white/5 rounded-xl p-4 mb-6 border border-white/10">
+                <p className="text-xs font-medium text-white/80 mb-2">Details</p>
+                <p className="text-sm text-white/60 leading-relaxed">{selectedItem.details}</p>
               </div>
 
               <div className="flex items-center justify-between mb-4">
                 <div>
                   {selectedItem.priceLabel && (
-                    <p className="text-xs text-stone-400">{selectedItem.priceLabel}</p>
+                    <p className="text-xs text-white/40">{selectedItem.priceLabel}</p>
                   )}
-                  <p className="text-xl font-medium text-stone-800">{formatPrice(selectedItem.price)}</p>
+                  <p className="text-xl font-medium text-amber-400">{formatPrice(selectedItem.price)}</p>
                 </div>
-                <div className="flex items-center gap-2 text-stone-400">
+                <div className="flex items-center gap-2 text-amber-400/50">
                   <selectedItem.icon className="w-5 h-5" />
                 </div>
               </div>
@@ -466,7 +558,7 @@ export default function HotelBoutiquePage() {
                   addToCart(selectedItem);
                   setSelectedItem(null);
                 }}
-                className="w-full py-3 bg-stone-800 text-white rounded-xl hover:bg-stone-700 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl hover:from-amber-400 hover:to-amber-500 transition-colors flex items-center justify-center gap-2 shadow-lg"
               >
                 <Plus className="w-4 h-4" />
                 Add to Order

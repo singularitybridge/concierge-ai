@@ -1,9 +1,12 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, Shield, ClipboardList, BookOpen } from 'lucide-react';
+import Image from 'next/image';
+import { Sparkles, Shield, ClipboardList, BookOpen, LogOut, ChevronRight } from 'lucide-react';
 import VoiceSessionChat from '../../components/VoiceSessionChat';
+import { useAuth } from '../../hooks/useAuth';
 
 const documents: Record<string, {
   title: string;
@@ -211,18 +214,48 @@ function getDocumentContent(doc: typeof documents[string]): string {
 }
 
 export default function DocumentPage() {
+  const { isAuthenticated, logout } = useAuth();
+  const [mounted, setMounted] = useState(false);
   const params = useParams();
   const docId = params.id as string;
   const doc = documents[docId];
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      setMounted(true);
+    }
+  }, [isAuthenticated]);
+
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen bg-stone-900 flex items-center justify-center">
+        <div className="text-white/50 text-sm">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
   if (!doc) {
     return (
-      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-stone-500 mb-4">Document not found</p>
-          <Link href="/admin" className="text-stone-700 hover:text-stone-900 underline">
-            Return to Admin
-          </Link>
+      <div className="min-h-screen relative overflow-hidden">
+        <Image
+          src="/hotel3.jpg"
+          alt="The 1898 Niseko"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-stone-900/60" />
+        <div className="relative z-10 min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-white/50 mb-4">Document not found</p>
+            <Link href="/admin" className="text-amber-400 hover:text-amber-300 underline">
+              Return to Admin
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -231,81 +264,163 @@ export default function DocumentPage() {
   const IconComponent = doc.icon;
   const documentContent = getDocumentContent(doc);
 
+  // Navigation menu items
+  const menuItems = [
+    { label: 'Grand Opening', href: '/experience' },
+    { label: 'Guest Portal', href: '/guest' },
+    { label: 'Staff Portal', href: '/admin', active: true },
+    { label: 'Shop', href: '/shop' },
+  ];
+
   return (
-    <div className="flex h-screen bg-stone-50">
-      {/* Left: Document Content */}
-      <div className="flex-[2] min-w-0 flex flex-col">
-        {/* Header */}
-        <div className="bg-white border-b border-stone-100 flex-shrink-0">
-          <div className="max-w-3xl mx-auto px-6 py-6">
-            <div className="flex items-center gap-4">
-              <Link
-                href="/admin"
-                className="p-2 text-stone-400 hover:text-stone-600 rounded-full transition-colors"
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Full Page Background */}
+      <Image
+        src="/hotel3.jpg"
+        alt="The 1898 Niseko"
+        fill
+        className="object-cover"
+        priority
+      />
+
+      {/* Sophisticated Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-stone-900/60" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+
+      {/* Content */}
+      <div className={`relative z-10 h-screen flex flex-col transition-opacity duration-1000 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+
+        {/* Top Navigation Bar */}
+        <nav className="flex items-center justify-between px-8 py-4 flex-shrink-0">
+          {/* Left - Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-sm" style={{ fontFamily: 'var(--font-cormorant)' }}>18</span>
+            </div>
+            <div>
+              <h1
+                className="text-xl font-light text-white tracking-wide leading-tight group-hover:text-amber-200 transition-colors"
+                style={{ fontFamily: 'var(--font-cormorant)' }}
               >
-                <ArrowLeft className="w-5 h-5" />
+                THE 1898
+              </h1>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-white/50">Niseko</p>
+            </div>
+          </Link>
+
+          {/* Center - Menu Items */}
+          <div className="flex items-center gap-1 bg-white/5 backdrop-blur-md rounded-full px-2 py-1.5 border border-white/10">
+            {menuItems.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`px-4 py-2 rounded-full text-sm transition-all ${
+                  item.active
+                    ? 'bg-white/15 text-white font-medium'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                {item.label}
               </Link>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center">
-                  <IconComponent className="w-5 h-5 text-stone-500" />
+            ))}
+          </div>
+
+          {/* Right - Logout */}
+          <button
+            onClick={logout}
+            className="flex items-center gap-2 px-4 py-2 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
+          >
+            <span className="text-sm">Logout</span>
+            <LogOut className="w-4 h-4" />
+          </button>
+        </nav>
+
+        {/* Breadcrumbs */}
+        <div className="px-8 pb-3 flex-shrink-0">
+          <nav className="flex items-center gap-2 text-sm">
+            <Link
+              href="/admin"
+              className="text-white/50 hover:text-white transition-colors"
+            >
+              Staff Portal
+            </Link>
+            <ChevronRight className="w-4 h-4 text-white/30" />
+            <span className="text-white/80">{doc.title}</span>
+          </nav>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 flex gap-6 px-8 pb-6 min-h-0">
+          {/* Left Column - Document Content */}
+          <div className="flex-1 min-w-0 flex flex-col">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-2xl flex-1 flex flex-col min-h-0">
+              {/* Document Header */}
+              <div className="mb-6 flex items-center gap-4 flex-shrink-0">
+                <div className="w-12 h-12 rounded-full bg-amber-400/20 flex items-center justify-center">
+                  <IconComponent className="w-6 h-6 text-amber-400" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-light text-stone-800" style={{ fontFamily: 'var(--font-cormorant)' }}>
+                  <h2
+                    className="text-4xl font-light text-white tracking-wide"
+                    style={{ fontFamily: 'var(--font-cormorant)' }}
+                  >
                     {doc.title}
-                  </h1>
-                  <p className="text-xs text-stone-400">Last updated: {doc.lastUpdated}</p>
+                  </h2>
+                  <p className="text-base text-white/50 mt-1">Last updated: {doc.lastUpdated}</p>
                 </div>
+              </div>
+
+              {/* Document Sections - Scrollable */}
+              <div className="space-y-4 flex-1 overflow-y-auto min-h-0 pr-2">
+                {doc.sections.map((section, idx) => (
+                  <div key={idx} className="p-4 bg-white/5 rounded-xl border border-white/10">
+                    <h3
+                      className="text-xl font-light text-white tracking-wide mb-3"
+                      style={{ fontFamily: 'var(--font-cormorant)' }}
+                    >
+                      {section.heading}
+                    </h3>
+                    <ul className="space-y-2">
+                      {section.content.map((item, itemIdx) => (
+                        <li key={itemIdx} className="flex gap-3 text-sm text-white/70">
+                          <span className="text-amber-400/60 mt-0.5">•</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="max-w-3xl mx-auto px-6 py-8">
-            <div className="space-y-8">
-              {doc.sections.map((section, idx) => (
-                <div key={idx} className="bg-white rounded-lg p-6">
-                  <h2 className="text-lg font-medium text-stone-800 mb-4" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                    {section.heading}
-                  </h2>
-                  <ul className="space-y-3">
-                    {section.content.map((item, itemIdx) => (
-                      <li key={itemIdx} className="flex gap-3 text-sm text-stone-600">
-                        <span className="text-stone-300 mt-1">•</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+          {/* Right Column - Voice Chat */}
+          <div className="w-[400px] flex-shrink-0 flex flex-col min-h-0">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl flex-1 overflow-hidden">
+              <VoiceSessionChat
+              agentId="knowledge-base"
+              sessionId={`kb-${docId}`}
+              elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_KB_AGENT_ID}
+              title="Training Assistant"
+              avatar="/avatars/kb-avatar.jpg"
+              welcomeMessage={`I can help you understand the ${doc.title}. What would you like to know?`}
+              suggestions={[
+                "Summarize this document",
+                "What are the key points?",
+                "Give me an example",
+                "What should I remember?"
+              ]}
+              contextData={{
+                documentId: docId,
+                documentTitle: doc.title,
+                documentContent: documentContent,
+                sections: doc.sections.map(s => s.heading)
+              }}
+              variant="dark"
+            />
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Right: Voice Chat */}
-      <div className="flex-[1] min-w-0 p-6 bg-stone-100">
-        <VoiceSessionChat
-          agentId="knowledge-base"
-          sessionId={`kb-${docId}`}
-          elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_KB_AGENT_ID}
-          title="Training Assistant"
-          avatar="/avatars/kb-avatar.jpg"
-          welcomeMessage={`I can help you understand the ${doc.title}. What would you like to know?`}
-          suggestions={[
-            "Summarize this document",
-            "What are the key points?",
-            "Give me an example",
-            "What should I remember?"
-          ]}
-          contextData={{
-            documentId: docId,
-            documentTitle: doc.title,
-            documentContent: documentContent,
-            sections: doc.sections.map(s => s.heading)
-          }}
-        />
       </div>
     </div>
   );
