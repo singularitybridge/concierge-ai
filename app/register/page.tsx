@@ -473,6 +473,7 @@ export default function CheckInPage() {
                   language
                 }}
                 variant="dark"
+                language={language}
               />
             </div>
           </div>

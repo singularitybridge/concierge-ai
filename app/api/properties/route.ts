@@ -29,6 +29,7 @@ interface Property {
 }
 
 interface PropertiesData {
+  hotelServices?: string[];
   properties: Property[];
 }
 
@@ -46,10 +47,12 @@ async function writeData(data: PropertiesData): Promise<void> {
 }
 
 // GET - Retrieve all properties or a single property by id
+// Use ?includeServices=true to include hotelServices in response
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
+    const includeServices = searchParams.get('includeServices') === 'true';
 
     const data = await readData();
 
@@ -59,6 +62,14 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Property not found' }, { status: 404 });
       }
       return NextResponse.json(property);
+    }
+
+    // Return full data with hotelServices if requested
+    if (includeServices) {
+      return NextResponse.json({
+        hotelServices: data.hotelServices || [],
+        properties: data.properties
+      });
     }
 
     return NextResponse.json(data.properties);

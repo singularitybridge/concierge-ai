@@ -11,15 +11,17 @@
       "nights": 5,
       "guestCount": 4,
       "status": "vip",
-      "propertyId": "sky-suite",
+      "propertyId": "hirafu-penthouse",
       "specialRequests": [
-        { "type": "Airport Pickup", "time": "2:00 PM", "status": "confirmed" },
-        { "type": "Welcome Champagne", "status": "confirmed" }
+        { "type": "Airport Pickup", "time": "2:00 PM", "status": "confirmed", "details": "New Chitose Airport transfer" },
+        { "type": "Welcome Champagne", "status": "confirmed" },
+        { "type": "Private Onsen Preparation", "status": "confirmed" }
       ],
       "pets": null,
       "preferences": {
         "dietary": ["vegetarian option available"],
-        "room": ["extra pillows", "hypoallergenic bedding"]
+        "room": ["extra pillows", "hypoallergenic bedding"],
+        "activities": ["ski lessons for children", "private guide"]
       }
     },
     {
@@ -33,14 +35,16 @@
       "nights": 3,
       "guestCount": 2,
       "status": "standard",
-      "propertyId": "onsen-suite",
+      "propertyId": "moiwa-suite",
       "specialRequests": [
-        { "type": "Late Check-out", "time": "2:00 PM", "status": "pending" }
+        { "type": "Late Check-out", "time": "2:00 PM", "status": "pending" },
+        { "type": "Couples Spa Treatment", "status": "confirmed" }
       ],
       "pets": null,
       "preferences": {
         "dietary": [],
-        "room": []
+        "room": ["tatami room prepared"],
+        "activities": ["onsen experience", "sake tasting"]
       }
     },
     {
@@ -54,12 +58,15 @@
       "nights": 4,
       "guestCount": 2,
       "status": "standard",
-      "propertyId": "garden-suite",
-      "specialRequests": [],
+      "propertyId": "village-duplex",
+      "specialRequests": [
+        { "type": "Traditional Japanese Breakfast", "status": "confirmed" }
+      ],
       "pets": null,
       "preferences": {
         "dietary": [],
-        "room": ["traditional futon"]
+        "room": ["fireplace prepared nightly"],
+        "activities": ["snowshoeing tour", "traditional tea ceremony"]
       }
     },
     {
@@ -73,14 +80,16 @@
       "nights": 2,
       "guestCount": 4,
       "status": "standard",
-      "propertyId": "forest-suite",
+      "propertyId": "annupuri-duplex",
       "specialRequests": [
+        { "type": "Kids Ski School", "status": "confirmed" },
         { "type": "Kids Menu", "status": "confirmed" }
       ],
       "pets": null,
       "preferences": {
         "dietary": ["kids menu needed"],
-        "room": ["baby crib"]
+        "room": ["baby crib", "childproofing"],
+        "activities": ["family ski lessons", "sledding"]
       }
     },
     {
@@ -94,14 +103,16 @@
       "nights": 4,
       "guestCount": 1,
       "status": "standard",
-      "propertyId": "valley-suite",
+      "propertyId": "weiss-suite",
       "specialRequests": [
-        { "type": "Quiet Room", "status": "confirmed" }
+        { "type": "Quiet Room", "status": "confirmed" },
+        { "type": "Early Morning Coffee", "time": "6:00 AM", "status": "confirmed" }
       ],
       "pets": null,
       "preferences": {
         "dietary": [],
-        "room": ["do not disturb mornings"]
+        "room": ["do not disturb mornings", "work desk setup"],
+        "activities": ["private ski guide", "wellness spa"]
       }
     },
     {
@@ -115,9 +126,11 @@
       "nights": 4,
       "guestCount": 1,
       "status": "vip",
-      "propertyId": "mountain-suite",
+      "propertyId": "hanazono-penthouse",
       "specialRequests": [
-        { "type": "Airport Pickup", "time": "3:00 PM", "status": "confirmed" }
+        { "type": "Airport Pickup", "time": "3:00 PM", "status": "confirmed", "details": "New Chitose Airport - luxury vehicle" },
+        { "type": "Welcome Amenity", "status": "confirmed", "details": "Premium sake selection" },
+        { "type": "Pet Accommodation", "status": "confirmed" }
       ],
       "pets": {
         "name": "Shmutzi",
@@ -125,7 +138,8 @@
       },
       "preferences": {
         "dietary": [],
-        "room": ["pet-friendly", "mountain view"]
+        "room": ["pet-friendly", "panoramic view suite", "ski-in access"],
+        "activities": ["backcountry skiing", "helicopter tour", "private chef dinner"]
       }
     }
   ]

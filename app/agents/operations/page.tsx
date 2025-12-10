@@ -5,41 +5,42 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Wrench, Bed, Sparkles, AlertTriangle, CheckCircle, ListTodo, LayoutDashboard } from 'lucide-react';
 import VoiceSessionChat from '../../components/VoiceSessionChat';
+import { useLanguageStore } from '@/lib/use-language-store';
 
-// Mock room status data
+// Real The 1898 Niseko suite types - Room status data
 const roomStatus = [
-  { name: 'Mountain Suite', status: 'Occupied', clean: true, maintenance: false },
-  { name: 'Garden Suite', status: 'Occupied', clean: true, maintenance: false },
-  { name: 'Onsen Suite', status: 'Checkout', clean: false, maintenance: false },
-  { name: 'Valley Suite', status: 'Occupied', clean: true, maintenance: true },
-  { name: 'Sky Suite', status: 'Arrival', clean: true, maintenance: false },
-  { name: 'Forest Suite', status: 'Occupied', clean: true, maintenance: false },
+  { name: 'Hirafu Penthouse', status: 'Arrival', clean: true, maintenance: false },
+  { name: 'Hanazono Penthouse', status: 'Occupied', clean: true, maintenance: false },
+  { name: 'Annupuri Duplex', status: 'Occupied', clean: true, maintenance: false },
+  { name: 'Village Duplex', status: 'Occupied', clean: true, maintenance: false },
+  { name: 'Moiwa Suite', status: 'Checkout', clean: false, maintenance: false },
+  { name: 'Weiss Suite', status: 'Occupied', clean: true, maintenance: true },
 ];
 
 const housekeepingTasks = [
-  { room: 'Onsen Suite', task: 'Full turnover', priority: 'High', assignee: 'Yuki', time: '13:00' },
-  { room: 'Sky Suite', task: 'Pre-arrival inspection', priority: 'High', assignee: 'Hana', time: '14:00' },
-  { room: 'Mountain Suite', task: 'Refresh service', priority: 'Normal', assignee: 'Yuki', time: '15:00' },
+  { room: 'Moiwa Suite', task: 'Full turnover - honeymoon setup', priority: 'High', assignee: 'Yuki', time: '13:00' },
+  { room: 'Hirafu Penthouse', task: 'VIP pre-arrival inspection', priority: 'High', assignee: 'Hana', time: '14:00' },
+  { room: 'Hanazono Penthouse', task: 'Refresh service - onsen prep', priority: 'Normal', assignee: 'Yuki', time: '15:00' },
 ];
 
 const maintenanceRequests = [
-  { room: 'Valley Suite', issue: 'Onsen temperature fluctuation', status: 'In Progress', reported: '2 hours ago' },
-  { room: 'Common Area', issue: 'Lobby fireplace maintenance', status: 'Scheduled', reported: '1 day ago' },
+  { room: 'Weiss Suite', issue: 'Private onsen temperature fluctuation', status: 'In Progress', reported: '2 hours ago' },
+  { room: 'Lobby', issue: 'Heated floor maintenance check', status: 'Scheduled', reported: '1 day ago' },
 ];
 
 const inventory = [
   { item: 'Bath towels', stock: 48, min: 36, status: 'OK' },
   { item: 'Yukata robes', stock: 18, min: 12, status: 'OK' },
-  { item: 'Shampoo sets', stock: 8, min: 12, status: 'Low' },
-  { item: 'Welcome tea', stock: 24, min: 18, status: 'OK' },
+  { item: 'Premium onsen bath salts', stock: 8, min: 12, status: 'Low' },
+  { item: 'Welcome sake sets', stock: 24, min: 18, status: 'OK' },
 ];
 
-// Tasks assigned to Mika Hayashi
+// Tasks assigned to Operations team
 const agentTasks = [
   {
     id: 1,
-    title: 'Onsen Temperature Check',
-    description: 'Resolve Valley Suite heating fluctuation reported by guest',
+    title: 'Private Onsen Check',
+    description: 'Resolve Weiss Suite onsen heating fluctuation reported by Dr. Yamamoto',
     priority: 'High',
     status: 'In Progress',
     createdAt: '2 hours ago',
@@ -47,23 +48,23 @@ const agentTasks = [
   {
     id: 2,
     title: 'Inventory Restock',
-    description: 'Order shampoo sets - currently below minimum stock level',
+    description: 'Order premium onsen bath salts - currently below minimum stock level',
     priority: 'Medium',
     status: 'Pending',
     createdAt: '1 day ago',
   },
   {
     id: 3,
-    title: 'Pre-arrival Room Check',
-    description: 'Inspect Sky Suite before Tanaka Family arrival at 15:00',
+    title: 'VIP Pre-arrival Check',
+    description: 'Inspect Hirafu Penthouse before Tanaka Family arrival at 15:00',
     priority: 'High',
     status: 'Pending',
     createdAt: '3 hours ago',
   },
   {
     id: 4,
-    title: 'Fireplace Maintenance',
-    description: 'Schedule annual maintenance for lobby fireplace',
+    title: 'Heated Floor Maintenance',
+    description: 'Schedule quarterly maintenance for lobby heated flooring system',
     priority: 'Low',
     status: 'Scheduled',
     createdAt: '1 day ago',
@@ -71,6 +72,7 @@ const agentTasks = [
 ];
 
 export default function OperationsAgentPage() {
+  const { language } = useLanguageStore();
   const [view, setView] = useState<'dashboard' | 'tasks'>('dashboard');
 
   return (
@@ -273,7 +275,7 @@ export default function OperationsAgentPage() {
 
       {/* Right: Voice Chat */}
       <div className="flex-[1] min-w-0 p-6">
-        <VoiceSessionChat agentId="operations" sessionId="operations" />
+        <VoiceSessionChat agentId="operations" sessionId="operations" language={language} />
       </div>
     </div>
   );

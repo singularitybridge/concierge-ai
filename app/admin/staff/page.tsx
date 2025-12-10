@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Users, ChevronRight, LogOut, ChevronLeft, Calendar, Clock, MapPin, Phone, Mail, Star } from 'lucide-react';
 import VoiceSessionChat from '../../components/VoiceSessionChat';
 import { useAuth } from '../../hooks/useAuth';
+import { useLanguageStore } from '@/lib/use-language-store';
 
 // Types
 interface Shift {
@@ -42,6 +43,7 @@ export default function StaffPage() {
   const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null);
   const [calendarView, setCalendarView] = useState<CalendarView>('week');
   const [currentDate, setCurrentDate] = useState(new Date('2024-12-10')); // Mock current date
+  const { language } = useLanguageStore();
 
   // Navigation menu items
   const menuItems = [
@@ -625,6 +627,7 @@ export default function StaffPage() {
                 ]}
                 contextData={staffContextData}
                 variant="dark"
+                language={language}
               />
             </div>
           </div>

@@ -8,6 +8,7 @@ import { Users, Star, MessageSquare, Plane, Car, Bell, CheckCircle, AlertTriangl
 import VoiceSessionChat from '../../components/VoiceSessionChat';
 import GuestDetailModal, { GuestData } from '../../components/GuestDetailModal';
 import { useAuth } from '../../hooks/useAuth';
+import { useLanguageStore } from '@/lib/use-language-store';
 
 // Service request interface (with taskId for linking to tasks page)
 interface ServiceRequest {
@@ -24,13 +25,13 @@ interface ServiceRequest {
   assignedTo?: string;
 }
 
-// Comprehensive guest data
+// Comprehensive guest data - Real The 1898 Niseko suite types
 const guestsData: GuestData[] = [
   {
     id: 'tanaka',
     name: 'Tanaka Family',
-    roomNumber: '301',
-    roomType: 'Sky Suite',
+    roomNumber: 'P-01',
+    roomType: 'Hirafu Penthouse',
     checkIn: 'Dec 10',
     checkOut: 'Dec 15',
     status: 'vip',
@@ -39,9 +40,9 @@ const guestsData: GuestData[] = [
     language: 'Japanese',
     email: 'tanaka.family@email.jp',
     phone: '+81-90-1234-5678',
-    preferences: ['Green tea', 'Extra futons', 'Late breakfast'],
-    notes: 'Celebrating 10th anniversary. Complimentary champagne arranged.',
-    specialRequests: ['Early check-in requested', 'Child bed needed', 'Connecting rooms if possible'],
+    preferences: ['Private onsen prepared', 'Mt. Yotei view suite', 'Butler service'],
+    notes: 'Celebrating 10th anniversary. Complimentary champagne arranged. The Ultimate Mountain Residence.',
+    specialRequests: ['Early check-in requested', 'Child bed needed', 'Private ski guide'],
     previousStays: 3,
     loyaltyTier: 'platinum',
     arrivalTime: '15:00',
@@ -50,8 +51,8 @@ const guestsData: GuestData[] = [
   {
     id: 'chen',
     name: 'Mr. & Mrs. Chen',
-    roomNumber: '205',
-    roomType: 'Onsen Suite',
+    roomNumber: 'M-01',
+    roomType: 'Moiwa Suite',
     checkIn: 'Dec 10',
     checkOut: 'Dec 13',
     status: 'arriving',
@@ -60,9 +61,9 @@ const guestsData: GuestData[] = [
     language: 'Mandarin',
     email: 'david.chen@email.tw',
     phone: '+886-912-345-678',
-    preferences: ['Private onsen time', 'Vegetarian options'],
-    notes: 'Honeymoon couple. Airport pickup confirmed.',
-    specialRequests: ['Airport pickup at 16:00', 'Rose petals in room'],
+    preferences: ['Private onsen time', 'Tatami room', 'Mt. Moiwa views'],
+    notes: 'Honeymoon couple. Airport pickup confirmed. Intimate Sophistication suite.',
+    specialRequests: ['New Chitose Airport pickup at 16:00', 'Rose petals in room', 'Couples spa treatment'],
     previousStays: 0,
     loyaltyTier: 'standard',
     arrivalTime: '16:00',
@@ -71,8 +72,8 @@ const guestsData: GuestData[] = [
   {
     id: 'sato',
     name: 'Sato Couple',
-    roomNumber: '402',
-    roomType: 'Garden Suite',
+    roomNumber: 'V-01',
+    roomType: 'Village Duplex',
     checkIn: 'Dec 8',
     checkOut: 'Dec 12',
     status: 'checked-in',
@@ -81,17 +82,17 @@ const guestsData: GuestData[] = [
     language: 'Japanese',
     email: 'sato.kenji@email.jp',
     phone: '+81-80-9876-5432',
-    preferences: ['Sake selection', 'Morning yoga'],
-    notes: 'Anniversary celebration. Champagne delivered.',
-    specialRequests: ['Dinner reservation for anniversary'],
+    preferences: ['Fireplace prepared nightly', 'Sake selection', 'Traditional tea ceremony'],
+    notes: 'Anniversary celebration. Champagne delivered. Contemporary Mountain Elegance.',
+    specialRequests: ['Dinner reservation for anniversary', 'Snowshoeing tour'],
     previousStays: 5,
     loyaltyTier: 'gold',
   },
   {
     id: 'kim',
     name: 'Kim Family',
-    roomNumber: '303',
-    roomType: 'Forest Suite',
+    roomNumber: 'A-01',
+    roomType: 'Annupuri Duplex',
     checkIn: 'Dec 9',
     checkOut: 'Dec 11',
     status: 'checked-in',
@@ -100,17 +101,17 @@ const guestsData: GuestData[] = [
     language: 'Korean',
     email: 'kim.family@email.kr',
     phone: '+82-10-1234-5678',
-    preferences: ['Korean breakfast', 'Ski equipment'],
-    notes: 'Family ski trip. Children ages 8 and 12.',
-    specialRequests: ['Kosher meals', 'Ski instructor for kids'],
+    preferences: ['Two-level living space', 'Kids play area', 'Mt. Annupuri views'],
+    notes: 'Family ski trip. Children ages 8 and 12. Elevated Living duplex suite.',
+    specialRequests: ['Kids ski school', 'Ski instructor for family', 'Childproofing'],
     previousStays: 1,
     loyaltyTier: 'standard',
   },
   {
     id: 'yamamoto',
     name: 'Dr. Yamamoto',
-    roomNumber: '201',
-    roomType: 'Valley Suite',
+    roomNumber: 'W-01',
+    roomType: 'Weiss Suite',
     checkIn: 'Dec 9',
     checkOut: 'Dec 13',
     status: 'checked-in',
@@ -119,17 +120,17 @@ const guestsData: GuestData[] = [
     language: 'Japanese',
     email: 'dr.yamamoto@hospital.jp',
     phone: '+81-70-1111-2222',
-    preferences: ['Quiet room', 'Early check-out option'],
-    notes: 'Business traveler. Works remotely. Do not disturb until 10am.',
-    specialRequests: ['Extra pillows', 'Desk lamp', 'Quiet room away from elevator'],
+    preferences: ['Work desk setup', 'Private bar', 'Heated floors'],
+    notes: 'Business traveler. Works remotely. Do not disturb until 10am. Refined Simplicity.',
+    specialRequests: ['Extra pillows', 'Private ski guide', 'Wellness spa treatment'],
     previousStays: 8,
     loyaltyTier: 'platinum',
   },
   {
     id: 'williams',
     name: 'Ms. Williams',
-    roomNumber: '404',
-    roomType: 'Mountain Suite',
+    roomNumber: 'P-02',
+    roomType: 'Hanazono Penthouse',
     checkIn: 'Dec 7',
     checkOut: 'Dec 10',
     status: 'checked-out',
@@ -138,9 +139,9 @@ const guestsData: GuestData[] = [
     language: 'English',
     email: 'sarah.williams@email.au',
     phone: '+61-412-345-678',
-    preferences: ['Flat white coffee', 'Vegan meals'],
-    notes: 'Late checkout approved. Departing at 14:00.',
-    specialRequests: ['Late checkout until 14:00'],
+    preferences: ['Panoramic views', 'Ski storage', 'Vegan meals'],
+    notes: 'Late checkout approved. Departing at 14:00. Panoramic Mountain Luxury suite.',
+    specialRequests: ['Late checkout until 14:00', 'Helicopter tour'],
     previousStays: 2,
     loyaltyTier: 'gold',
   }
@@ -153,9 +154,9 @@ const requestsData: ServiceRequest[] = [
     taskId: 'dinner-reservation-sato',
     guestId: 'sato',
     guestName: 'Sato Couple',
-    roomNumber: '402',
+    roomNumber: 'V-01',
     type: 'concierge',
-    description: 'Dinner reservation at 19:00 for anniversary',
+    description: 'Anniversary dinner at Kamimura - Michelin starred',
     status: 'completed',
     priority: 'medium',
     createdAt: '10 min ago',
@@ -166,9 +167,9 @@ const requestsData: ServiceRequest[] = [
     taskId: 'ski-rental-kim',
     guestId: 'kim',
     guestName: 'Kim Family',
-    roomNumber: '303',
+    roomNumber: 'A-01',
     type: 'concierge',
-    description: 'Ski equipment rental for family',
+    description: 'Premium ski equipment and kids ski school booking',
     status: 'in-progress',
     priority: 'medium',
     createdAt: '25 min ago',
@@ -179,9 +180,9 @@ const requestsData: ServiceRequest[] = [
     taskId: 'spa-appointment-yamamoto',
     guestId: 'yamamoto',
     guestName: 'Dr. Yamamoto',
-    roomNumber: '201',
+    roomNumber: 'W-01',
     type: 'concierge',
-    description: 'Spa appointment tomorrow at 15:00',
+    description: 'Wellness spa treatment tomorrow at 15:00',
     status: 'pending',
     priority: 'low',
     createdAt: '1 hour ago'
@@ -191,9 +192,9 @@ const requestsData: ServiceRequest[] = [
     taskId: 'welcome-package-tanaka',
     guestId: 'tanaka',
     guestName: 'Tanaka Family',
-    roomNumber: '301',
+    roomNumber: 'P-01',
     type: 'room-service',
-    description: 'Welcome champagne and fruit basket',
+    description: 'VIP welcome amenity - champagne and fresh fruit to Hirafu Penthouse',
     status: 'pending',
     priority: 'high',
     createdAt: '5 min ago'
@@ -203,9 +204,9 @@ const requestsData: ServiceRequest[] = [
     taskId: 'airport-pickup-chen',
     guestId: 'chen',
     guestName: 'Mr. & Mrs. Chen',
-    roomNumber: '205',
+    roomNumber: 'M-01',
     type: 'transport',
-    description: 'Airport pickup at New Chitose Airport',
+    description: 'Luxury vehicle pickup at New Chitose Airport',
     status: 'in-progress',
     priority: 'high',
     createdAt: '2 hours ago',
@@ -217,6 +218,7 @@ type ViewTab = 'guests' | 'arrivals' | 'requests';
 
 export default function GuestsAgentPage() {
   const { isAuthenticated, logout } = useAuth();
+  const { language } = useLanguageStore();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<ViewTab>('guests');
@@ -681,6 +683,7 @@ export default function GuestsAgentPage() {
                 ]}
                 contextData={{ guestServicesData }}
                 variant="dark"
+                language={language}
               />
             </div>
           </div>

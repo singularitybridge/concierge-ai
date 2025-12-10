@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Building2, Users, User, Phone, Mail, ChevronRight, LogOut, MapPin, Bed, Bath, Sparkles, ArrowUpRight, Calendar, PawPrint } from 'lucide-react';
 import VoiceSessionChat from '../../components/VoiceSessionChat';
 import { useAuth } from '../../hooks/useAuth';
+import { useLanguageStore } from '@/lib/use-language-store';
 
 // Property types
 interface Staff {
@@ -91,6 +92,7 @@ type ViewMode = 'properties' | 'guests';
 
 export default function PropertiesPage() {
   const { isAuthenticated, logout } = useAuth();
+  const { language } = useLanguageStore();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [propertiesData, setPropertiesData] = useState<Property[]>([]);
@@ -738,6 +740,7 @@ export default function PropertiesPage() {
                 }
                 contextData={contextData}
                 variant="dark"
+                language={language}
               />
             </div>
           </div>

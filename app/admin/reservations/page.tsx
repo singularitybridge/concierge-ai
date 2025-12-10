@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import VoiceSessionChat from '../../components/VoiceSessionChat';
 import { useAuth } from '../../hooks/useAuth';
+import { useLanguageStore } from '@/lib/use-language-store';
 
 interface Reservation {
   id: string;
@@ -45,6 +46,7 @@ interface Property {
 
 export default function ReservationsPage() {
   const { isAuthenticated, logout } = useAuth();
+  const { language } = useLanguageStore();
   const [mounted, setMounted] = useState(false);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [guests, setGuests] = useState<Map<string, Guest>>(new Map());
@@ -547,6 +549,7 @@ export default function ReservationsPage() {
                 ]}
                 contextData={contextData}
                 variant="dark"
+                language={language}
               />
             </div>
           </div>

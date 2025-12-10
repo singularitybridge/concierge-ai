@@ -501,6 +501,7 @@ export default function RestaurantMenuPage() {
                   orderConfirmed
                 }}
                 variant="dark"
+                language={language}
               />
             </div>
           </div>

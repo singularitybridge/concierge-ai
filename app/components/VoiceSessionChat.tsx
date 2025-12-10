@@ -8,6 +8,14 @@ import { useConversation } from '@elevenlabs/react';
 import VoiceActionModal from './VoiceActionModal';
 import { executeClientFunction } from '../utils/clientSideFunctions';
 
+// First message translations for ElevenLabs agent override
+const firstMessageTranslations: Record<string, string> = {
+  en: "Welcome to The 1898 Niseko! I'm Yuki, your check-in concierge. I'd be delighted to assist with your arrival today. May I have your name please?",
+  zh: "欢迎来到1898二世古！我是由纪，您的入住礼宾。很高兴为您办理今天的入住手续。请问您的姓名是？",
+  ja: "ザ 1898 ニセコへようこそ！私はゆき、チェックインコンシェルジュでございます。本日のご到着のお手伝いをさせていただきます。お名前をお聞かせいただけますか？",
+  ru: "Добро пожаловать в The 1898 Niseko! Я Юки, ваш консьерж по регистрации. Буду рада помочь вам с заселением сегодня. Могу я узнать ваше имя?",
+};
+
 interface Message {
   role: 'user' | 'assistant';
   content: string;
@@ -27,9 +35,10 @@ interface VoiceSessionChatProps {
   avatar?: string; // Avatar image path
   welcomeMessage?: string; // Welcome/intro message about the agent
   variant?: 'light' | 'dark'; // Visual variant: light (default) or dark (glass-morphism)
+  language?: 'en' | 'zh' | 'ja' | 'ru'; // Language for the agent to speak in
 }
 
-export default function VoiceSessionChat({ agentId, sessionId = 'default', elevenLabsAgentId, contextData, title, subtitle, suggestions, avatar, welcomeMessage, variant = 'light' }: VoiceSessionChatProps) {
+export default function VoiceSessionChat({ agentId, sessionId = 'default', elevenLabsAgentId, contextData, title, subtitle, suggestions, avatar, welcomeMessage, variant = 'light', language = 'en' }: VoiceSessionChatProps) {
   const isDark = variant === 'dark';
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -642,8 +651,33 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default', eleve
       if (provider === 'vapi' && vapi) {
         await vapi.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID || '');
       } else if (provider === 'elevenlabs') {
+        console.log('🌐 Starting ElevenLabs session with language:', language);
+        const agentIdToUse = elevenLabsAgentId || process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || '';
+        const isDefaultAgent = !elevenLabsAgentId;
+
+        // Build agent overrides with language and optional firstMessage
+        const agentOverrides: { language: string; firstMessage?: string } = {
+          language: language,
+        };
+
+        if (isDefaultAgent) {
+          // Default agent (Yuki): use hardcoded translations for non-English
+          if (language !== 'en') {
+            const firstMessage = firstMessageTranslations[language] || firstMessageTranslations.en;
+            agentOverrides.firstMessage = firstMessage;
+            console.log('📝 First message override (Yuki):', firstMessage.substring(0, 50) + '...');
+          }
+        } else if (welcomeMessage) {
+          // Custom agent (Chef Chen, etc.): use the welcomeMessage prop which is already translated
+          agentOverrides.firstMessage = welcomeMessage;
+          console.log('📝 First message override (custom):', welcomeMessage.substring(0, 50) + '...');
+        }
+
         await elevenLabsConversation.startSession({
-          agentId: elevenLabsAgentId || process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || '',
+          agentId: agentIdToUse,
+          overrides: {
+            agent: agentOverrides
+          }
         });
 
         // If contextData has documentContent, send it as a contextual update after connection

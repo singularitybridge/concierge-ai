@@ -9,6 +9,7 @@ import {
   Wine, Gift, Heart, ChefHat, Waves
 } from 'lucide-react';
 import VoiceSessionChat from '../components/VoiceSessionChat';
+import { useLanguageStore } from '@/lib/use-language-store';
 
 interface ShopItem {
   id: string;
@@ -93,6 +94,7 @@ export default function HotelBoutiquePage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
+  const { language } = useLanguageStore();
 
   // Check authentication
   useEffect(() => {
@@ -494,6 +496,7 @@ export default function HotelBoutiquePage() {
                   orderConfirmed
                 }}
                 variant="dark"
+                language={language}
               />
             </div>
           </div>

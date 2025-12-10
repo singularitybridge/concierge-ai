@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { Sparkles, Shield, ClipboardList, BookOpen, LogOut, ChevronRight } from 'lucide-react';
 import VoiceSessionChat from '../../components/VoiceSessionChat';
 import { useAuth } from '../../hooks/useAuth';
+import { useLanguageStore } from '@/lib/use-language-store';
 
 const documents: Record<string, {
   title: string;
@@ -215,6 +216,7 @@ function getDocumentContent(doc: typeof documents[string]): string {
 
 export default function DocumentPage() {
   const { isAuthenticated, logout } = useAuth();
+  const { language } = useLanguageStore();
   const [mounted, setMounted] = useState(false);
   const params = useParams();
   const docId = params.id as string;
@@ -416,6 +418,7 @@ export default function DocumentPage() {
                 sections: doc.sections.map(s => s.heading)
               }}
               variant="dark"
+              language={language}
             />
             </div>
           </div>

@@ -10,6 +10,7 @@ import {
   Wine, Mountain, Car, Shirt, PawPrint, Plane, Coffee, Sparkle, AlertCircle
 } from 'lucide-react';
 import VoiceSessionChat from '../../components/VoiceSessionChat';
+import { useLanguageStore } from '@/lib/use-language-store';
 
 interface Guest {
   id: string;
@@ -94,6 +95,7 @@ export default function GuestPortalPage({ params }: { params: Promise<{ slug: st
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
+  const { language } = useLanguageStore();
 
   useEffect(() => {
     async function fetchGuestData() {
@@ -549,6 +551,7 @@ export default function GuestPortalPage({ params }: { params: Promise<{ slug: st
                   availableServices: quickActions.map(a => ({ label: a.label, description: a.description, type: a.serviceType }))
                 }}
                 variant="dark"
+                language={language}
               />
             </div>
           </div>

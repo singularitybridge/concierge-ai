@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, TrendingUp, Calendar, DollarSign, BarChart3, Percent } from 'lucide-react';
 import VoiceSessionChat from '../../components/VoiceSessionChat';
+import { useLanguageStore } from '@/lib/use-language-store';
 
 // Mock data for revenue dashboard
 const occupancyData = [
@@ -16,16 +17,19 @@ const occupancyData = [
   { day: 'Sun', rate: 83 },
 ];
 
+// Real The 1898 Niseko suite types with premium pricing
 const roomPricing = [
-  { name: 'Mountain Suite', basePrice: 85000, currentPrice: 95000, demand: 'High' },
-  { name: 'Garden Suite', basePrice: 75000, currentPrice: 75000, demand: 'Medium' },
-  { name: 'Onsen Suite', basePrice: 95000, currentPrice: 110000, demand: 'High' },
-  { name: 'Valley Suite', basePrice: 70000, currentPrice: 65000, demand: 'Low' },
-  { name: 'Sky Suite', basePrice: 120000, currentPrice: 135000, demand: 'High' },
-  { name: 'Forest Suite', basePrice: 80000, currentPrice: 80000, demand: 'Medium' },
+  { name: 'Hirafu Penthouse', basePrice: 280000, currentPrice: 320000, demand: 'High' },
+  { name: 'Hanazono Penthouse', basePrice: 220000, currentPrice: 250000, demand: 'High' },
+  { name: 'Annupuri Duplex', basePrice: 180000, currentPrice: 195000, demand: 'Medium' },
+  { name: 'Village Duplex', basePrice: 150000, currentPrice: 150000, demand: 'Medium' },
+  { name: 'Moiwa Suite', basePrice: 120000, currentPrice: 135000, demand: 'High' },
+  { name: 'Weiss Suite', basePrice: 85000, currentPrice: 78000, demand: 'Low' },
 ];
 
 export default function RevenueAgentPage() {
+  const { language } = useLanguageStore();
+
   return (
     <div className="flex h-screen bg-stone-100">
       {/* Left: Revenue Dashboard */}
@@ -157,7 +161,7 @@ export default function RevenueAgentPage() {
 
       {/* Right: Voice Chat */}
       <div className="flex-[1] min-w-0 p-6">
-        <VoiceSessionChat agentId="revenue-manager" sessionId="revenue" />
+        <VoiceSessionChat agentId="revenue-manager" sessionId="revenue" language={language} />
       </div>
     </div>
   );

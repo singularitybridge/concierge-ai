@@ -10,6 +10,7 @@ import {
   Wine, Mountain, Car, Shirt, PawPrint, Plane, Coffee, Sparkle
 } from 'lucide-react';
 import VoiceSessionChat from '../components/VoiceSessionChat';
+import { useLanguageStore } from '@/lib/use-language-store';
 
 // Mock guest data
 const guestData = {
@@ -96,6 +97,7 @@ export default function GuestPage() {
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
+  const { language } = useLanguageStore();
 
   useEffect(() => {
     const auth = localStorage.getItem('niseko_authenticated');
@@ -470,6 +472,7 @@ export default function GuestPage() {
                   availableServices: quickActions.map(a => ({ label: a.label, description: a.description, type: a.serviceType }))
                 }}
                 variant="dark"
+                language={language}
               />
             </div>
           </div>

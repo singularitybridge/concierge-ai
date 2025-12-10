@@ -727,6 +727,7 @@ export default function DriversManagementPage() {
                 ]}
                 contextData={driversContextData}
                 variant="dark"
+                language={language}
               />
             </div>
           </div>

@@ -684,6 +684,7 @@ export default function GuestManagementPage() {
                 ]}
                 contextData={guestContextData}
                 variant="dark"
+                language={language}
               />
             </div>
           </div>

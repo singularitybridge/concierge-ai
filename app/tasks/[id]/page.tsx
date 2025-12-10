@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import VoiceSessionChat from '../../components/VoiceSessionChat';
+import { useLanguageStore } from '@/lib/use-language-store';
 
 // Mock tasks data - in production this would come from a database
 const tasksData: Record<string, TaskData> = {
@@ -364,6 +365,7 @@ export default function TaskDetailPage() {
   const router = useRouter();
   const params = useParams();
   const taskId = params.id as string;
+  const { language } = useLanguageStore();
 
   const [task, setTask] = useState<TaskData | null>(null);
   const [newComment, setNewComment] = useState('');
@@ -844,6 +846,7 @@ export default function TaskDetailPage() {
                   }
                 }}
                 variant="dark"
+                language={language}
               />
             </div>
           </div>

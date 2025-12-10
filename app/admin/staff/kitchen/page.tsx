@@ -683,6 +683,7 @@ export default function KitchenManagementPage() {
                 ]}
                 contextData={kitchenContextData}
                 variant="dark"
+                language={language}
               />
             </div>
           </div>

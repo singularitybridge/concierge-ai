@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Cpu, Activity, GitBranch, Shield, Zap, CheckCircle, Clock, ListTodo, LayoutDashboard } from 'lucide-react';
 import VoiceSessionChat from '../../components/VoiceSessionChat';
+import { useLanguageStore } from '@/lib/use-language-store';
 
 // System narrative data
 const systemPulse = {
@@ -85,6 +86,7 @@ const agentTasks = [
 ];
 
 export default function ArchitectAgentPage() {
+  const { language } = useLanguageStore();
   const [view, setView] = useState<'dashboard' | 'tasks'>('dashboard');
 
   return (
@@ -295,7 +297,7 @@ export default function ArchitectAgentPage() {
 
       {/* Right: Voice Chat */}
       <div className="flex-[1] min-w-0 p-6">
-        <VoiceSessionChat agentId="digital-architect" sessionId="architect" />
+        <VoiceSessionChat agentId="digital-architect" sessionId="architect" language={language} />
       </div>
     </div>
   );
