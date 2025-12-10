@@ -227,8 +227,7 @@ export default function GuestsAgentPage() {
 
   // Navigation menu items
   const menuItems = [
-    { label: 'Grand Opening', href: '/experience' },
-    { label: 'Guest Portal', href: '/guest' },
+    { label: 'Register', href: '/register' },
     { label: 'Staff Portal', href: '/admin', active: true },
     { label: 'Shop', href: '/shop' },
   ];

@@ -1,0 +1,130 @@
+{
+  "properties": [
+    {
+      "id": "sky-suite",
+      "name": "Sky Suite",
+      "type": "Penthouse Suite",
+      "location": "Floor 4, East Wing",
+      "image": "/hotel3.jpg",
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "maxGuests": 6,
+      "amenities": ["Private Onsen", "Mt. Yotei View", "Butler Service"],
+      "status": "occupied",
+      "guest": {
+        "id": "tanaka-family",
+        "name": "Tanaka Family",
+        "checkIn": "Dec 10",
+        "checkOut": "Dec 15",
+        "guestCount": 4,
+        "status": "vip"
+      },
+      "staffId": "yuki"
+    },
+    {
+      "id": "onsen-suite",
+      "name": "Onsen Suite",
+      "type": "Premium Suite",
+      "location": "Floor 2, West Wing",
+      "image": "/hotel3.jpg",
+      "bedrooms": 2,
+      "bathrooms": 2,
+      "maxGuests": 4,
+      "amenities": ["Private Onsen", "Garden View", "Tatami Room"],
+      "status": "occupied",
+      "guest": {
+        "id": "chen-couple",
+        "name": "Mr. & Mrs. Chen",
+        "checkIn": "Dec 10",
+        "checkOut": "Dec 13",
+        "guestCount": 2,
+        "status": "standard"
+      },
+      "staffId": "kenji"
+    },
+    {
+      "id": "garden-suite",
+      "name": "Garden Suite",
+      "type": "Deluxe Suite",
+      "location": "Floor 4, South Wing",
+      "image": "/hotel3.jpg",
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "maxGuests": 4,
+      "amenities": ["Japanese Garden", "Tea Ceremony Room", "Fireplace"],
+      "status": "occupied",
+      "guest": {
+        "id": "sato-couple",
+        "name": "Sato Couple",
+        "checkIn": "Dec 8",
+        "checkOut": "Dec 12",
+        "guestCount": 2,
+        "status": "standard"
+      },
+      "staffId": "mika"
+    },
+    {
+      "id": "forest-suite",
+      "name": "Forest Suite",
+      "type": "Family Suite",
+      "location": "Floor 3, North Wing",
+      "image": "/hotel3.jpg",
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "maxGuests": 6,
+      "amenities": ["Forest View", "Kids Play Area", "Connecting Rooms"],
+      "status": "occupied",
+      "guest": {
+        "id": "kim-family",
+        "name": "Kim Family",
+        "checkIn": "Dec 9",
+        "checkOut": "Dec 11",
+        "guestCount": 4,
+        "status": "standard"
+      },
+      "staffId": "yuki"
+    },
+    {
+      "id": "valley-suite",
+      "name": "Valley Suite",
+      "type": "Executive Suite",
+      "location": "Floor 2, East Wing",
+      "image": "/hotel3.jpg",
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "maxGuests": 2,
+      "amenities": ["Valley View", "Work Desk", "Private Bar"],
+      "status": "occupied",
+      "guest": {
+        "id": "dr-yamamoto",
+        "name": "Dr. Yamamoto",
+        "checkIn": "Dec 9",
+        "checkOut": "Dec 13",
+        "guestCount": 1,
+        "status": "standard"
+      },
+      "staffId": "kenji"
+    },
+    {
+      "id": "mountain-suite",
+      "name": "Mountain Suite",
+      "type": "Premium Suite",
+      "location": "Floor 4, West Wing",
+      "image": "/hotel3.jpg",
+      "bedrooms": 2,
+      "bathrooms": 2,
+      "maxGuests": 4,
+      "amenities": ["Mt. Yotei Panorama", "Ski Storage", "Private Balcony"],
+      "status": "occupied",
+      "guest": {
+        "id": "avi-osipov",
+        "name": "Avi Osipov",
+        "checkIn": "Dec 20",
+        "checkOut": "Dec 24",
+        "guestCount": 1,
+        "status": "vip"
+      },
+      "staffId": "mika"
+    }
+  ]
+}

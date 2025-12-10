@@ -114,8 +114,7 @@ export default function HotelBoutiquePage() {
 
   // Navigation menu items
   const menuItems = [
-    { label: 'Grand Opening', href: '/experience' },
-    { label: 'Guest Portal', href: '/guest' },
+    { label: 'Register', href: '/register' },
     { label: 'Staff Portal', href: '/admin' },
     { label: 'Shop', href: '/shop', active: true },
   ];

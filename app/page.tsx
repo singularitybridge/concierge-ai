@@ -42,16 +42,10 @@ export default function WelcomePage() {
 
   const portals = [
     {
-      href: '/experience',
+      href: '/register',
       icon: Calendar,
-      title: 'Grand Opening',
+      title: 'Register',
       description: 'RSVP for December 10th celebration'
-    },
-    {
-      href: '/guest',
-      icon: Users,
-      title: 'Guest Portal',
-      description: 'Access your stay information'
     },
     {
       href: '/admin',

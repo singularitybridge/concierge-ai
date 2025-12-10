@@ -266,8 +266,7 @@ export default function DocumentPage() {
 
   // Navigation menu items
   const menuItems = [
-    { label: 'Grand Opening', href: '/experience' },
-    { label: 'Guest Portal', href: '/guest' },
+    { label: 'Register', href: '/register' },
     { label: 'Staff Portal', href: '/admin', active: true },
     { label: 'Shop', href: '/shop' },
   ];
@@ -401,14 +400,14 @@ export default function DocumentPage() {
               agentId="knowledge-base"
               sessionId={`kb-${docId}`}
               elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_KB_AGENT_ID}
-              title="Training Assistant"
+              title="Training Coordinator"
               avatar="/avatars/kb-avatar.jpg"
-              welcomeMessage={`I can help you understand the ${doc.title}. What would you like to know?`}
+              welcomeMessage={`Hello! I'm your training coordinator. Let's go through the ${doc.title} together. Feel free to ask me anything - I'm here to help you master these procedures.`}
               suggestions={[
-                "Summarize this document",
-                "What are the key points?",
-                "Give me an example",
-                "What should I remember?"
+                "Walk me through this",
+                "What's most important here?",
+                "Give me a real example",
+                "How do I handle this situation?"
               ]}
               contextData={{
                 documentId: docId,

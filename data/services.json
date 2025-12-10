@@ -1,0 +1,124 @@
+{
+  "services": [
+    {
+      "id": "room-service",
+      "name": "Room Service",
+      "category": "dining",
+      "description": "In-room dining from our award-winning kitchen",
+      "icon": "Utensils",
+      "availability": "24/7",
+      "estimatedTime": "30-45 minutes",
+      "pricing": "Menu prices + 15% service"
+    },
+    {
+      "id": "housekeeping",
+      "name": "Housekeeping",
+      "category": "room",
+      "description": "Room cleaning, turndown service, and amenity refresh",
+      "icon": "Shirt",
+      "availability": "7:00 AM - 10:00 PM",
+      "estimatedTime": "20-30 minutes",
+      "pricing": "Complimentary"
+    },
+    {
+      "id": "onsen-booking",
+      "name": "Private Onsen",
+      "category": "wellness",
+      "description": "Reserve private hot spring bath",
+      "icon": "Waves",
+      "availability": "6:00 AM - 11:00 PM",
+      "estimatedTime": "60 minute sessions",
+      "pricing": "¥5,000 per session"
+    },
+    {
+      "id": "spa-treatment",
+      "name": "Spa Treatment",
+      "category": "wellness",
+      "description": "Traditional Japanese and Western spa treatments",
+      "icon": "Sparkles",
+      "availability": "9:00 AM - 9:00 PM",
+      "estimatedTime": "60-120 minutes",
+      "pricing": "From ¥15,000"
+    },
+    {
+      "id": "amenities",
+      "name": "Amenities Request",
+      "category": "room",
+      "description": "Extra towels, toiletries, pillows, and supplies",
+      "icon": "Coffee",
+      "availability": "24/7",
+      "estimatedTime": "10-15 minutes",
+      "pricing": "Complimentary"
+    },
+    {
+      "id": "laundry",
+      "name": "Laundry Service",
+      "category": "room",
+      "description": "Same-day laundry and dry cleaning",
+      "icon": "Shirt",
+      "availability": "7:00 AM - 7:00 PM",
+      "estimatedTime": "Same day if before 10 AM",
+      "pricing": "Per item pricing"
+    },
+    {
+      "id": "ski-rental",
+      "name": "Ski Equipment Rental",
+      "category": "activities",
+      "description": "Premium ski and snowboard equipment",
+      "icon": "Snowflake",
+      "availability": "7:00 AM - 6:00 PM",
+      "estimatedTime": "15-20 minutes fitting",
+      "pricing": "From ¥8,000/day"
+    },
+    {
+      "id": "ski-lessons",
+      "name": "Ski Lessons",
+      "category": "activities",
+      "description": "Private and group lessons for all levels",
+      "icon": "Mountain",
+      "availability": "9:00 AM - 4:00 PM",
+      "estimatedTime": "2-4 hours",
+      "pricing": "From ¥25,000"
+    },
+    {
+      "id": "airport-transfer",
+      "name": "Airport Transfer",
+      "category": "transportation",
+      "description": "Private car service to/from New Chitose Airport",
+      "icon": "Car",
+      "availability": "24/7 with advance booking",
+      "estimatedTime": "2-2.5 hours",
+      "pricing": "¥35,000 one way"
+    },
+    {
+      "id": "restaurant-reservation",
+      "name": "Restaurant Reservation",
+      "category": "dining",
+      "description": "Book our restaurants or local dining",
+      "icon": "Wine",
+      "availability": "Concierge available 24/7",
+      "estimatedTime": "Confirmation within 1 hour",
+      "pricing": "Complimentary service"
+    },
+    {
+      "id": "babysitting",
+      "name": "Babysitting",
+      "category": "family",
+      "description": "Professional childcare services",
+      "icon": "Baby",
+      "availability": "With 24 hour advance notice",
+      "estimatedTime": "Minimum 3 hours",
+      "pricing": "¥3,000/hour"
+    },
+    {
+      "id": "pet-services",
+      "name": "Pet Services",
+      "category": "pets",
+      "description": "Pet sitting, walking, and grooming",
+      "icon": "PawPrint",
+      "availability": "7:00 AM - 9:00 PM",
+      "estimatedTime": "Varies by service",
+      "pricing": "From ¥2,000"
+    }
+  ]
+}

@@ -1,0 +1,132 @@
+{
+  "guests": [
+    {
+      "id": "tanaka-family",
+      "name": "Tanaka Family",
+      "email": "tanaka@example.com",
+      "phone": "+81-90-1111-2222",
+      "confirmationCode": "NIS-2024-TAN01",
+      "checkIn": "2024-12-10",
+      "checkOut": "2024-12-15",
+      "nights": 5,
+      "guestCount": 4,
+      "status": "vip",
+      "propertyId": "sky-suite",
+      "specialRequests": [
+        { "type": "Airport Pickup", "time": "2:00 PM", "status": "confirmed" },
+        { "type": "Welcome Champagne", "status": "confirmed" }
+      ],
+      "pets": null,
+      "preferences": {
+        "dietary": ["vegetarian option available"],
+        "room": ["extra pillows", "hypoallergenic bedding"]
+      }
+    },
+    {
+      "id": "chen-couple",
+      "name": "Mr. & Mrs. Chen",
+      "email": "chen@example.com",
+      "phone": "+86-138-0000-1111",
+      "confirmationCode": "NIS-2024-CHN01",
+      "checkIn": "2024-12-10",
+      "checkOut": "2024-12-13",
+      "nights": 3,
+      "guestCount": 2,
+      "status": "standard",
+      "propertyId": "onsen-suite",
+      "specialRequests": [
+        { "type": "Late Check-out", "time": "2:00 PM", "status": "pending" }
+      ],
+      "pets": null,
+      "preferences": {
+        "dietary": [],
+        "room": []
+      }
+    },
+    {
+      "id": "sato-couple",
+      "name": "Sato Couple",
+      "email": "sato@example.com",
+      "phone": "+81-90-3333-4444",
+      "confirmationCode": "NIS-2024-SAT01",
+      "checkIn": "2024-12-08",
+      "checkOut": "2024-12-12",
+      "nights": 4,
+      "guestCount": 2,
+      "status": "standard",
+      "propertyId": "garden-suite",
+      "specialRequests": [],
+      "pets": null,
+      "preferences": {
+        "dietary": [],
+        "room": ["traditional futon"]
+      }
+    },
+    {
+      "id": "kim-family",
+      "name": "Kim Family",
+      "email": "kim@example.com",
+      "phone": "+82-10-5555-6666",
+      "confirmationCode": "NIS-2024-KIM01",
+      "checkIn": "2024-12-09",
+      "checkOut": "2024-12-11",
+      "nights": 2,
+      "guestCount": 4,
+      "status": "standard",
+      "propertyId": "forest-suite",
+      "specialRequests": [
+        { "type": "Kids Menu", "status": "confirmed" }
+      ],
+      "pets": null,
+      "preferences": {
+        "dietary": ["kids menu needed"],
+        "room": ["baby crib"]
+      }
+    },
+    {
+      "id": "dr-yamamoto",
+      "name": "Dr. Yamamoto",
+      "email": "yamamoto@example.com",
+      "phone": "+81-90-7777-8888",
+      "confirmationCode": "NIS-2024-YAM01",
+      "checkIn": "2024-12-09",
+      "checkOut": "2024-12-13",
+      "nights": 4,
+      "guestCount": 1,
+      "status": "standard",
+      "propertyId": "valley-suite",
+      "specialRequests": [
+        { "type": "Quiet Room", "status": "confirmed" }
+      ],
+      "pets": null,
+      "preferences": {
+        "dietary": [],
+        "room": ["do not disturb mornings"]
+      }
+    },
+    {
+      "id": "avi-osipov",
+      "name": "Avi Osipov",
+      "email": "avi@example.com",
+      "phone": "+1-555-123-4567",
+      "confirmationCode": "NIS-2025-DEMO",
+      "checkIn": "2024-12-20",
+      "checkOut": "2024-12-24",
+      "nights": 4,
+      "guestCount": 1,
+      "status": "vip",
+      "propertyId": "mountain-suite",
+      "specialRequests": [
+        { "type": "Airport Pickup", "time": "3:00 PM", "status": "confirmed" }
+      ],
+      "pets": {
+        "name": "Shmutzi",
+        "type": "Cat"
+      },
+      "preferences": {
+        "dietary": [],
+        "room": ["pet-friendly", "mountain view"]
+      }
+    }
+  ]
+}

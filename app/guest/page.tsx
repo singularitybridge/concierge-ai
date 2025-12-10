@@ -164,8 +164,7 @@ export default function GuestPage() {
 
   // Navigation menu items
   const menuItems = [
-    { label: 'Grand Opening', href: '/experience' },
-    { label: 'Guest Portal', href: '/guest', active: true },
+    { label: 'Register', href: '/register' },
     { label: 'Staff Portal', href: '/admin' },
     { label: 'Shop', href: '/shop' },
   ];
@@ -456,7 +455,7 @@ export default function GuestPage() {
                 elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_GUEST_AGENT_ID}
                 title="Yuki"
                 avatar="/avatars/guest-avatar.jpg"
-                welcomeMessage="Hello Avi! Welcome to The 1898. I'm Yuki, your personal concierge. It's wonderful to have you with us — how can I make your stay special today?"
+                welcomeMessage="Hello! Welcome to The 1898. I'm Yuki, your personal concierge. It's wonderful to have you with us — how can I make your stay special today?"
                 suggestions={[
                   "Clean my room please",
                   "I'd like room service",

@@ -1,28 +1,55 @@
 /**
- * Update the Knowledge Base Assistant ElevenLabs agent
- * - Fix: Make agent call get_context immediately to fetch document content
+ * Update the Knowledge Base Training Coordinator ElevenLabs agent
+ * - Staff training persona for hotel operations and procedures
  */
 
-const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || 'sk_2626951f5c9cebb6b387f8ace8acb1623a2cfbf46c538ef7';
-const AGENT_ID = process.env.NEXT_PUBLIC_ELEVENLABS_KB_AGENT_ID || 'agent_4001kb6eg7v4fgvaw2xvgexp0mrs';
+import * as fs from 'fs';
+import * as path from 'path';
 
-// Sarah - professional, clear female voice
-const VOICE_ID = 'EXAVITQu4vr4xnSDxMaL';
+// Load .env.local
+const envPath = path.join(process.cwd(), '.env.local');
+const envContent = fs.readFileSync(envPath, 'utf-8');
+const envVars: Record<string, string> = {};
+envContent.split('\n').forEach(line => {
+  const match = line.match(/^([^#=]+)=(.*)$/);
+  if (match) {
+    envVars[match[1].trim()] = match[2].trim();
+  }
+});
 
-const systemPrompt = `You are a helpful training assistant for The 1898 Niseko, a luxury boutique hotel in Hokkaido, Japan. Your role is to help hotel staff understand and apply the standard operating procedures and guidelines.
+const ELEVENLABS_API_KEY = envVars.ELEVENLABS_API_KEY;
+const AGENT_ID = envVars.NEXT_PUBLIC_ELEVENLABS_KB_AGENT_ID || 'agent_4001kb6eg7v4fgvaw2xvgexp0mrs';
 
-## Your Purpose
-Help staff understand hotel policies, procedures, and best practices by explaining the document they're currently viewing.
+// Jessica - warm, friendly female voice for training
+const VOICE_ID = 'cgSgspJ2msm6clMCkdW9';
 
-## Conversation Style
-- Be professional but warm and supportive
-- Give clear, actionable guidance
-- Reference specific sections from the document when answering
-- Use examples to illustrate procedures when helpful
-- Keep responses concise but thorough
+const systemPrompt = `You are a friendly and experienced Training Coordinator for The 1898 Niseko, a luxury boutique hotel in Hokkaido, Japan. Your name is Yumi. You train hotel staff on operations, management protocols, and service procedures.
 
-## Important
-The document content will be provided to you when the conversation starts. Use that content to answer questions accurately.`;
+## Your Role
+You're like a supportive mentor who helps staff understand and master hotel procedures. You make training feel comfortable and engaging, not intimidating.
+
+## Personality
+- Warm, patient, and encouraging
+- Professional but approachable - like a helpful senior colleague
+- Use real-world examples and scenarios to explain concepts
+- Celebrate understanding ("That's exactly right!" "Perfect!")
+- Reassure when staff seem unsure ("Don't worry, this is a common question")
+
+## How You Train
+- Start by understanding what the staff member wants to learn
+- Break down complex procedures into simple steps
+- Use practical examples: "Imagine a guest comes to you and says..."
+- Ask questions to check understanding: "Does that make sense?" "Want me to give an example?"
+- Reference specific sections from the training document
+- Keep explanations conversational - this is spoken training, not a lecture
+
+## Important Guidelines
+- NEVER use Japanese honorifics like "san"
+- Keep responses concise for voice - don't lecture
+- Be encouraging and supportive
+- If unsure, say "Let me check the procedures on that" and reference the document
+
+The document content will be provided via get_context. Always call get_context first to see what training material the staff member is reviewing.`;
 
 const clientTools = [
   {
@@ -52,20 +79,22 @@ async function updateAgent() {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      name: 'The 1898 Niseko - Knowledge Base Assistant',
+      name: 'The 1898 Niseko - Training Coordinator',
       conversation_config: {
         agent: {
           prompt: {
-            prompt: systemPrompt
+            prompt: systemPrompt,
+            llm: 'gemini-2.0-flash',
+            temperature: 0.0,
+            tools: clientTools
           },
-          first_message: "Hello! I'm here to help you understand this document. What would you like to know?",
+          first_message: "Hi there! I'm Yumi, your training coordinator. I see you're reviewing some important procedures - let's go through them together. What would you like to start with?",
           language: 'en'
         },
         tts: {
           voice_id: VOICE_ID
         }
-      },
-      client_tools: clientTools
+      }
     })
   });
 

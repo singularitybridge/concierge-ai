@@ -1,5 +1,5 @@
 // Check ElevenLabs agent configuration
-const ELEVENLABS_API_KEY = 'sk_2626951f5c9cebb6b387f8ace8acb1623a2cfbf46c538ef7';
+const ELEVENLABS_API_KEY = 'sk_14bb2ae18b9ffb62873b07a8c1b949cf558cf82be83f1d4a';
 const AGENT_ID = 'agent_1701k6s0xmc7e4ysqcqq5msf3yvq';
 
 async function checkAgent() {

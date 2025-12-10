@@ -1,0 +1,130 @@
+{
+  "staff": [
+    {
+      "id": "yuki",
+      "name": "Yuki Tanaka",
+      "role": "Head Concierge",
+      "department": "Guest Services",
+      "avatar": "/avatars/revenue.jpg",
+      "phone": "+81-90-1234-5678",
+      "email": "yuki@1898niseko.com",
+      "status": "on-duty",
+      "rating": 4.9,
+      "hireDate": "2021-03-15",
+      "shifts": [
+        { "id": "s1", "date": "2024-12-09", "startTime": "07:00", "endTime": "15:00", "type": "morning", "location": "Front Desk" },
+        { "id": "s2", "date": "2024-12-10", "startTime": "07:00", "endTime": "15:00", "type": "morning", "location": "Front Desk" },
+        { "id": "s3", "date": "2024-12-11", "startTime": "15:00", "endTime": "23:00", "type": "afternoon", "location": "Lobby" },
+        { "id": "s4", "date": "2024-12-12", "startTime": "15:00", "endTime": "23:00", "type": "afternoon", "location": "Lobby" },
+        { "id": "s5", "date": "2024-12-13", "startTime": "00:00", "endTime": "00:00", "type": "off" },
+        { "id": "s6", "date": "2024-12-14", "startTime": "07:00", "endTime": "15:00", "type": "morning", "location": "Front Desk" },
+        { "id": "s7", "date": "2024-12-15", "startTime": "07:00", "endTime": "15:00", "type": "morning", "location": "Front Desk" }
+      ]
+    },
+    {
+      "id": "kenji",
+      "name": "Kenji Sato",
+      "role": "Guest Services Director",
+      "department": "Guest Services",
+      "avatar": "/avatars/guests.jpg",
+      "phone": "+81-90-2345-6789",
+      "email": "kenji@1898niseko.com",
+      "status": "on-duty",
+      "rating": 4.8,
+      "hireDate": "2020-06-01",
+      "shifts": [
+        { "id": "s1", "date": "2024-12-09", "startTime": "15:00", "endTime": "23:00", "type": "afternoon", "location": "Guest Relations" },
+        { "id": "s2", "date": "2024-12-10", "startTime": "15:00", "endTime": "23:00", "type": "afternoon", "location": "Guest Relations" },
+        { "id": "s3", "date": "2024-12-11", "startTime": "07:00", "endTime": "15:00", "type": "morning", "location": "Front Desk" },
+        { "id": "s4", "date": "2024-12-12", "startTime": "00:00", "endTime": "00:00", "type": "off" },
+        { "id": "s5", "date": "2024-12-13", "startTime": "07:00", "endTime": "15:00", "type": "morning", "location": "Front Desk" },
+        { "id": "s6", "date": "2024-12-14", "startTime": "15:00", "endTime": "23:00", "type": "afternoon", "location": "Guest Relations" },
+        { "id": "s7", "date": "2024-12-15", "startTime": "15:00", "endTime": "23:00", "type": "afternoon", "location": "Guest Relations" }
+      ]
+    },
+    {
+      "id": "mika",
+      "name": "Mika Hayashi",
+      "role": "Operations Manager",
+      "department": "Operations",
+      "avatar": "/avatars/operations.jpg",
+      "phone": "+81-90-3456-7890",
+      "email": "mika@1898niseko.com",
+      "status": "on-duty",
+      "rating": 4.7,
+      "hireDate": "2019-11-10",
+      "shifts": [
+        { "id": "s1", "date": "2024-12-09", "startTime": "06:00", "endTime": "14:00", "type": "morning", "location": "Operations Center" },
+        { "id": "s2", "date": "2024-12-10", "startTime": "06:00", "endTime": "14:00", "type": "morning", "location": "Operations Center" },
+        { "id": "s3", "date": "2024-12-11", "startTime": "06:00", "endTime": "14:00", "type": "morning", "location": "Operations Center" },
+        { "id": "s4", "date": "2024-12-12", "startTime": "14:00", "endTime": "22:00", "type": "afternoon", "location": "Housekeeping" },
+        { "id": "s5", "date": "2024-12-13", "startTime": "14:00", "endTime": "22:00", "type": "afternoon", "location": "Housekeeping" },
+        { "id": "s6", "date": "2024-12-14", "startTime": "00:00", "endTime": "00:00", "type": "off" },
+        { "id": "s7", "date": "2024-12-15", "startTime": "00:00", "endTime": "00:00", "type": "off" }
+      ]
+    },
+    {
+      "id": "takeshi",
+      "name": "Takeshi Yamada",
+      "role": "Concierge",
+      "department": "Guest Services",
+      "avatar": "/avatars/architect.jpg",
+      "phone": "+81-90-4567-8901",
+      "email": "takeshi@1898niseko.com",
+      "status": "off-duty",
+      "rating": 4.6,
+      "hireDate": "2022-01-20",
+      "shifts": [
+        { "id": "s1", "date": "2024-12-09", "startTime": "00:00", "endTime": "00:00", "type": "off" },
+        { "id": "s2", "date": "2024-12-10", "startTime": "23:00", "endTime": "07:00", "type": "night", "location": "Front Desk" },
+        { "id": "s3", "date": "2024-12-11", "startTime": "23:00", "endTime": "07:00", "type": "night", "location": "Front Desk" },
+        { "id": "s4", "date": "2024-12-12", "startTime": "23:00", "endTime": "07:00", "type": "night", "location": "Front Desk" },
+        { "id": "s5", "date": "2024-12-13", "startTime": "00:00", "endTime": "00:00", "type": "off" },
+        { "id": "s6", "date": "2024-12-14", "startTime": "23:00", "endTime": "07:00", "type": "night", "location": "Front Desk" },
+        { "id": "s7", "date": "2024-12-15", "startTime": "23:00", "endTime": "07:00", "type": "night", "location": "Front Desk" }
+      ]
+    },
+    {
+      "id": "sakura",
+      "name": "Sakura Ito",
+      "role": "Spa Manager",
+      "department": "Wellness",
+      "avatar": "/avatars/guests.jpg",
+      "phone": "+81-90-5678-9012",
+      "email": "sakura@1898niseko.com",
+      "status": "on-duty",
+      "rating": 4.9,
+      "hireDate": "2020-09-05",
+      "shifts": [
+        { "id": "s1", "date": "2024-12-09", "startTime": "09:00", "endTime": "17:00", "type": "morning", "location": "Spa & Onsen" },
+        { "id": "s2", "date": "2024-12-10", "startTime": "09:00", "endTime": "17:00", "type": "morning", "location": "Spa & Onsen" },
+        { "id": "s3", "date": "2024-12-11", "startTime": "12:00", "endTime": "20:00", "type": "afternoon", "location": "Spa & Onsen" },
+        { "id": "s4", "date": "2024-12-12", "startTime": "12:00", "endTime": "20:00", "type": "afternoon", "location": "Spa & Onsen" },
+        { "id": "s5", "date": "2024-12-13", "startTime": "09:00", "endTime": "17:00", "type": "morning", "location": "Spa & Onsen" },
+        { "id": "s6", "date": "2024-12-14", "startTime": "00:00", "endTime": "00:00", "type": "off" },
+        { "id": "s7", "date": "2024-12-15", "startTime": "09:00", "endTime": "17:00", "type": "morning", "location": "Spa & Onsen" }
+      ]
+    },
+    {
+      "id": "hiroshi",
+      "name": "Hiroshi Nakamura",
+      "role": "Executive Chef",
+      "department": "F&B",
+      "avatar": "/avatars/revenue.jpg",
+      "phone": "+81-90-6789-0123",
+      "email": "hiroshi@1898niseko.com",
+      "status": "on-duty",
+      "rating": 5.0,
+      "hireDate": "2018-04-01",
+      "shifts": [
+        { "id": "s1", "date": "2024-12-09", "startTime": "10:00", "endTime": "22:00", "type": "afternoon", "location": "Main Kitchen", "notes": "Dinner service" },
+        { "id": "s2", "date": "2024-12-10", "startTime": "10:00", "endTime": "22:00", "type": "afternoon", "location": "Main Kitchen", "notes": "VIP dinner" },
+        { "id": "s3", "date": "2024-12-11", "startTime": "10:00", "endTime": "22:00", "type": "afternoon", "location": "Main Kitchen" },
+        { "id": "s4", "date": "2024-12-12", "startTime": "00:00", "endTime": "00:00", "type": "off" },
+        { "id": "s5", "date": "2024-12-13", "startTime": "00:00", "endTime": "00:00", "type": "off" },
+        { "id": "s6", "date": "2024-12-14", "startTime": "10:00", "endTime": "22:00", "type": "afternoon", "location": "Main Kitchen", "notes": "Weekend service" },
+        { "id": "s7", "date": "2024-12-15", "startTime": "10:00", "endTime": "22:00", "type": "afternoon", "location": "Main Kitchen", "notes": "Weekend service" }
+      ]
+    }
+  ]
+}

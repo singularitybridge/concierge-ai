@@ -1,0 +1,100 @@
+{
+  "products": [
+    {
+      "id": "sake-set",
+      "name": "Niseko Premium Sake Set",
+      "category": "beverages",
+      "description": "Local Hokkaido sake trio with traditional cups",
+      "price": 12500,
+      "currency": "JPY",
+      "image": "/products/sake-set.jpg",
+      "inStock": true,
+      "featured": true
+    },
+    {
+      "id": "onsen-kit",
+      "name": "Onsen Bath Kit",
+      "category": "wellness",
+      "description": "Yukata, tenugui towel, and bath salts",
+      "price": 8500,
+      "currency": "JPY",
+      "image": "/products/onsen-kit.jpg",
+      "inStock": true,
+      "featured": true
+    },
+    {
+      "id": "hokkaido-chocolate",
+      "name": "Hokkaido Milk Chocolate Box",
+      "category": "food",
+      "description": "Artisan chocolates made with fresh Hokkaido milk",
+      "price": 3500,
+      "currency": "JPY",
+      "image": "/products/chocolate.jpg",
+      "inStock": true,
+      "featured": false
+    },
+    {
+      "id": "yuki-candle",
+      "name": "Yuki Forest Candle",
+      "category": "home",
+      "description": "Hand-poured soy candle with forest scent",
+      "price": 4500,
+      "currency": "JPY",
+      "image": "/products/candle.jpg",
+      "inStock": true,
+      "featured": false
+    },
+    {
+      "id": "1898-robe",
+      "name": "The 1898 Signature Robe",
+      "category": "apparel",
+      "description": "Luxury cotton robe with hotel embroidery",
+      "price": 18000,
+      "currency": "JPY",
+      "image": "/products/robe.jpg",
+      "inStock": true,
+      "featured": true
+    },
+    {
+      "id": "local-honey",
+      "name": "Niseko Wildflower Honey",
+      "category": "food",
+      "description": "Pure honey from local Hokkaido apiaries",
+      "price": 2800,
+      "currency": "JPY",
+      "image": "/products/honey.jpg",
+      "inStock": true,
+      "featured": false
+    },
+    {
+      "id": "ski-wax-kit",
+      "name": "Premium Ski Wax Kit",
+      "category": "sports",
+      "description": "Professional grade wax and tools",
+      "price": 6500,
+      "currency": "JPY",
+      "image": "/products/ski-wax.jpg",
+      "inStock": true,
+      "featured": false
+    },
+    {
+      "id": "tea-ceremony-set",
+      "name": "Matcha Tea Ceremony Set",
+      "category": "home",
+      "description": "Complete set with bowl, whisk, and premium matcha",
+      "price": 15000,
+      "currency": "JPY",
+      "image": "/products/tea-set.jpg",
+      "inStock": true,
+      "featured": true
+    }
+  ],
+  "categories": [
+    { "id": "beverages", "name": "Beverages", "icon": "Wine" },
+    { "id": "wellness", "name": "Wellness", "icon": "Sparkles" },
+    { "id": "food", "name": "Food & Treats", "icon": "Cookie" },
+    { "id": "home", "name": "Home & Living", "icon": "Home" },
+    { "id": "apparel", "name": "Apparel", "icon": "Shirt" },
+    { "id": "sports", "name": "Sports", "icon": "Snowflake" }
+  ]
+}

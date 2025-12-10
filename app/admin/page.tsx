@@ -3,30 +3,47 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { TrendingUp, Users, Wrench, Network, Cpu, Plus, X, Loader2, LogOut, BookOpen, Shield, Sparkles, ClipboardList } from 'lucide-react';
+import { TrendingUp, Users, Wrench, Network, Cpu, Plus, X, Loader2, LogOut, BookOpen, Shield, Sparkles, ClipboardList, Building2, Calendar, ChefHat, Car } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import LanguageSelector from '../components/LanguageSelector';
+import { useLanguageStore } from '@/lib/use-language-store';
+import { translations as defaultTranslations } from '@/lib/translations';
 
 const tasks = [
   {
-    id: 'pricing-review',
-    title: 'Review Dynamic Pricing',
-    description: 'Analyze weekend rates for ski season peak',
-    assignedTo: 'Yuki Tanaka',
-    agent: 'revenue',
+    id: 'room-turnover',
+    title: 'Suite 301 Express Turnover',
+    description: 'Early check-out, next guest arriving 2PM - deep clean priority',
+    assignedTo: 'Mika Hayashi',
+    agent: 'operations',
   },
   {
-    id: 'vip-arrival',
-    title: 'VIP Guest Arrival',
-    description: 'Prepare welcome package for Tanaka Family',
+    id: 'airport-pickup',
+    title: 'Airport Pickup - Sato Family',
+    description: 'New Chitose Airport, 4 guests, Flight JL515 arriving 14:30',
     assignedTo: 'Kenji Sato',
     agent: 'guests',
   },
   {
-    id: 'maintenance-check',
-    title: 'Onsen Temperature Check',
-    description: 'Resolve Valley Suite heating fluctuation',
+    id: 'restaurant-reservation',
+    title: 'Kaiseki Dinner Booking',
+    description: 'VIP table for 6, dietary: 2 vegetarian, 1 gluten-free',
+    assignedTo: 'Yuki Tanaka',
+    agent: 'revenue',
+  },
+  {
+    id: 'onsen-maintenance',
+    title: 'Private Onsen Inspection',
+    description: 'Mountain View Suite - guest reported water temperature variance',
     assignedTo: 'Mika Hayashi',
     agent: 'operations',
+  },
+  {
+    id: 'ski-equipment',
+    title: 'Ski Equipment Delivery',
+    description: 'Premium rental setup for Room 205, 2 adults + 1 child',
+    assignedTo: 'Kenji Sato',
+    agent: 'guests',
   },
 ];
 
@@ -105,6 +122,8 @@ const knowledgeBaseDocs = [
 
 export default function AdminPage() {
   const { isAuthenticated, logout } = useAuth();
+  const { translations: storeTranslations } = useLanguageStore();
+  const t = storeTranslations?.admin ? storeTranslations : defaultTranslations.en;
   const [showModal, setShowModal] = useState(false);
   const [taskInput, setTaskInput] = useState('');
   const [isAssigning, setIsAssigning] = useState(false);
@@ -161,10 +180,9 @@ export default function AdminPage() {
 
   // Navigation menu items
   const menuItems = [
-    { label: 'Grand Opening', href: '/experience' },
-    { label: 'Guest Portal', href: '/guest' },
-    { label: 'Staff Portal', href: '/admin', active: true },
-    { label: 'Shop', href: '/shop' },
+    { label: t.nav.checkIn, href: '/register' },
+    { label: t.admin.title, href: '/admin', active: true },
+    { label: t.nav.restaurant, href: '/restaurant' },
   ];
 
   return (
@@ -220,14 +238,17 @@ export default function AdminPage() {
             ))}
           </div>
 
-          {/* Right - Logout */}
-          <button
-            onClick={logout}
-            className="flex items-center gap-2 px-4 py-2 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
-          >
-            <span className="text-sm">Logout</span>
-            <LogOut className="w-4 h-4" />
-          </button>
+          {/* Right - Language & Logout */}
+          <div className="flex items-center gap-2">
+            <LanguageSelector variant="dark" />
+            <button
+              onClick={logout}
+              className="flex items-center gap-2 px-4 py-2 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
+            >
+              <span className="text-sm">{t.nav.logout}</span>
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </nav>
 
         {/* Main Content */}
@@ -241,9 +262,9 @@ export default function AdminPage() {
                   className="text-4xl font-light text-white tracking-wide"
                   style={{ fontFamily: 'var(--font-cormorant)' }}
                 >
-                  Staff Portal
+                  {t.admin.title}
                 </h2>
-                <p className="text-base text-white/50 mt-2">Property Management System</p>
+                <p className="text-base text-white/50 mt-2">{t.admin.subtitle}</p>
               </div>
 
               {/* Scrollable Content */}
@@ -261,9 +282,9 @@ export default function AdminPage() {
                       className="text-xl font-light text-white tracking-wide"
                       style={{ fontFamily: 'var(--font-cormorant)' }}
                     >
-                      Your AI Team
+                      {t.admin.yourAITeam}
                     </h2>
-                    <span className="text-xs text-amber-400/80">{agents.length} agents</span>
+                    <span className="text-xs text-amber-400/80">{agents.length} {t.admin.agents}</span>
                   </div>
 
                   <div className="space-y-2">
@@ -333,14 +354,14 @@ export default function AdminPage() {
                       className="text-xl font-light text-white tracking-wide"
                       style={{ fontFamily: 'var(--font-cormorant)' }}
                     >
-                      Active Tasks
+                      {t.admin.activeTasks}
                     </h2>
                     <button
                       onClick={() => setShowModal(true)}
                       className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-amber-400 hover:text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 rounded-full transition-colors border border-amber-400/20"
                     >
                       <Plus className="w-3 h-3" />
-                      Add
+                      {t.admin.add}
                     </button>
                   </div>
 
@@ -372,8 +393,117 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Right Column - Knowledge Base & Stats */}
+              {/* Right Column - Property Overview & Knowledge Base */}
               <div className="space-y-6">
+
+                {/* Property Stats Card */}
+                <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+                  <h2
+                    className="text-xl font-light text-white tracking-wide mb-4"
+                    style={{ fontFamily: 'var(--font-cormorant)' }}
+                  >
+                    {t.admin.propertyOverview}
+                  </h2>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+                      <p className="text-2xl font-light text-amber-400">6</p>
+                      <p className="text-xs text-white/50 mt-1">{t.admin.suites}</p>
+                    </div>
+                    <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+                      <p className="text-2xl font-light text-amber-400">83%</p>
+                      <p className="text-xs text-white/50 mt-1">{t.admin.occupancy}</p>
+                    </div>
+                    <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+                      <p className="text-2xl font-light text-amber-400">12</p>
+                      <p className="text-xs text-white/50 mt-1">{t.admin.tasks}</p>
+                    </div>
+                  </div>
+
+                  {/* Quick Actions */}
+                  <div className="mt-4 pt-4 border-t border-white/10">
+                    <p className="text-xs text-white/40 mb-3">{t.admin.management}</p>
+                    <div className="space-y-2">
+                      <Link
+                        href="/admin/properties"
+                        className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/30 rounded-xl transition-all group"
+                      >
+                        <Building2 className="flex-shrink-0 w-5 h-5 text-amber-400/70 group-hover:text-amber-400 transition-colors" strokeWidth={1.5} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-white group-hover:text-amber-100 transition-colors">
+                            {t.admin.properties}
+                          </p>
+                          <p className="text-xs text-white/40 truncate">
+                            {t.admin.manageProperties}
+                          </p>
+                        </div>
+                      </Link>
+                      <Link
+                        href="/admin/reservations"
+                        className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/30 rounded-xl transition-all group"
+                      >
+                        <Calendar className="flex-shrink-0 w-5 h-5 text-amber-400/70 group-hover:text-amber-400 transition-colors" strokeWidth={1.5} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-white group-hover:text-amber-100 transition-colors">
+                            {t.admin.reservations}
+                          </p>
+                          <p className="text-xs text-white/40 truncate">
+                            {t.admin.incomingBookings}
+                          </p>
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Staff Management Section */}
+                  <div className="mt-4 pt-4 border-t border-white/10">
+                    <p className="text-xs text-white/40 mb-3">{t.staffManagement.title}</p>
+                    <div className="space-y-2">
+                      <Link
+                        href="/admin/staff/kitchen"
+                        className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/30 rounded-xl transition-all group"
+                      >
+                        <ChefHat className="flex-shrink-0 w-5 h-5 text-amber-400/70 group-hover:text-amber-400 transition-colors" strokeWidth={1.5} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-white group-hover:text-amber-100 transition-colors">
+                            {t.staffManagement.kitchen.title}
+                          </p>
+                          <p className="text-xs text-white/40 truncate">
+                            {t.staffManagement.kitchen.subtitle}
+                          </p>
+                        </div>
+                      </Link>
+                      <Link
+                        href="/admin/staff/guest"
+                        className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/30 rounded-xl transition-all group"
+                      >
+                        <Sparkles className="flex-shrink-0 w-5 h-5 text-purple-400/70 group-hover:text-purple-400 transition-colors" strokeWidth={1.5} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-white group-hover:text-amber-100 transition-colors">
+                            {t.staffManagement.guest.title}
+                          </p>
+                          <p className="text-xs text-white/40 truncate">
+                            {t.staffManagement.guest.subtitle}
+                          </p>
+                        </div>
+                      </Link>
+                      <Link
+                        href="/admin/staff/drivers"
+                        className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-sky-400/30 rounded-xl transition-all group"
+                      >
+                        <Car className="flex-shrink-0 w-5 h-5 text-sky-400/70 group-hover:text-sky-400 transition-colors" strokeWidth={1.5} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-white group-hover:text-amber-100 transition-colors">
+                            {t.staffManagement.drivers.title}
+                          </p>
+                          <p className="text-xs text-white/40 truncate">
+                            {t.staffManagement.drivers.subtitle}
+                          </p>
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Knowledge Base Card */}
                 <div className="p-4 bg-white/5 rounded-xl border border-white/10">
@@ -382,9 +512,9 @@ export default function AdminPage() {
                       className="text-xl font-light text-white tracking-wide"
                       style={{ fontFamily: 'var(--font-cormorant)' }}
                     >
-                      Knowledge Base
+                      {t.admin.knowledgeBase}
                     </h2>
-                    <span className="text-xs text-amber-400/80">{knowledgeBaseDocs.length + 1} docs</span>
+                    <span className="text-xs text-amber-400/80">{knowledgeBaseDocs.length + 1} {t.admin.docs}</span>
                   </div>
 
                   <div className="space-y-2">
@@ -421,44 +551,6 @@ export default function AdminPage() {
                         </p>
                       </div>
                     </Link>
-                  </div>
-                </div>
-
-                {/* Property Stats Card */}
-                <div className="p-4 bg-white/5 rounded-xl border border-white/10">
-                  <h2
-                    className="text-xl font-light text-white tracking-wide mb-4"
-                    style={{ fontFamily: 'var(--font-cormorant)' }}
-                  >
-                    Property Overview
-                  </h2>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-                      <p className="text-2xl font-light text-amber-400">6</p>
-                      <p className="text-xs text-white/50 mt-1">Suites</p>
-                    </div>
-                    <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-                      <p className="text-2xl font-light text-amber-400">83%</p>
-                      <p className="text-xs text-white/50 mt-1">Occupancy</p>
-                    </div>
-                    <div className="text-center p-3 bg-white/5 rounded-xl border border-white/10">
-                      <p className="text-2xl font-light text-amber-400">12</p>
-                      <p className="text-xs text-white/50 mt-1">Tasks</p>
-                    </div>
-                  </div>
-
-                  {/* Quick Actions */}
-                  <div className="mt-4 pt-4 border-t border-white/10">
-                    <p className="text-xs text-white/40 mb-3">Quick Actions</p>
-                    <div className="flex gap-2">
-                      <button className="flex-1 px-3 py-2 text-xs text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors border border-white/10">
-                        View Reports
-                      </button>
-                      <button className="flex-1 px-3 py-2 text-xs text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors border border-white/10">
-                        Analytics
-                      </button>
-                    </div>
                   </div>
                 </div>
               </div>
