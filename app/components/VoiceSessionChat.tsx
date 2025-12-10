@@ -16,6 +16,22 @@ const firstMessageTranslations: Record<string, string> = {
   ru: "Добро пожаловать в The 1898 Niseko! Я Юки, ваш консьерж по регистрации. Буду рада помочь вам с заселением сегодня. Могу я узнать ваше имя?",
 };
 
+// Chef Tanaka (Restaurant) first message translations
+const chefTanakaFirstMessages: Record<string, string> = {
+  en: "Welcome to The 1898 Niseko restaurant! I am Chef Tanaka, your guide to authentic Japanese cuisine featuring the finest Hokkaido ingredients. What sounds good to you today?",
+  zh: "欢迎来到1898二世古餐厅！我是田中主厨，将为您介绍正宗的日本料理，采用北海道最优质的食材。今天您想吃什么？",
+  ja: "ザ 1898 ニセコのレストランへようこそ！私は田中シェフです。北海道の最高級食材を使った本格日本料理をご案内いたします。本日は何をお召し上がりになりますか？",
+  ru: "Добро пожаловать в ресторан The 1898 Niseko! Я шеф-повар Танака, ваш гид по аутентичной японской кухне с лучшими ингредиентами Хоккайдо. Что бы вы хотели сегодня?",
+};
+
+// Language names for contextual updates
+const languageNames: Record<string, string> = {
+  en: 'English',
+  zh: 'Chinese (Mandarin)',
+  ja: 'Japanese',
+  ru: 'Russian',
+};
+
 interface Message {
   role: 'user' | 'assistant';
   content: string;
@@ -345,6 +361,12 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default', eleve
         window.dispatchEvent(event);
         return 'Order cleared';
       },
+      shop_filter_category: async (parameters: { category: string }) => {
+        console.log('🔧 ElevenLabs client tool: shop_filter_category', parameters);
+        const event = new CustomEvent('shop-filter-category', { detail: { category: parameters.category } });
+        window.dispatchEvent(event);
+        return `Filtered to ${parameters.category} category`;
+      },
       shop_close_product: async () => {
         console.log('🔧 ElevenLabs client tool: shop_close_product');
         const event = new CustomEvent('shop-close-product', {});
@@ -654,6 +676,7 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default', eleve
         console.log('🌐 Starting ElevenLabs session with language:', language);
         const agentIdToUse = elevenLabsAgentId || process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || '';
         const isDefaultAgent = !elevenLabsAgentId;
+        const isBoutiqueAgent = elevenLabsAgentId === process.env.NEXT_PUBLIC_ELEVENLABS_BOUTIQUE_AGENT_ID;
 
         // Build agent overrides with language and optional firstMessage
         const agentOverrides: { language: string; firstMessage?: string } = {
@@ -667,8 +690,13 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default', eleve
             agentOverrides.firstMessage = firstMessage;
             console.log('📝 First message override (Yuki):', firstMessage.substring(0, 50) + '...');
           }
+        } else if (isBoutiqueAgent) {
+          // Chef Tanaka (Restaurant): use chef-specific translations
+          const firstMessage = chefTanakaFirstMessages[language] || chefTanakaFirstMessages.en;
+          agentOverrides.firstMessage = firstMessage;
+          console.log('📝 First message override (Chef Tanaka):', firstMessage.substring(0, 50) + '...');
         } else if (welcomeMessage) {
-          // Custom agent (Chef Chen, etc.): use the welcomeMessage prop which is already translated
+          // Other custom agents: use the welcomeMessage prop which is already translated
           agentOverrides.firstMessage = welcomeMessage;
           console.log('📝 First message override (custom):', welcomeMessage.substring(0, 50) + '...');
         }
@@ -679,6 +707,19 @@ export default function VoiceSessionChat({ agentId, sessionId = 'default', eleve
             agent: agentOverrides
           }
         });
+
+        // Send language instruction as contextual update to ensure responses are in the correct language
+        if (language !== 'en') {
+          setTimeout(() => {
+            const languageName = languageNames[language] || 'English';
+            const languageContext = `[LANGUAGE INSTRUCTION]
+IMPORTANT: The guest has selected ${languageName} as their preferred language.
+You MUST respond in ${languageName} for ALL your responses throughout this conversation.
+Do not switch to English unless the guest explicitly asks.`;
+            console.log('🌐 Sending language context:', languageName);
+            elevenLabsConversation.sendContextualUpdate(languageContext);
+          }, 300);
+        }
 
         // If contextData has documentContent, send it as a contextual update after connection
         if (contextDataRef.current?.documentContent) {

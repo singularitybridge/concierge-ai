@@ -22,13 +22,13 @@ interface CartItem {
 
 const categoryIcons: Record<string, typeof Star> = {
   'signature': Star,
-  'appetizers': UtensilsCrossed,
-  'specialty': ChefHat,
-  'stir-fry': Flame,
-  'soups': Soup,
-  'steamed': Cloud,
-  'wild-game': Leaf,
-  'mains-desserts': Cake
+  'sashimi': UtensilsCrossed,
+  'hokkaido': ChefHat,
+  'wagyu': Flame,
+  'nabe': Soup,
+  'tempura': Cloud,
+  'rice-noodles': Leaf,
+  'desserts': Cake
 };
 
 export default function RestaurantMenuPage() {
@@ -469,13 +469,13 @@ export default function RestaurantMenuPage() {
                 agentId="restaurant-concierge"
                 sessionId="hotel-restaurant"
                 elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_BOUTIQUE_AGENT_ID}
-                title={t.restaurant?.chefName || 'Chef Chen'}
-                avatar="/avatars/chef-chen.png"
-                welcomeMessage={t.restaurant?.welcomeMessage || "Welcome to our restaurant! I'm Chef Chen, and I'll be helping you explore our authentic Sichuan cuisine today. Would you like to try our signature dishes or perhaps something milder?"}
+                title={t.restaurant?.chefName || 'Chef Tanaka'}
+                avatar="/avatars/chef-tanaka.png"
+                welcomeMessage={t.restaurant?.welcomeMessage || "Welcome to The 1898 Niseko restaurant! I'm Chef Tanaka, and I'll guide you through our authentic Japanese cuisine featuring the finest Hokkaido ingredients. Would you like to try our kaiseki course or perhaps our famous wagyu?"}
                 suggestions={[
                   t.restaurant?.suggestionRecommend || "What do you recommend?",
                   t.restaurant?.suggestionSignature || "Show signature dishes",
-                  t.restaurant?.suggestionSpicy || "Something spicy",
+                  t.restaurant?.suggestionHokkaido || "Hokkaido specialties",
                   t.restaurant?.suggestionVegetarian || "Vegetarian options"
                 ]}
                 contextData={{

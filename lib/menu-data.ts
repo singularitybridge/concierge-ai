@@ -35,667 +35,603 @@ export const menuCategories: MenuCategory[] = [
   {
     id: 'signature',
     name: {
-      en: 'Signature Dishes',
-      zh: '招牌菜',
-      ja: 'シグネチャー料理',
+      en: 'Chef\'s Signature',
+      zh: '主厨推荐',
+      ja: 'シェフおすすめ',
       ru: 'Фирменные блюда'
     },
     icon: 'star'
   },
   {
-    id: 'appetizers',
+    id: 'sashimi',
     name: {
-      en: 'Appetizers',
-      zh: '前菜',
-      ja: '前菜',
-      ru: 'Закуски'
+      en: 'Sashimi & Sushi',
+      zh: '刺身与寿司',
+      ja: '刺身・寿司',
+      ru: 'Сашими и суши'
     },
     icon: 'utensils'
   },
   {
-    id: 'specialty',
+    id: 'hokkaido',
     name: {
-      en: 'Specialty Dishes',
-      zh: '特色菜',
-      ja: '特選料理',
-      ru: 'Фирменные блюда'
+      en: 'Hokkaido Specialties',
+      zh: '北海道特产',
+      ja: '北海道名物',
+      ru: 'Блюда Хоккайдо'
     },
     icon: 'chef-hat'
   },
   {
-    id: 'stir-fry',
+    id: 'wagyu',
     name: {
-      en: 'Stir-Fry',
-      zh: '小炒',
-      ja: '炒め物',
-      ru: 'Жареные блюда'
+      en: 'Wagyu & Grills',
+      zh: '和牛烧烤',
+      ja: '和牛・焼き物',
+      ru: 'Вагю и гриль'
     },
     icon: 'flame'
   },
   {
-    id: 'soups',
+    id: 'nabe',
     name: {
-      en: 'Soups',
-      zh: '汤',
-      ja: 'スープ',
-      ru: 'Супы'
+      en: 'Hot Pots',
+      zh: '火锅',
+      ja: '鍋物',
+      ru: 'Горячие горшки'
     },
     icon: 'soup'
   },
   {
-    id: 'steamed',
+    id: 'tempura',
     name: {
-      en: 'Steamed Dishes',
-      zh: '蒸菜',
-      ja: '蒸し料理',
-      ru: 'Паровые блюда'
+      en: 'Tempura',
+      zh: '天妇罗',
+      ja: '天ぷら',
+      ru: 'Темпура'
     },
     icon: 'cloud'
   },
   {
-    id: 'wild-game',
+    id: 'rice-noodles',
     name: {
-      en: 'Wild Game',
-      zh: '野味',
-      ja: 'ジビエ',
-      ru: 'Дичь'
+      en: 'Rice & Noodles',
+      zh: '饭面',
+      ja: 'ご飯・麺類',
+      ru: 'Рис и лапша'
     },
     icon: 'leaf'
   },
   {
-    id: 'mains-desserts',
+    id: 'desserts',
     name: {
-      en: 'Mains & Desserts',
-      zh: '主食与甜品',
-      ja: '主食とデザート',
-      ru: 'Основные блюда и десерты'
+      en: 'Desserts',
+      zh: '甜品',
+      ja: 'デザート',
+      ru: 'Десерты'
     },
     icon: 'cake'
   }
 ];
 
 export const menuItems: MenuItem[] = [
-  // Signature Dishes (招牌菜)
+  // Chef's Signature
   {
-    id: 'spicy-chicken-pot',
-    image: '/menu/spicy-chicken-pot.jpg',
-    category: 'signature',
-    title: {
-      en: 'Spicy Chicken Pot',
-      zh: '香辣鸡煲',
-      ja: 'スパイシーチキン鍋',
-      ru: 'Острая курица в горшочке'
-    },
-    description: {
-      en: 'Tender chicken pieces simmered in a fragrant, spicy broth with aromatic spices and fresh herbs',
-      zh: '嫩滑鸡肉配上香辣汤底，搭配香料和新鲜香草慢炖而成',
-      ja: '柔らかい鶏肉を香り豊かなスパイシーブロスでじっくり煮込んだ一品',
-      ru: 'Нежная курица, тушенная в ароматном остром бульоне с пряностями и свежей зеленью'
-    },
-    isSignature: true,
-    isSpicy: true
-  },
-  {
-    id: 'spicy-numbing-seafood-hotpot',
-    image: '/menu/spicy-numbing-seafood-hotpot.jpg',
-    category: 'signature',
-    title: {
-      en: 'Mala Seafood Dry Pot',
-      zh: '麻辣海鲜干锅',
-      ja: '麻辣シーフード干鍋',
-      ru: 'Острый сухой вок с морепродуктами'
-    },
-    description: {
-      en: 'Fresh seafood tossed in numbing Sichuan peppercorns and dried chilies, creating an addictive mala sensation',
-      zh: '新鲜海鲜配上四川花椒和干辣椒，麻辣鲜香',
-      ja: '新鮮な海鮮を四川山椒と唐辛子で炒めた、クセになる麻辣の一品',
-      ru: 'Свежие морепродукты с сычуаньским перцем и сушеным чили'
-    },
-    isSignature: true,
-    isSpicy: true
-  },
-  {
-    id: 'sichuan-boiled-wagyu-beef',
+    id: 'kaiseki-omakase',
     image: '/menu/sichuan-boiled-wagyu-beef.jpg',
     category: 'signature',
     title: {
-      en: 'Sichuan Boiled Wagyu Beef',
-      zh: '水煮和牛',
-      ja: '水煮和牛',
-      ru: 'Говядина Вагю по-сычуаньски'
+      en: 'Kaiseki Omakase',
+      zh: '怀石料理套餐',
+      ja: '懐石おまかせ',
+      ru: 'Кайсеки Омакасе'
     },
     description: {
-      en: 'Premium wagyu beef slices in a fiery red chili oil broth, garnished with bean sprouts and cilantro',
-      zh: '优质和牛薄片配上红油辣汤，搭配豆芽和香菜',
-      ja: 'プレミアム和牛を真っ赤なラー油スープで仕上げ、もやしとパクチーを添えて',
-      ru: 'Премиальная говядина Вагю в огненном бульоне с чили, ростками фасоли и кинзой'
-    },
-    isSignature: true,
-    isSpicy: true
-  },
-  {
-    id: 'pickled-cabbage-fish',
-    image: '/menu/pickled-cabbage-fish.jpg',
-    category: 'signature',
-    title: {
-      en: 'Pickled Cabbage Fish',
-      zh: '酸菜鱼',
-      ja: '酸菜魚',
-      ru: 'Рыба с квашеной капустой'
-    },
-    description: {
-      en: 'Fresh fish fillets in a tangy pickled mustard green broth, a classic Sichuan comfort dish',
-      zh: '新鲜鱼片配上酸菜汤底，经典四川家常味道',
-      ja: '新鮮な魚の切り身を酸菜スープで煮込んだ、四川の家庭料理の定番',
-      ru: 'Филе свежей рыбы в кисловатом бульоне с маринованной горчичной зеленью'
+      en: 'A 7-course seasonal tasting menu featuring the finest Hokkaido ingredients, crafted by our head chef',
+      zh: '七道菜的时令品尝菜单，精选北海道最优质的食材，由我们的主厨精心烹制',
+      ja: '北海道の最高級食材を使用した、料理長による7品のおまかせコース',
+      ru: 'Дегустационное меню из 7 блюд с лучшими ингредиентами Хоккайдо'
     },
     isSignature: true
   },
   {
-    id: 'boiling-fish-in-spicy-broth',
-    image: '/menu/boiling-fish-in-spicy-broth.jpg',
+    id: 'snow-crab-course',
+    image: '/menu/spicy-numbing-seafood-hotpot.jpg',
     category: 'signature',
     title: {
-      en: 'Boiling Fish in Spicy Broth',
-      zh: '麻辣沸腾鱼',
-      ja: '麻辣沸騰魚',
-      ru: 'Кипящая рыба в остром бульоне'
+      en: 'Hokkaido Snow Crab Course',
+      zh: '北海道雪蟹套餐',
+      ja: '北海道ズワイガニコース',
+      ru: 'Курс из снежного краба Хоккайдо'
     },
     description: {
-      en: 'Dramatic tableside presentation of fresh fish in bubbling mala broth with numbing peppercorns',
-      zh: '现场浇热油的新鲜鱼片，麻辣汤底沸腾上桌',
-      ja: 'テーブルで熱々の油を注ぐパフォーマンス、麻辣スープで煮込んだ新鮮な魚',
-      ru: 'Эффектная подача свежей рыбы в бурлящем остром бульоне с сычуаньским перцем'
+      en: 'Full course featuring premium Hokkaido snow crab: sashimi, grilled, steamed, and crab miso soup',
+      zh: '北海道优质雪蟹全套：刺身、烧烤、清蒸和蟹味噌汤',
+      ja: '北海道産ズワイガニのフルコース：お刺身、焼き、蒸し、蟹味噌汁',
+      ru: 'Полный курс премиального снежного краба: сашими, гриль, на пару, суп мисо'
     },
-    isSignature: true,
-    isSpicy: true
+    isSignature: true
   },
-
-  // Appetizers (前菜)
   {
-    id: 'soy-braised-beef',
+    id: 'wagyu-a5-tasting',
     image: '/menu/soy-braised-beef.jpg',
-    category: 'appetizers',
+    category: 'signature',
     title: {
-      en: 'Soy Braised Beef',
-      zh: '酱牛肉',
-      ja: '醤油牛肉',
-      ru: 'Говядина в соевом соусе'
+      en: 'A5 Wagyu Tasting',
+      zh: 'A5和牛品鉴',
+      ja: 'A5和牛テイスティング',
+      ru: 'Дегустация A5 Вагю'
     },
     description: {
-      en: 'Thinly sliced beef slowly braised in aromatic soy sauce, served cold with a silky texture',
-      zh: '薄切牛肉配上香浓酱汁慢炖，冷盘呈上，口感细腻',
-      ja: '香り高い醤油でじっくり煮込んだ牛肉の薄切り、冷製で滑らかな食感',
-      ru: 'Тонко нарезанная говядина, тушенная в ароматном соевом соусе, подается холодной'
+      en: 'Premium A5 Japanese wagyu served three ways: seared, sukiyaki-style, and as elegant nigiri',
+      zh: 'A5级日本和牛三种烹饪方式：香煎、寿喜烧风格和精致握寿司',
+      ja: 'A5和牛を3通りで：炙り、すき焼き風、握り寿司',
+      ru: 'Премиальная говядина A5 Вагю тремя способами: обжаренная, сукияки, нигири'
+    },
+    isSignature: true
+  },
+  {
+    id: 'uni-trio',
+    image: '/menu/pickled-cabbage-fish.jpg',
+    category: 'signature',
+    title: {
+      en: 'Hokkaido Uni Trio',
+      zh: '北海道海胆三味',
+      ja: '北海道うに三種盛り',
+      ru: 'Трио морских ежей Хоккайдо'
+    },
+    description: {
+      en: 'Fresh sea urchin from three Hokkaido regions, each with its unique flavor profile',
+      zh: '来自北海道三个地区的新鲜海胆，每种都有独特的风味',
+      ja: '北海道3産地のうにの食べ比べ、それぞれ異なる味わい',
+      ru: 'Свежие морские ежи из трех регионов Хоккайдо с уникальными вкусами'
+    },
+    isSignature: true
+  },
+
+  // Sashimi & Sushi
+  {
+    id: 'otoro-sashimi',
+    image: '/menu/boiling-fish-in-spicy-broth.jpg',
+    category: 'sashimi',
+    title: {
+      en: 'Otoro Tuna Sashimi',
+      zh: '大腹金枪鱼刺身',
+      ja: '大トロ刺身',
+      ru: 'Сашими из Оторо тунца'
+    },
+    description: {
+      en: 'The finest fatty tuna belly, hand-selected from Tsukiji Market, served with fresh wasabi',
+      zh: '最上等的金枪鱼腹部，筑地市场精选，配新鲜山葵',
+      ja: '築地から厳選した最高級大トロ、本わさび添え',
+      ru: 'Лучший жирный тунец из рынка Цукидзи со свежим васаби'
     }
   },
   {
-    id: 'cold-chicken-in-chili-oil',
+    id: 'hokkaido-sashimi-mori',
     image: '/menu/cold-chicken-in-chili-oil.jpg',
-    category: 'appetizers',
+    category: 'sashimi',
     title: {
-      en: 'Bo Bo Chicken',
-      zh: '钵钵鸡',
-      ja: '鉢鉢鶏',
-      ru: 'Курица Бо Бо'
+      en: 'Hokkaido Sashimi Platter',
+      zh: '北海道刺身拼盘',
+      ja: '北海道刺身盛り合わせ',
+      ru: 'Ассорти сашими из Хоккайдо'
     },
     description: {
-      en: 'Cold chicken skewers marinated in fragrant chili oil with sesame and Sichuan peppercorn',
-      zh: '串串冷鸡肉浸泡在香辣红油中，配以芝麻和花椒',
-      ja: '香り豊かなラー油に漬け込んだ冷製鶏肉の串、ゴマと山椒を添えて',
-      ru: 'Холодные куриные шашлычки в ароматном масле чили с кунжутом и сычуаньским перцем'
-    },
-    isSpicy: true
-  },
-  {
-    id: 'pork-ear-in-chili-oil',
-    image: '/menu/pork-ear-in-chili-oil.jpg',
-    category: 'appetizers',
-    title: {
-      en: 'Pork Ear in Chili Oil',
-      zh: '红油猪耳',
-      ja: '紅油豚耳',
-      ru: 'Свиные уши в масле чили'
-    },
-    description: {
-      en: 'Thinly sliced pig ears with a crunchy texture, dressed in spicy red chili oil',
-      zh: '薄切猪耳朵，口感爽脆，配以香辣红油',
-      ja: '薄切りの豚耳、コリコリ食感にスパイシーな紅油をかけて',
-      ru: 'Тонко нарезанные свиные уши с хрустящей текстурой в остром красном масле чили'
-    },
-    isSpicy: true
-  },
-  {
-    id: 'smashed-cucumber-with-garlic',
-    image: '/menu/smashed-cucumber-with-garlic.jpg',
-    category: 'appetizers',
-    title: {
-      en: 'Smashed Cucumber with Garlic',
-      zh: '蒜拍黄瓜',
-      ja: 'たたきキュウリのニンニク和え',
-      ru: 'Битые огурцы с чесноком'
-    },
-    description: {
-      en: 'Refreshing smashed cucumbers tossed with fresh garlic, light soy sauce, and sesame oil',
-      zh: '爽脆黄瓜配上新鲜蒜蓉、生抽和香油',
-      ja: 'さっぱりとしたたたきキュウリに、生ニンニク、薄口醤油、ごま油を和えて',
-      ru: 'Освежающие битые огурцы со свежим чесноком, легким соевым соусом и кунжутным маслом'
-    },
-    isVegetarian: true
-  },
-  {
-    id: 'mouthwatering-chicken',
-    image: '/menu/mouthwatering-chicken.jpg',
-    category: 'appetizers',
-    title: {
-      en: 'Mouthwatering Chicken',
-      zh: '口水鸡',
-      ja: '口水鶏',
-      ru: 'Курица "Слюнки текут"'
-    },
-    description: {
-      en: 'Poached chicken slices drenched in a spicy, numbing sauce so good it makes your mouth water',
-      zh: '白切鸡片浇上麻辣酱汁，让人垂涎欲滴',
-      ja: '茹で鶏のスライスに、よだれが出るほど美味しい麻辣ソースをたっぷりと',
-      ru: 'Ломтики отварной курицы в остром соусе, от которого текут слюнки'
-    },
-    isSpicy: true
-  },
-
-  // Specialty Dishes (特色菜)
-  {
-    id: 'garlic-spare-ribs',
-    image: '/menu/garlic-spare-ribs.jpg',
-    category: 'specialty',
-    title: {
-      en: 'Garlic Spare Ribs',
-      zh: '蒜香排骨',
-      ja: 'ガーリックスペアリブ',
-      ru: 'Свиные ребрышки с чесноком'
-    },
-    description: {
-      en: 'Crispy fried spare ribs coated in a fragrant garlic sauce, perfectly balanced sweet and savory',
-      zh: '酥脆排骨裹上香浓蒜汁，甜咸适中',
-      ja: 'カリカリに揚げたスペアリブに香り豊かなガーリックソースを絡めて',
-      ru: 'Хрустящие жареные ребрышки в ароматном чесночном соусе'
+      en: 'Premium assortment of Hokkaido seafood: salmon, scallop, sweet shrimp, squid, and seasonal catch',
+      zh: '北海道优质海鲜拼盘：三文鱼、扇贝、甜虾、鱿鱼和时令鱼',
+      ja: 'サーモン、ホタテ、甘エビ、イカ、季節の魚の盛り合わせ',
+      ru: 'Премиальное ассорти морепродуктов: лосось, гребешок, креветка, кальмар'
     }
   },
   {
-    id: 'pickled-pepper-chicken-giblets',
-    image: '/menu/pickled-pepper-chicken-giblets.jpg',
-    category: 'specialty',
-    title: {
-      en: 'Pickled Pepper Chicken Giblets',
-      zh: '泡椒鸡杂',
-      ja: '泡椒鶏モツ',
-      ru: 'Куриные потроха с маринованным перцем'
-    },
-    description: {
-      en: 'Tender chicken gizzards and hearts stir-fried with tangy pickled peppers',
-      zh: '嫩滑鸡胗和鸡心配上酸辣泡椒快炒',
-      ja: '柔らかい鶏の砂肝とハツを酸っぱい泡椒で炒めて',
-      ru: 'Нежные куриные потроха, обжаренные с кисловатым маринованным перцем'
-    },
-    isSpicy: true
-  },
-  {
-    id: 'yu-xiang-shredded-pork',
-    image: '/menu/yu-xiang-shredded-pork.jpg',
-    category: 'specialty',
-    title: {
-      en: 'Yu Xiang Shredded Pork',
-      zh: '鱼香肉丝',
-      ja: '魚香肉絲',
-      ru: 'Свинина Юй Сян'
-    },
-    description: {
-      en: 'Shredded pork in a savory-sweet "fish fragrant" sauce with wood ear mushrooms and bamboo',
-      zh: '肉丝配上甜咸鱼香汁，搭配木耳和竹笋',
-      ja: '細切り豚肉を甘辛い魚香ソースで炒め、キクラゲと竹の子を添えて',
-      ru: 'Нашинкованная свинина в сладко-соленом соусе "рыбный аромат" с древесными грибами'
-    }
-  },
-  {
-    id: 'spicy-diced-chicken',
-    image: '/menu/spicy-diced-chicken.jpg',
-    category: 'specialty',
-    title: {
-      en: 'La Zi Ji - Spicy Diced Chicken',
-      zh: '辣子鸡',
-      ja: '辣子鶏',
-      ru: 'Ла Цзы Цзи - Острая курица'
-    },
-    description: {
-      en: 'Crispy chicken pieces buried in a mountain of dried chilies and Sichuan peppercorns',
-      zh: '酥脆鸡块埋在满满的干辣椒和花椒中',
-      ja: 'カリカリの鶏肉を山盛りの唐辛子と山椒で覆って',
-      ru: 'Хрустящие кусочки курицы в горе сушеного чили и сычуаньского перца'
-    },
-    isSpicy: true
-  },
-  {
-    id: 'green-pepper-shredded-pork',
-    image: '/menu/green-pepper-shredded-pork.jpg',
-    category: 'specialty',
-    title: {
-      en: 'Green Pepper Shredded Pork',
-      zh: '青椒肉丝',
-      ja: '青椒肉絲',
-      ru: 'Свинина с зеленым перцем'
-    },
-    description: {
-      en: 'Classic stir-fry of tender pork strips with fresh green peppers in a light soy glaze',
-      zh: '经典快炒嫩肉丝配上新鲜青椒，淋上生抽',
-      ja: '柔らかい豚肉の細切りと新鮮なピーマンの定番炒め、薄口醤油で仕上げ',
-      ru: 'Классическое жаркое из нежной свинины со свежим зеленым перцем'
-    }
-  },
-  {
-    id: 'kung-pao-chicken',
-    image: '/menu/kung-pao-chicken.jpg',
-    category: 'specialty',
-    title: {
-      en: 'Kung Pao Chicken',
-      zh: '宫保鸡丁',
-      ja: '宮保鶏丁',
-      ru: 'Курица Гунбао'
-    },
-    description: {
-      en: 'Diced chicken with peanuts, dried chilies, and Sichuan peppercorns in a sweet-savory sauce',
-      zh: '鸡丁配上花生、干辣椒和花椒，浇上甜咸酱汁',
-      ja: '鶏肉のさいの目切りにピーナッツ、唐辛子、山椒を加え、甘辛いソースで',
-      ru: 'Нарезанная кубиками курица с арахисом, сушеным чили и сычуаньским перцем'
-    },
-    isSpicy: true
-  },
-  {
-    id: 'twice-cooked-pork',
-    image: '/menu/twice-cooked-pork.jpg',
-    category: 'specialty',
-    title: {
-      en: 'Twice Cooked Pork',
-      zh: '回锅肉',
-      ja: '回鍋肉',
-      ru: 'Свинина двойной обжарки'
-    },
-    description: {
-      en: 'Sliced pork belly first boiled then stir-fried with leeks and fermented black beans',
-      zh: '五花肉先煮后炒，配上韭菜和豆豉',
-      ja: '豚バラ肉を茹でてから、ニラと豆豉で炒めた四川の定番',
-      ru: 'Свиная грудинка, сначала отваренная, затем обжаренная с луком-пореем'
-    }
-  },
-  {
-    id: 'braised-beef-brisket-with-potato',
-    image: '/menu/braised-beef-brisket-with-potato.jpg',
-    category: 'specialty',
-    title: {
-      en: 'Braised Beef Brisket with Potato',
-      zh: '土豆炖牛腩',
-      ja: '牛バラ肉とジャガイモの煮込み',
-      ru: 'Тушеная говяжья грудинка с картофелем'
-    },
-    description: {
-      en: 'Tender beef brisket slow-braised with potatoes until melt-in-your-mouth perfection',
-      zh: '嫩牛腩和土豆慢炖至入口即化',
-      ja: '牛バラ肉とジャガイモをじっくり煮込み、とろけるような柔らかさに',
-      ru: 'Нежная говяжья грудинка, медленно тушенная с картофелем до таяния во рту'
-    }
-  },
-
-  // Stir-Fry (小炒)
-  {
-    id: 'hot-and-sour-potato-shreds',
-    image: '/menu/hot-and-sour-potato-shreds.jpg',
-    category: 'stir-fry',
-    title: {
-      en: 'Hot and Sour Potato Shreds',
-      zh: '酸辣土豆丝',
-      ja: '酸辣土豆絲',
-      ru: 'Кисло-острая картофельная соломка'
-    },
-    description: {
-      en: 'Julienned potatoes with a crisp texture, stir-fried with vinegar and dried chilies',
-      zh: '细切土豆丝口感爽脆，配上醋和干辣椒快炒',
-      ja: '千切りジャガイモをシャキシャキに、お酢と唐辛子で炒めて',
-      ru: 'Хрустящая картофельная соломка, обжаренная с уксусом и сушеным чили'
-    },
-    isSpicy: true,
-    isVegetarian: true
-  },
-  {
-    id: 'crispy-corn-cake',
-    image: '/menu/crispy-corn-cake.jpg',
-    category: 'stir-fry',
-    title: {
-      en: 'Crispy Corn Cake',
-      zh: '玉米烙',
-      ja: 'コーンケーキ',
-      ru: 'Хрустящий кукурузный кейк'
-    },
-    description: {
-      en: 'Sweet corn kernels pan-fried into a crispy golden cake, a delightful sweet-savory treat',
-      zh: '甜玉米粒煎成金黄酥脆的饼，甜咸可口',
-      ja: 'スイートコーンをカリカリのゴールデンケーキに、甘じょっぱいおやつ',
-      ru: 'Зерна сладкой кукурузы, обжаренные в хрустящую золотистую лепешку'
-    },
-    isVegetarian: true
-  },
-  {
-    id: 'mapo-tofu',
-    image: '/menu/mapo-tofu.jpg',
-    category: 'stir-fry',
-    title: {
-      en: 'Mapo Tofu',
-      zh: '麻婆豆腐',
-      ja: '麻婆豆腐',
-      ru: 'Мапо Тофу'
-    },
-    description: {
-      en: 'Silken tofu in a fiery sauce with fermented black beans, chili oil, and ground pork',
-      zh: '嫩豆腐配上麻辣酱汁、豆豉、辣油和肉末',
-      ja: '絹ごし豆腐を豆豉、ラー油、挽肉入りの激辛ソースで',
-      ru: 'Шелковистый тофу в остром соусе с ферментированными бобами и фаршем'
-    },
-    isSpicy: true
-  },
-  {
-    id: 'eggplant-with-chili-pepper',
-    image: '/menu/eggplant-with-chili-pepper.jpg',
-    category: 'stir-fry',
-    title: {
-      en: 'Eggplant with Chili Pepper',
-      zh: '尖椒炒茄子',
-      ja: '茄子と唐辛子の炒め',
-      ru: 'Баклажаны с острым перцем'
-    },
-    description: {
-      en: 'Tender eggplant stir-fried with fresh green chili peppers in a savory garlic sauce',
-      zh: '嫩茄子配上新鲜青椒，蒜香酱汁快炒',
-      ja: '柔らかいナスと青唐辛子をガーリックソースで炒めて',
-      ru: 'Нежные баклажаны, обжаренные со свежим зеленым чили в чесночном соусе'
-    },
-    isSpicy: true,
-    isVegetarian: true
-  },
-  {
-    id: 'tomato-scrambled-eggs',
-    image: '/menu/tomato-scrambled-eggs.jpg',
-    category: 'stir-fry',
-    title: {
-      en: 'Tomato Scrambled Eggs',
-      zh: '番茄炒鸡蛋',
-      ja: 'トマトと卵の炒め',
-      ru: 'Яичница с помидорами'
-    },
-    description: {
-      en: 'Fluffy scrambled eggs with sweet tomatoes, a beloved Chinese comfort classic',
-      zh: '滑嫩鸡蛋配上甜番茄，中国家常菜经典',
-      ja: 'ふわふわの炒り卵と甘いトマト、中国の定番家庭料理',
-      ru: 'Пышная яичница со сладкими помидорами, любимая китайская классика'
-    },
-    isVegetarian: true
-  },
-  {
-    id: 'stir-fried-seasonal-vegetables',
-    image: '/menu/stir-fried-seasonal-vegetables.jpg',
-    category: 'stir-fry',
-    title: {
-      en: 'Stir-Fried Seasonal Vegetables',
-      zh: '炒时蔬',
-      ja: '季節野菜の炒め',
-      ru: 'Жареные сезонные овощи'
-    },
-    description: {
-      en: 'Fresh seasonal vegetables quickly stir-fried with garlic to preserve their natural crunch',
-      zh: '新鲜时令蔬菜配上蒜蓉快炒，保持爽脆',
-      ja: '新鮮な旬の野菜をニンニクでサッと炒め、シャキシャキ感をキープ',
-      ru: 'Свежие сезонные овощи, быстро обжаренные с чесноком'
-    },
-    isVegetarian: true
-  },
-
-  // Soups (汤)
-  {
-    id: 'free-range-chicken-soup',
-    image: '/menu/free-range-chicken-soup.jpg',
-    category: 'soups',
-    title: {
-      en: 'Otaru Farm Free-Range Chicken Soup',
-      zh: '小樽农场走地鸡鸡汤',
-      ja: '小樽農場地鶏のスープ',
-      ru: 'Суп из деревенской курицы с фермы Отару'
-    },
-    description: {
-      en: 'Rich, nourishing soup made with premium free-range chicken from Otaru Farm, simmered for hours',
-      zh: '选用小樽农场优质走地鸡，慢炖数小时，营养丰富',
-      ja: '小樽農場の上質な地鶏を何時間も煮込んだ、栄養たっぷりのスープ',
-      ru: 'Богатый питательный суп из премиальной деревенской курицы с фермы Отару'
-    }
-  },
-  {
-    id: 'silky-pork-soup',
-    image: '/menu/silky-pork-soup.jpg',
-    category: 'soups',
-    title: {
-      en: 'Silky Pork Soup',
-      zh: '滑肉汤',
-      ja: 'なめらか豚肉スープ',
-      ru: 'Шелковистый суп со свининой'
-    },
-    description: {
-      en: 'Velvety pork slices in a clear, light broth with delicate seasonings',
-      zh: '滑嫩肉片配上清淡汤底，味道细腻',
-      ja: 'なめらかな豚肉を澄んだ軽いスープで、繊細な味付けで',
-      ru: 'Бархатистые ломтики свинины в прозрачном легком бульоне'
-    }
-  },
-
-  // Steamed Dishes (蒸菜)
-  {
-    id: 'steamed-pork-with-rice-powder',
-    image: '/menu/steamed-pork-with-rice-powder.jpg',
-    category: 'steamed',
-    title: {
-      en: 'Steamed Pork with Rice Powder',
-      zh: '粉蒸肉',
-      ja: '粉蒸肉',
-      ru: 'Свинина на пару с рисовой пудрой'
-    },
-    description: {
-      en: 'Tender pork belly coated in toasted rice powder, steamed until melt-in-your-mouth soft',
-      zh: '五花肉裹上烤米粉，蒸至入口即化',
-      ja: '豚バラ肉に炒った米粉をまぶし、とろけるような柔らかさに蒸して',
-      ru: 'Нежная свиная грудинка в обжаренной рисовой пудре, приготовленная на пару'
-    }
-  },
-
-  // Wild Game (野味)
-  {
-    id: 'braised-venison',
-    image: '/menu/braised-venison.jpg',
-    category: 'wild-game',
-    title: {
-      en: 'Braised Venison',
-      zh: '红烧鹿肉',
-      ja: '鹿肉の煮込み',
-      ru: 'Тушеная оленина'
-    },
-    description: {
-      en: 'Premium venison slowly braised in aromatic soy sauce with warming spices',
-      zh: '优质鹿肉配上香浓酱油和温暖香料慢炖',
-      ja: 'プレミアム鹿肉を香り高い醤油と温かいスパイスでじっくり煮込んで',
-      ru: 'Премиальная оленина, медленно тушенная в ароматном соевом соусе со специями'
-    }
-  },
-  {
-    id: 'braised-wild-turtle',
-    image: '/menu/braised-wild-turtle.jpg',
-    category: 'wild-game',
-    title: {
-      en: 'Braised Wild Turtle',
-      zh: '红烧野生甲鱼',
-      ja: 'スッポンの煮込み',
-      ru: 'Тушеная дикая черепаха'
-    },
-    description: {
-      en: 'Wild soft-shell turtle braised in a rich, savory sauce, prized for its collagen',
-      zh: '野生甲鱼红烧，胶原蛋白丰富，滋补佳品',
-      ja: '野生のスッポンを濃厚なソースで煮込んだ、コラーゲン豊富な一品',
-      ru: 'Дикая мягкотелая черепаха, тушенная в насыщенном соусе, ценится за коллаген'
-    }
-  },
-  {
-    id: 'sichuan-braised-bear-paw',
-    image: '/menu/sichuan-braised-bear-paw.jpg',
-    category: 'wild-game',
-    title: {
-      en: 'Sichuan Braised Bear Paw',
-      zh: '川味红烧熊掌',
-      ja: '四川風熊の手煮込み',
-      ru: 'Медвежья лапа по-сычуаньски'
-    },
-    description: {
-      en: 'A rare delicacy braised in traditional Sichuan style with aromatic spices',
-      zh: '珍稀食材配上传统四川做法和香料慢炖',
-      ja: '希少な珍味を四川の伝統的な方法で香り豊かなスパイスと煮込んで',
-      ru: 'Редкий деликатес, тушенный в традиционном сычуаньском стиле с ароматными специями'
-    }
-  },
-
-  // Mains & Desserts (主食与甜品)
-  {
-    id: 'fried-rice',
+    id: 'ikura-don',
     image: '/menu/fried-rice.jpg',
-    category: 'mains-desserts',
+    category: 'sashimi',
     title: {
-      en: 'House Special Fried Rice',
-      zh: '炒饭',
-      ja: 'チャーハン',
-      ru: 'Жареный рис по-домашнему'
+      en: 'Ikura Salmon Roe Bowl',
+      zh: '三文鱼籽盖饭',
+      ja: 'いくら丼',
+      ru: 'Икура Дон'
     },
     description: {
-      en: 'Wok-tossed rice with eggs, scallions, and savory seasonings, perfectly smoky',
-      zh: '锅气十足的炒饭，配上鸡蛋、葱花和调味料',
-      ja: '中華鍋で炒めたご飯に卵とネギ、香ばしいスモーキーな一品',
-      ru: 'Рис, обжаренный в воке с яйцами, зеленым луком и ароматными приправами'
+      en: 'Glistening Hokkaido salmon roe over warm rice, a beloved Hokkaido delicacy',
+      zh: '晶莹的北海道三文鱼籽盖在温暖的米饭上，北海道经典美食',
+      ja: 'きらきら輝く北海道産いくらをご飯に、北海道の名物',
+      ru: 'Сияющая икра лосося Хоккайдо на теплом рисе'
     }
   },
   {
-    id: 'handmade-ice-jelly',
-    image: '/menu/handmade-ice-jelly.jpg',
-    category: 'mains-desserts',
+    id: 'sushi-omakase',
+    image: '/menu/garlic-spare-ribs.jpg',
+    category: 'sashimi',
     title: {
-      en: 'Handmade Ice Jelly',
-      zh: '手工冰粉',
-      ja: '手作り冰粉',
-      ru: 'Домашнее ледяное желе'
+      en: 'Sushi Omakase (12pc)',
+      zh: '寿司套餐（12贯）',
+      ja: '寿司おまかせ（12貫）',
+      ru: 'Суши Омакасе (12 шт.)'
     },
     description: {
-      en: 'Refreshing Sichuan dessert of handmade jelly with brown sugar syrup, sesame, and peanuts',
-      zh: '清爽四川甜品，手工冰粉配上红糖浆、芝麻和花生',
-      ja: 'さっぱりとした四川デザート、手作りゼリーに黒糖シロップ、ゴマ、ピーナッツを添えて',
-      ru: 'Освежающий сычуаньский десерт: домашнее желе с сиропом, кунжутом и арахисом'
+      en: 'Chef\'s selection of 12 nigiri sushi featuring the day\'s finest catch',
+      zh: '主厨精选12贯握寿司，呈现当日最新鲜的食材',
+      ja: '料理長が厳選した本日の12貫握り寿司',
+      ru: '12 нигири суши от шефа с лучшим уловом дня'
+    }
+  },
+
+  // Hokkaido Specialties
+  {
+    id: 'jingisukan',
+    image: '/menu/braised-beef-brisket-with-potato.jpg',
+    category: 'hokkaido',
+    title: {
+      en: 'Jingisukan Lamb BBQ',
+      zh: '成吉思汗烤羊肉',
+      ja: 'ジンギスカン',
+      ru: 'Дзингисукан баранина'
+    },
+    description: {
+      en: 'Hokkaido\'s iconic grilled lamb on a dome-shaped grill with fresh vegetables',
+      zh: '北海道标志性的烤羊肉，圆顶烤架配新鲜蔬菜',
+      ja: '北海道名物、ドーム型の鉄板で焼くラム肉と新鮮野菜',
+      ru: 'Легендарная баранина Хоккайдо на куполообразном гриле с овощами'
+    }
+  },
+  {
+    id: 'yubari-melon',
+    image: '/menu/handmade-ice-jelly.jpg',
+    category: 'hokkaido',
+    title: {
+      en: 'Yubari King Melon',
+      zh: '夕张王甜瓜',
+      ja: '夕張メロン',
+      ru: 'Юбари Кинг Дыня'
+    },
+    description: {
+      en: 'The legendary Yubari melon from Hokkaido, renowned for its perfect sweetness',
+      zh: '传奇的北海道夕张甜瓜，以其完美的甜度闻名',
+      ja: '北海道が誇る夕張メロン、完璧な甘さ',
+      ru: 'Легендарная дыня Юбари из Хоккайдо, известная идеальной сладостью'
+    },
+    isVegetarian: true
+  },
+  {
+    id: 'hokkaido-scallops',
+    image: '/menu/steamed-pork-with-rice-powder.jpg',
+    category: 'hokkaido',
+    title: {
+      en: 'Grilled Hokkaido Scallops',
+      zh: '烤北海道扇贝',
+      ja: '北海道産ホタテの炙り',
+      ru: 'Гребешки Хоккайдо на гриле'
+    },
+    description: {
+      en: 'Giant Hokkaido scallops grilled with butter and soy, caramelized to perfection',
+      zh: '巨大的北海道扇贝用黄油和酱油烤制，焦糖化完美',
+      ja: '北海道産の大きなホタテをバター醤油で香ばしく',
+      ru: 'Гигантские гребешки Хоккайдо на гриле с маслом и соей'
+    }
+  },
+  {
+    id: 'soup-curry',
+    image: '/menu/free-range-chicken-soup.jpg',
+    category: 'hokkaido',
+    title: {
+      en: 'Sapporo Soup Curry',
+      zh: '札幌汤咖喱',
+      ja: '札幌スープカレー',
+      ru: 'Саппоро Суп Карри'
+    },
+    description: {
+      en: 'Sapporo\'s famous soup curry with tender chicken and Hokkaido vegetables',
+      zh: '札幌著名的汤咖喱配嫩鸡肉和北海道蔬菜',
+      ja: '札幌名物スープカレー、柔らかチキンと北海道野菜',
+      ru: 'Знаменитый суп-карри Саппоро с нежной курицей и овощами'
+    },
+    isSpicy: true
+  },
+
+  // Wagyu & Grills
+  {
+    id: 'wagyu-sirloin',
+    image: '/menu/twice-cooked-pork.jpg',
+    category: 'wagyu',
+    title: {
+      en: 'A5 Wagyu Sirloin Steak',
+      zh: 'A5和牛西冷牛排',
+      ja: 'A5和牛サーロインステーキ',
+      ru: 'Стейк Сирлоин A5 Вагю'
+    },
+    description: {
+      en: 'Premium A5 wagyu sirloin grilled over Japanese charcoal, served with seasonal garnish',
+      zh: 'A5级和牛西冷用日本木炭烤制，配时令装饰',
+      ja: 'A5和牛サーロインを備長炭で焼き上げ、季節の付け合わせと',
+      ru: 'Премиальный стейк A5 Вагю на японском угле с сезонным гарниром'
+    }
+  },
+  {
+    id: 'wagyu-yakiniku',
+    image: '/menu/kung-pao-chicken.jpg',
+    category: 'wagyu',
+    title: {
+      en: 'Wagyu Yakiniku Set',
+      zh: '和牛烧肉套餐',
+      ja: '和牛焼肉セット',
+      ru: 'Сет Вагю Якинику'
+    },
+    description: {
+      en: 'Assorted wagyu cuts for tabletop grilling: ribeye, short rib, and tongue',
+      zh: '各种和牛部位供桌上烧烤：肋眼、短肋和牛舌',
+      ja: 'テーブルで焼く和牛セット：リブアイ、カルビ、タン',
+      ru: 'Ассорти вагю для гриля за столом: рибай, ребра и язык'
+    }
+  },
+  {
+    id: 'robata-seafood',
+    image: '/menu/spicy-chicken-pot.jpg',
+    category: 'wagyu',
+    title: {
+      en: 'Robata Seafood Grill',
+      zh: '�的场海鲜烧烤',
+      ja: '海鮮炉端焼き',
+      ru: 'Робата морепродукты'
+    },
+    description: {
+      en: 'Traditional charcoal-grilled seafood: king crab, lobster, and giant prawns',
+      zh: '传统炭烤海鲜：帝王蟹、龙虾和大虾',
+      ja: '炭火で焼く海鮮：タラバガニ、伊勢海老、大海老',
+      ru: 'Морепродукты на угле: королевский краб, лобстер, креветки'
+    }
+  },
+
+  // Hot Pots
+  {
+    id: 'shabu-shabu',
+    image: '/menu/mapo-tofu.jpg',
+    category: 'nabe',
+    title: {
+      en: 'Wagyu Shabu Shabu',
+      zh: '和牛涮涮锅',
+      ja: '和牛しゃぶしゃぶ',
+      ru: 'Вагю Сябу-Сябу'
+    },
+    description: {
+      en: 'Thinly sliced wagyu beef swished in kombu dashi with seasonal vegetables',
+      zh: '薄切和牛在昆布高汤中涮煮，配时令蔬菜',
+      ja: '薄切り和牛を昆布出汁でしゃぶしゃぶ、旬の野菜と',
+      ru: 'Тонко нарезанная вагю в бульоне комбу с сезонными овощами'
+    }
+  },
+  {
+    id: 'sukiyaki',
+    image: '/menu/yu-xiang-shredded-pork.jpg',
+    category: 'nabe',
+    title: {
+      en: 'Premium Sukiyaki',
+      zh: '特选寿喜烧',
+      ja: '特選すき焼き',
+      ru: 'Премиум Сукияки'
+    },
+    description: {
+      en: 'Wagyu beef simmered in sweet soy broth with tofu, vegetables, and raw egg dip',
+      zh: '和牛在甜酱油汤中炖煮，配豆腐、蔬菜和生鸡蛋蘸料',
+      ja: '和牛を甘辛い割り下で、豆腐、野菜、溶き卵で',
+      ru: 'Вагю в сладком соевом бульоне с тофу, овощами и сырым яйцом'
+    }
+  },
+  {
+    id: 'crab-nabe',
+    image: '/menu/silky-pork-soup.jpg',
+    category: 'nabe',
+    title: {
+      en: 'Hokkaido Crab Hot Pot',
+      zh: '北海道螃蟹火锅',
+      ja: '北海道カニ鍋',
+      ru: 'Краб Хоккайдо Набе'
+    },
+    description: {
+      en: 'Rich hot pot with Hokkaido king crab, vegetables, and tofu in dashi broth',
+      zh: '浓郁火锅配北海道帝王蟹、蔬菜和豆腐，高汤底',
+      ja: '北海道産タラバガニの鍋、野菜と豆腐を出汁で',
+      ru: 'Богатый хот-пот с крабом Хоккайдо, овощами и тофу'
+    }
+  },
+
+  // Tempura
+  {
+    id: 'tempura-mori',
+    image: '/menu/crispy-corn-cake.jpg',
+    category: 'tempura',
+    title: {
+      en: 'Tempura Moriawase',
+      zh: '天妇罗拼盘',
+      ja: '天ぷら盛り合わせ',
+      ru: 'Темпура Ассорти'
+    },
+    description: {
+      en: 'Assorted tempura: tiger prawn, seasonal vegetables, and Hokkaido squid',
+      zh: '天妇罗拼盘：虎虾、时令蔬菜和北海道鱿鱼',
+      ja: '天ぷら盛り合わせ：車海老、旬の野菜、北海道産イカ',
+      ru: 'Ассорти темпуры: тигровая креветка, сезонные овощи, кальмар'
+    }
+  },
+  {
+    id: 'ebi-tempura',
+    image: '/menu/hot-and-sour-potato-shreds.jpg',
+    category: 'tempura',
+    title: {
+      en: 'Tiger Prawn Tempura',
+      zh: '虎虾天妇罗',
+      ja: '車海老の天ぷら',
+      ru: 'Темпура с тигровыми креветками'
+    },
+    description: {
+      en: 'Five large tiger prawns in light, crispy batter with tentsuyu dipping sauce',
+      zh: '五只大虎虾裹上轻脆面糊，配天汁蘸酱',
+      ja: '大きな車海老5尾をサクサクの衣で、天つゆと',
+      ru: 'Пять больших тигровых креветок в легком хрустящем кляре'
+    }
+  },
+  {
+    id: 'vegetable-tempura',
+    image: '/menu/stir-fried-seasonal-vegetables.jpg',
+    category: 'tempura',
+    title: {
+      en: 'Seasonal Vegetable Tempura',
+      zh: '时令蔬菜天妇罗',
+      ja: '季節野菜の天ぷら',
+      ru: 'Овощная темпура'
+    },
+    description: {
+      en: 'Light and crispy tempura of seasonal Hokkaido vegetables',
+      zh: '北海道时令蔬菜的轻脆天妇罗',
+      ja: '北海道の旬の野菜を軽くサクサクに',
+      ru: 'Легкая хрустящая темпура из сезонных овощей Хоккайдо'
+    },
+    isVegetarian: true
+  },
+
+  // Rice & Noodles
+  {
+    id: 'sapporo-ramen',
+    image: '/menu/mouthwatering-chicken.jpg',
+    category: 'rice-noodles',
+    title: {
+      en: 'Sapporo Miso Ramen',
+      zh: '札幌味噌拉面',
+      ja: '札幌味噌ラーメン',
+      ru: 'Саппоро Мисо Рамен'
+    },
+    description: {
+      en: 'Hokkaido\'s signature rich miso ramen with chashu pork, corn, and butter',
+      zh: '北海道招牌浓郁味噌拉面配叉烧、玉米和黄油',
+      ja: '北海道名物の濃厚味噌ラーメン、チャーシュー、コーン、バター',
+      ru: 'Фирменный мисо рамен Хоккайдо с чашу, кукурузой и маслом'
+    }
+  },
+  {
+    id: 'unagi-don',
+    image: '/menu/eggplant-with-chili-pepper.jpg',
+    category: 'rice-noodles',
+    title: {
+      en: 'Grilled Unagi Don',
+      zh: '烤鳗鱼饭',
+      ja: 'うな丼',
+      ru: 'Унаги Дон'
+    },
+    description: {
+      en: 'Grilled freshwater eel glazed with sweet tare sauce over fluffy rice',
+      zh: '烤淡水鳗鱼淋上甜酱汁，盖在蓬松米饭上',
+      ja: '香ばしく焼いた鰻を甘いタレで、ふっくらご飯の上に',
+      ru: 'Жареный угорь в сладком соусе таре на пышном рисе'
+    }
+  },
+  {
+    id: 'chirashi-don',
+    image: '/menu/spicy-diced-chicken.jpg',
+    category: 'rice-noodles',
+    title: {
+      en: 'Chirashi Don',
+      zh: '什锦刺身饭',
+      ja: 'ちらし丼',
+      ru: 'Чираши Дон'
+    },
+    description: {
+      en: 'Assorted sashimi over sushi rice with ikura and seasonal garnish',
+      zh: '各种刺身盖在寿司饭上，配三文鱼籽和时令装饰',
+      ja: '色とりどりのお刺身を酢飯に、いくらと季節の薬味',
+      ru: 'Ассорти сашими на рисе для суши с икрой и гарниром'
+    }
+  },
+  {
+    id: 'soba-cold',
+    image: '/menu/smashed-cucumber-with-garlic.jpg',
+    category: 'rice-noodles',
+    title: {
+      en: 'Zaru Soba',
+      zh: '冷�的面',
+      ja: 'ざるそば',
+      ru: 'Зару Соба'
+    },
+    description: {
+      en: 'Chilled buckwheat noodles served on a bamboo mat with dipping sauce',
+      zh: '冷荞麦面放在竹席上，配蘸酱',
+      ja: '竹ざるに盛った冷たいそば、つゆと薬味',
+      ru: 'Охлажденная гречневая лапша на бамбуковой подставке'
+    },
+    isVegetarian: true
+  },
+
+  // Desserts
+  {
+    id: 'matcha-parfait',
+    image: '/menu/tomato-scrambled-eggs.jpg',
+    category: 'desserts',
+    title: {
+      en: 'Matcha Parfait',
+      zh: '抹茶芭菲',
+      ja: '抹茶パフェ',
+      ru: 'Матча Парфе'
+    },
+    description: {
+      en: 'Layers of matcha ice cream, red bean, mochi, and cream with matcha sauce',
+      zh: '抹茶冰淇淋、红豆、麻糬和奶油层层叠加，淋上抹茶酱',
+      ja: '抹茶アイス、あんこ、もち、クリームを重ねて、抹茶ソース',
+      ru: 'Слои мороженого матча, красной фасоли, моти и крема'
+    },
+    isVegetarian: true
+  },
+  {
+    id: 'hokkaido-milk-soft',
+    image: '/menu/green-pepper-shredded-pork.jpg',
+    category: 'desserts',
+    title: {
+      en: 'Hokkaido Milk Soft Serve',
+      zh: '北海道牛奶冰淇淋',
+      ja: '北海道ミルクソフト',
+      ru: 'Мягкое мороженое Хоккайдо'
+    },
+    description: {
+      en: 'Creamy soft serve made with rich Hokkaido milk, pure and simple perfection',
+      zh: '用浓郁的北海道牛奶制作的奶油冰淇淋，纯粹简单的完美',
+      ja: '濃厚な北海道牛乳で作るクリーミーなソフトクリーム',
+      ru: 'Кремовое мороженое из богатого молока Хоккайдо'
+    },
+    isVegetarian: true
+  },
+  {
+    id: 'mochi-ice-cream',
+    image: '/menu/braised-venison.jpg',
+    category: 'desserts',
+    title: {
+      en: 'Mochi Ice Cream Trio',
+      zh: '麻糬冰淇淋三味',
+      ja: 'もちアイス三種',
+      ru: 'Моти-мороженое Трио'
+    },
+    description: {
+      en: 'Three flavors of ice cream wrapped in soft mochi: matcha, strawberry, and black sesame',
+      zh: '三种口味冰淇淋裹在软糯麻糬中：抹茶、草莓和黑芝麻',
+      ja: '抹茶、いちご、黒ごまの三種のもちアイス',
+      ru: 'Три вкуса мороженого в моти: матча, клубника, черный кунжут'
+    },
+    isVegetarian: true
+  },
+  {
+    id: 'dorayaki',
+    image: '/menu/pickled-pepper-chicken-giblets.jpg',
+    category: 'desserts',
+    title: {
+      en: 'Dorayaki',
+      zh: '铜锣烧',
+      ja: 'どら焼き',
+      ru: 'Дораяки'
+    },
+    description: {
+      en: 'Traditional Japanese pancake sandwich filled with sweet red bean paste',
+      zh: '传统日式铜锣烧，夹有甜红豆馅',
+      ja: '伝統的などら焼き、ふっくらあんこ入り',
+      ru: 'Традиционный японский блинчик с начинкой из красной фасоли'
     },
     isVegetarian: true
   }
