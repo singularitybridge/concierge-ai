@@ -821,14 +821,15 @@ export default function TaskDetailPage() {
                 agentId="task-assistant"
                 sessionId={`task-${taskId}`}
                 elevenLabsAgentId={process.env.NEXT_PUBLIC_ELEVENLABS_TASK_AGENT_ID}
-                title="Task Assistant"
-                avatar="/avatars/task-avatar.jpg"
-                welcomeMessage={`I can help you manage this task. You can ask me to update the status, add notes, or add comments.`}
+                title="Yuki"
+                subtitle="Task Assistant"
+                avatar="/avatars/yuki-avatar.jpg"
+                welcomeMessage={`Hi, I'm Yuki. Let me check what we're working on...`}
                 suggestions={[
-                  "Mark this as complete",
-                  "What's this task about?",
-                  "Add a note",
-                  "Update the status"
+                  "Mark as complete",
+                  "Add an update",
+                  "Change status",
+                  "Add a note"
                 ]}
                 contextData={{
                   taskData: {

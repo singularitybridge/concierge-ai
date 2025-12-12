@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Portal: Mobile-First Implementation Plan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .terminal {
+            background: #0f172a;
+            color: #94a3b8;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .terminal .prompt { color: #22d3ee; }
+        .terminal .comment { color: #475569; }
+        .terminal .success { color: #86efac; }
+
+        .code-block {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .code-block .keyword { color: #c084fc; }
+        .code-block .string { color: #86efac; }
+        .code-block .comment { color: #64748b; }
+        .code-block .number { color: #fbbf24; }
+    </style>
+</head>
+<body class="bg-white text-slate-900">
+    <div class="max-w-6xl mx-auto px-6 py-12">
+
+        <!-- Header -->
+        <div class="mb-16 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-8 h-8 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                <h1 class="text-4xl font-light text-slate-900">Staff Member Portal</h1>
+            </div>
+            <p class="text-lg text-slate-600 leading-relaxed ml-11">
+                A mobile-first staff portal for The 1898 Niseko boutique hotel, enabling 6 team members to manage daily tasks, update status, communicate with supervisors, and deliver exceptional guest experiences.
+            </p>
+            <div class="flex flex-wrap gap-2 mt-6 ml-11">
+                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">Mobile-First</span>
+                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">Task Management</span>
+                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">Real-time Status</span>
+                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">Photo Upload</span>
+                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">Team Communication</span>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Executive Summary</h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-4 ml-9">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-2">Route Strategy</h3>
+                    <p class="text-sm text-slate-600">/my-shift - Personal, staff-centric URL emphasizing ownership and daily workflow</p>
+                </div>
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-2">Mobile-First Design</h3>
+                    <p class="text-sm text-slate-600">Optimized for one-handed use, quick status updates, and photo capture on mobile devices</p>
+                </div>
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-2">Core Workflow</h3>
+                    <p class="text-sm text-slate-600">Dashboard → Task Details → Complete with Photo → Update Status</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Requirements -->
+        <div class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Feature Requirements</h2>
+            </div>
+            <div class="space-y-6 ml-9">
+
+                <!-- User Story 1 -->
+                <div class="p-5 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3">
+                        <div class="px-2 py-0.5 bg-slate-200 text-slate-700 text-xs rounded">US-01</div>
+                        <div class="flex-1">
+                            <h3 class="font-medium mb-2">Staff Member Dashboard</h3>
+                            <p class="text-sm text-slate-600 mb-3">
+                                As a hotel staff member, I want to see my personal dashboard with avatar, current status, and today's tasks so I can quickly understand my daily responsibilities.
+                            </p>
+                            <div class="text-xs text-slate-500">
+                                <strong>Acceptance:</strong> Dashboard shows staff avatar, name, role, current status badge, task count, and quick action buttons
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Story 2 -->
+                <div class="p-5 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3">
+                        <div class="px-2 py-0.5 bg-slate-200 text-slate-700 text-xs rounded">US-02</div>
+                        <div class="flex-1">
+                            <h3 class="font-medium mb-2">Task Detail & Completion</h3>
+                            <p class="text-sm text-slate-600 mb-3">
+                                As a housekeeper, I want to view task details including room number and requirements, then complete tasks with photo proof so my supervisor can verify quality.
+                            </p>
+                            <div class="text-xs text-slate-500">
+                                <strong>Acceptance:</strong> Task detail page shows full information, includes mobile photo capture, allows status change, and validates completion
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Story 3 -->
+                <div class="p-5 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3">
+                        <div class="px-2 py-0.5 bg-slate-200 text-slate-700 text-xs rounded">US-03</div>
+                        <div class="flex-1">
+                            <h3 class="font-medium mb-2">Status Management</h3>
+                            <p class="text-sm text-slate-600 mb-3">
+                                As a concierge, I want to update my status between available, busy, on break, and off duty so the team knows my availability for guest requests.
+                            </p>
+                            <div class="text-xs text-slate-500">
+                                <strong>Acceptance:</strong> Status selector with 4 states, visual indicators, timestamp tracking, and real-time updates visible to supervisors
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Story 4 -->
+                <div class="p-5 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3">
+                        <div class="px-2 py-0.5 bg-slate-200 text-slate-700 text-xs rounded">US-04</div>
+                        <div class="flex-1">
+                            <h3 class="font-medium mb-2">Issue Reporting</h3>
+                            <p class="text-sm text-slate-600 mb-3">
+                                As a maintenance staff member, I want to report issues with photos and descriptions so urgent problems are communicated quickly to supervisors.
+                            </p>
+                            <div class="text-xs text-slate-500">
+                                <strong>Acceptance:</strong> Issue form with category, priority, photo upload, description field, and confirmation of supervisor notification
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Technical Architecture -->
+        <div class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Technical Architecture</h2>
+            </div>
+
+            <div class="ml-9 space-y-6">
+
+                <!-- Routing Structure -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3">Routing Structure</h3>
+                    <div class="terminal p-4 rounded-lg text-sm">
+                        <div class="comment text-xs mb-2"># New Routes to Create</div>
+                        <div class="prompt">app/my-shift/page.tsx</div>
+                        <div class="text-xs text-slate-400 ml-4">→ Staff member dashboard (main view)</div>
+                        <div class="prompt mt-2">app/my-shift/task/[id]/page.tsx</div>
+                        <div class="text-xs text-slate-400 ml-4">→ Individual task detail & completion</div>
+                        <div class="comment text-xs mt-3"># Reuse Existing Pattern</div>
+                        <div class="prompt">Similar to: app/tasks/[id]/page.tsx</div>
+                    </div>
+                </div>
+
+                <!-- Component Architecture -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3">Component Architecture</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                            <h4 class="text-sm font-medium mb-2">Reusable Components</h4>
+                            <div class="text-xs text-slate-600 space-y-1">
+                                <div>✓ VoiceSessionChat - Already integrated</div>
+                                <div>✓ LanguageSelector - Multi-language support</div>
+                                <div>✓ useAuth hook - Authentication</div>
+                                <div>✓ Image component - Avatar handling</div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                            <h4 class="text-sm font-medium mb-2">New Components Needed</h4>
+                            <div class="text-xs text-slate-600 space-y-1">
+                                <div>• StatusSelector - Quick status toggle</div>
+                                <div>• TaskCard - Mobile-optimized task list item</div>
+                                <div>• PhotoUploadButton - Camera integration</div>
+                                <div>• IssueReportModal - Report problems</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- State Management -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3">State Management Pattern</h3>
+                    <div class="code-block p-4 rounded-lg text-sm">
+<pre class="text-xs"><span class="comment">// Client-side state (existing pattern from tasks/[id]/page.tsx)</span>
+<span class="keyword">const</span> [staffMember, setStaffMember] = useState&lt;StaffMember | <span class="keyword">null</span>&gt;(<span class="keyword">null</span>);
+<span class="keyword">const</span> [tasks, setTasks] = useState&lt;Task[]&gt;([]);
+<span class="keyword">const</span> [status, setStatus] = useState&lt;StaffStatus&gt;(<span class="string">'available'</span>);
+
+<span class="comment">// Mock data structure (no backend yet)</span>
+<span class="keyword">const</span> staffData: Record&lt;string, StaffMember&gt; = {
+  <span class="string">'housekeeper-mika'</span>: { name: <span class="string">'Mika Sato'</span>, role: <span class="string">'Housekeeper'</span>, ... },
+  <span class="string">'concierge-yuki'</span>: { name: <span class="string">'Yuki Nakamura'</span>, role: <span class="string">'Concierge'</span>, ... }
+};</pre>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Codebase Integration -->
+        <div class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Codebase Integration Analysis</h2>
+            </div>
+
+            <div class="ml-9 space-y-4">
+
+                <!-- Existing Patterns -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3 text-slate-700">Existing Patterns to Follow</h3>
+                    <div class="space-y-2">
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                            <div class="flex items-start gap-2">
+                                <svg class="w-4 h-4 text-green-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium">Task Management Pattern</div>
+                                    <div class="text-xs text-slate-600">app/tasks/[id]/page.tsx provides complete reference for task detail view with status updates and activity log</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                            <div class="flex items-start gap-2">
+                                <svg class="w-4 h-4 text-green-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium">Navigation & Auth</div>
+                                    <div class="text-xs text-slate-600">All admin pages use consistent nav bar with logo, menu items, language selector, and logout button</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                            <div class="flex items-start gap-2">
+                                <svg class="w-4 h-4 text-green-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium">Visual Design System</div>
+                                    <div class="text-xs text-slate-600">Background image overlay with gradient, glass-morphism cards (bg-white/10 backdrop-blur-xl), Cormorant font for headers</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                            <div class="flex items-start gap-2">
+                                <svg class="w-4 h-4 text-green-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium">Voice Integration</div>
+                                    <div class="text-xs text-slate-600">VoiceSessionChat component with ElevenLabs for task assistance, context data passing, and client-side tool execution</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Assets -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3 text-slate-700">Available Assets</h3>
+                    <div class="terminal p-4 rounded-lg text-sm">
+                        <div class="comment text-xs mb-2"># Staff Avatars (public/avatars/)</div>
+                        <div class="success text-xs">→ guests.jpg, operations.jpg, revenue.jpg, architect.jpg</div>
+                        <div class="success text-xs">→ yuki-avatar.jpg (recently added female avatar)</div>
+                        <div class="success text-xs">→ Multiple numbered avatars (00046.png, 00052.png, etc.)</div>
+                        <div class="comment text-xs mt-3"># Background Images (public/)</div>
+                        <div class="success text-xs">→ hotel3.jpg (used consistently across admin pages)</div>
+                    </div>
+                </div>
+
+                <!-- Translation System -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3 text-slate-700">Multi-Language Support</h3>
+                    <div class="code-block p-4 rounded-lg text-sm">
+<pre class="text-xs"><span class="comment">// Add to lib/translations.ts</span>
+staffPortal: {
+  title: <span class="string">'My Shift'</span>,
+  dashboard: <span class="string">'Dashboard'</span>,
+  todaysTasks: <span class="string">"Today's Tasks"</span>,
+  status: {
+    available: <span class="string">'Available'</span>,
+    busy: <span class="string">'Busy'</span>,
+    onBreak: <span class="string">'On Break'</span>,
+    offDuty: <span class="string">'Off Duty'</span>
+  },
+  actions: {
+    updateStatus: <span class="string">'Update Status'</span>,
+    reportIssue: <span class="string">'Report Issue'</span>,
+    contactSupervisor: <span class="string">'Contact Supervisor'</span>
+  }
+}</pre>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Data Models -->
+        <div class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Data Models</h2>
+            </div>
+
+            <div class="ml-9 space-y-6">
+
+                <!-- StaffMember Interface -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3">StaffMember Type</h3>
+                    <div class="code-block p-4 rounded-lg text-sm">
+<pre class="text-xs"><span class="keyword">interface</span> StaffMember {
+  id: <span class="keyword">string</span>;                    <span class="comment">// Unique identifier</span>
+  name: <span class="keyword">string</span>;                  <span class="comment">// Full name</span>
+  role: <span class="keyword">string</span>;                  <span class="comment">// Job title (Housekeeper, Concierge, etc.)</span>
+  department: <span class="keyword">string</span>;            <span class="comment">// Housekeeping, Front Desk, Kitchen, etc.</span>
+  avatar: <span class="keyword">string</span>;                <span class="comment">// Avatar image path</span>
+  status: StaffStatus;            <span class="comment">// Current availability status</span>
+  email: <span class="keyword">string</span>;                 <span class="comment">// Contact email</span>
+  phone: <span class="keyword">string</span>;                 <span class="comment">// Contact phone</span>
+  tasks: <span class="keyword">string</span>[];               <span class="comment">// Array of task IDs assigned today</span>
+  supervisor: {                   <span class="comment">// Supervisor info for escalation</span>
+    name: <span class="keyword">string</span>;
+    avatar: <span class="keyword">string</span>;
+    agentId: <span class="keyword">string</span>;
+  };
+  shiftStart?: <span class="keyword">string</span>;           <span class="comment">// Today's shift start time</span>
+  shiftEnd?: <span class="keyword">string</span>;             <span class="comment">// Today's shift end time</span>
+}
+
+<span class="keyword">type</span> StaffStatus = <span class="string">'available'</span> | <span class="string">'busy'</span> | <span class="string">'on-break'</span> | <span class="string">'off-duty'</span>;</pre>
+                    </div>
+                </div>
+
+                <!-- Task Extension -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3">Extended Task Type (for Staff View)</h3>
+                    <div class="code-block p-4 rounded-lg text-sm">
+<pre class="text-xs"><span class="keyword">interface</span> StaffTask <span class="keyword">extends</span> TaskData {
+  completionPhotos?: <span class="keyword">string</span>[];   <span class="comment">// Base64 or URLs of completion photos</span>
+  estimatedDuration?: <span class="keyword">number</span>;    <span class="comment">// Minutes (for planning)</span>
+  roomNumber?: <span class="keyword">string</span>;           <span class="comment">// Specific room if applicable</span>
+  guestNotes?: <span class="keyword">string</span>;           <span class="comment">// Special guest preferences</span>
+}</pre>
+                    </div>
+                </div>
+
+                <!-- Mock Data Structure -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3">Mock Staff Data (No Backend Yet)</h3>
+                    <div class="code-block p-4 rounded-lg text-sm">
+<pre class="text-xs"><span class="keyword">const</span> staffMembers: Record&lt;<span class="keyword">string</span>, StaffMember&gt; = {
+  <span class="string">'mika-sato'</span>: {
+    id: <span class="string">'mika-sato'</span>,
+    name: <span class="string">'Mika Sato'</span>,
+    role: <span class="string">'Housekeeper'</span>,
+    department: <span class="string">'Housekeeping'</span>,
+    avatar: <span class="string">'/avatars/00046.png'</span>,
+    status: <span class="string">'available'</span>,
+    email: <span class="string">'mika@the1898niseko.com'</span>,
+    phone: <span class="string">'+81-123-456-7890'</span>,
+    tasks: [<span class="string">'room-turnover'</span>, <span class="string">'suite-301-deep-clean'</span>],
+    supervisor: {
+      name: <span class="string">'Mika Hayashi'</span>,
+      avatar: <span class="string">'/avatars/operations.jpg'</span>,
+      agentId: <span class="string">'operations'</span>
+    },
+    shiftStart: <span class="string">'08:00'</span>,
+    shiftEnd: <span class="string">'16:00'</span>
+  },
+  <span class="string">'yuki-nakamura'</span>: {
+    id: <span class="string">'yuki-nakamura'</span>,
+    name: <span class="string">'Yuki Nakamura'</span>,
+    role: <span class="string">'Concierge'</span>,
+    department: <span class="string">'Front Desk'</span>,
+    avatar: <span class="string">'/avatars/yuki-avatar.jpg'</span>,
+    status: <span class="string">'busy'</span>,
+    email: <span class="string">'yuki@the1898niseko.com'</span>,
+    phone: <span class="string">'+81-123-456-7891'</span>,
+    tasks: [<span class="string">'dinner-reservation-sato'</span>, <span class="string">'spa-appointment-yamamoto'</span>],
+    supervisor: {
+      name: <span class="string">'Kenji Sato'</span>,
+      avatar: <span class="string">'/avatars/guests.jpg'</span>,
+      agentId: <span class="string">'guests'</span>
+    },
+    shiftStart: <span class="string">'07:00'</span>,
+    shiftEnd: <span class="string">'15:00'</span>
+  }
+};</pre>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- UI/UX Design -->
+        <div class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Mobile-First UI/UX Design</h2>
+            </div>
+
+            <div class="ml-9 space-y-6">
+
+                <!-- Layout Strategy -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3">Responsive Layout Strategy</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                            <h4 class="text-sm font-medium mb-3">Mobile (< 768px)</h4>
+                            <div class="space-y-2 text-xs text-slate-600">
+                                <div>• Full-width single column layout</div>
+                                <div>• Large touch targets (min 44x44px)</div>
+                                <div>• Bottom-fixed action buttons</div>
+                                <div>• Collapsible task details</div>
+                                <div>• Quick-access status toggle</div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                            <h4 class="text-sm font-medium mb-3">Desktop (≥ 768px)</h4>
+                            <div class="space-y-2 text-xs text-slate-600">
+                                <div>• Two-column: Tasks + Voice Chat</div>
+                                <div>• Persistent sidebar navigation</div>
+                                <div>• Expanded task cards</div>
+                                <div>• Inline photo preview</div>
+                                <div>• Hover states and tooltips</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Indicators -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3">Status Visual System</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-3 p-3 bg-slate-50 rounded border border-slate-200">
+                            <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                            <span class="text-sm font-medium">Available</span>
+                            <span class="text-xs text-slate-500">Ready for new tasks</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-slate-50 rounded border border-slate-200">
+                            <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                            <span class="text-sm font-medium">Busy</span>
+                            <span class="text-xs text-slate-500">Working on current task</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-slate-50 rounded border border-slate-200">
+                            <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                            <span class="text-sm font-medium">On Break</span>
+                            <span class="text-xs text-slate-500">Temporarily unavailable</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-slate-50 rounded border border-slate-200">
+                            <div class="w-3 h-3 rounded-full bg-slate-400"></div>
+                            <span class="text-sm font-medium">Off Duty</span>
+                            <span class="text-xs text-slate-500">Shift ended</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photo Upload Flow -->
+                <div>
+                    <h3 class="font-medium text-sm mb-3">Photo Upload Workflow</h3>
+                    <div class="code-block p-4 rounded-lg text-sm">
+<pre class="text-xs"><span class="comment">// Mobile Camera Integration (Mocked for MVP)</span>
+&lt;<span class="keyword">input</span>
+  <span class="keyword">type</span>=<span class="string">"file"</span>
+  <span class="keyword">accept</span>=<span class="string">"image/*"</span>
+  <span class="keyword">capture</span>=<span class="string">"environment"</span>  <span class="comment">// Triggers rear camera on mobile</span>
+  <span class="keyword">onChange</span>={handlePhotoCapture}
+/&gt;
+
+<span class="comment">// Base64 encoding for display (no upload API yet)</span>
+<span class="keyword">const</span> handlePhotoCapture = (e: ChangeEvent) =&gt; {
+  <span class="keyword">const</span> file = e.target.files?.[<span class="number">0</span>];
+  <span class="keyword">if</span> (file) {
+    <span class="keyword">const</span> reader = <span class="keyword">new</span> FileReader();
+    reader.onloadend = () =&gt; {
+      <span class="keyword">const</span> base64 = reader.result <span class="keyword">as</span> <span class="keyword">string</span>;
+      setCompletionPhotos([...completionPhotos, base64]);
+    };
+    reader.readAsDataURL(file);
+  }
+};</pre>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Implementation Timeline -->
+        <div class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Implementation Timeline</h2>
+            </div>
+
+            <div class="ml-9 space-y-4">
+
+                <!-- Phase 1 -->
+                <div class="p-5 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="px-3 py-1 bg-emerald-100 text-emerald-700 text-sm rounded-full font-medium">Phase 1</div>
+                        <span class="text-sm text-slate-600">2-3 days</span>
+                    </div>
+                    <h3 class="font-medium mb-3">Core Dashboard & Navigation</h3>
+                    <div class="space-y-2 text-sm text-slate-600">
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-slate-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>Create /my-shift/page.tsx with mock staff data</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-slate-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>Build mobile-first dashboard with status selector</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-slate-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>Implement task list with priority filtering</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-slate-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>Add translations for staff portal to lib/translations.ts</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 2 -->
+                <div class="p-5 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full font-medium">Phase 2</div>
+                        <span class="text-sm text-slate-600">2-3 days</span>
+                    </div>
+                    <h3 class="font-medium mb-3">Task Detail & Photo Completion</h3>
+                    <div class="space-y-2 text-sm text-slate-600">
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-slate-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>Create /my-shift/task/[id]/page.tsx (adapt from tasks/[id])</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-slate-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>Build PhotoUploadButton component with camera access</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-slate-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>Implement task completion flow with photo validation</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-slate-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>Add status update buttons (in-progress, completed, blocked)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 3 -->
+                <div class="p-5 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full font-medium">Phase 3</div>
+                        <span class="text-sm text-slate-600">2 days</span>
+                    </div>
+                    <h3 class="font-medium mb-3">Communication & Issue Reporting</h3>
+                    <div class="space-y-2 text-sm text-slate-600">
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-slate-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>Create IssueReportModal component</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-slate-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>Integrate VoiceSessionChat with supervisor contact</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-slate-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>Add quick action buttons (emergency, maintenance, supplies)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 4 -->
+                <div class="p-5 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="px-3 py-1 bg-amber-100 text-amber-700 text-sm rounded-full font-medium">Phase 4</div>
+                        <span class="text-sm text-slate-600">1-2 days</span>
+                    </div>
+                    <h3 class="font-medium mb-3">Polish & Testing</h3>
+                    <div class="space-y-2 text-sm text-slate-600">
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-slate-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>Mobile device testing (iOS Safari, Chrome Android)</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-slate-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>Accessibility audit (keyboard nav, screen readers)</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-slate-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>Performance optimization (image compression, lazy loading)</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-slate-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>Update navigation links in admin pages to include /my-shift</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Testing Strategy -->
+        <div class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Testing Strategy</h2>
+            </div>
+
+            <div class="ml-9 space-y-4">
+
+                <div class="grid md:grid-cols-2 gap-4">
+
+                    <!-- Mobile Testing -->
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <h3 class="font-medium text-sm mb-3">Mobile Device Testing</h3>
+                        <div class="space-y-2 text-xs text-slate-600">
+                            <div class="flex items-start gap-2">
+                                <div class="w-4 h-4 bg-slate-200 rounded flex-shrink-0 mt-0.5"></div>
+                                <span>iOS Safari - photo capture, touch targets</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <div class="w-4 h-4 bg-slate-200 rounded flex-shrink-0 mt-0.5"></div>
+                                <span>Chrome Android - offline behavior, PWA</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <div class="w-4 h-4 bg-slate-200 rounded flex-shrink-0 mt-0.5"></div>
+                                <span>Responsive breakpoints (375px, 768px, 1024px)</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <div class="w-4 h-4 bg-slate-200 rounded flex-shrink-0 mt-0.5"></div>
+                                <span>One-handed usability (thumb zone)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Functional Testing -->
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <h3 class="font-medium text-sm mb-3">Functional Test Cases</h3>
+                        <div class="space-y-2 text-xs text-slate-600">
+                            <div class="flex items-start gap-2">
+                                <div class="w-4 h-4 bg-slate-200 rounded flex-shrink-0 mt-0.5"></div>
+                                <span>Status change updates in real-time</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <div class="w-4 h-4 bg-slate-200 rounded flex-shrink-0 mt-0.5"></div>
+                                <span>Task completion requires photo</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <div class="w-4 h-4 bg-slate-200 rounded flex-shrink-0 mt-0.5"></div>
+                                <span>Issue report sends notification</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <div class="w-4 h-4 bg-slate-200 rounded flex-shrink-0 mt-0.5"></div>
+                                <span>Supervisor contact opens voice chat</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- User Acceptance Testing -->
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <h3 class="font-medium text-sm mb-3">User Acceptance Test Scenarios</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <div class="font-medium text-xs mb-1">Scenario 1: Morning Shift Start</div>
+                            <div class="text-xs text-slate-600">Housekeeper Mika arrives, logs in, updates status to "Available", views 3 room turnovers assigned</div>
+                        </div>
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <div class="font-medium text-xs mb-1">Scenario 2: Task Completion</div>
+                            <div class="text-xs text-slate-600">Completes Suite 301 cleaning, captures photo of made bed, marks complete, task moves to "Completed" list</div>
+                        </div>
+                        <div class="p-3 bg-white rounded border border-slate-200">
+                            <div class="font-medium text-xs mb-1">Scenario 3: Issue Escalation</div>
+                            <div class="text-xs text-slate-600">Discovers broken AC in Suite 204, uses "Report Issue" button with photo, supervisor receives notification</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Key Files to Create -->
+        <div class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Files to Create/Modify</h2>
+            </div>
+
+            <div class="ml-9">
+                <div class="terminal p-4 rounded-lg text-sm">
+                    <div class="comment text-xs mb-3"># New Files</div>
+                    <div class="prompt">app/my-shift/page.tsx</div>
+                    <div class="success text-xs ml-4 mb-2">→ Main staff dashboard with status, tasks, quick actions</div>
+
+                    <div class="prompt">app/my-shift/task/[id]/page.tsx</div>
+                    <div class="success text-xs ml-4 mb-2">→ Task detail view with photo upload and completion</div>
+
+                    <div class="prompt">app/components/StatusSelector.tsx</div>
+                    <div class="success text-xs ml-4 mb-2">→ Mobile-friendly status toggle component</div>
+
+                    <div class="prompt">app/components/PhotoUploadButton.tsx</div>
+                    <div class="success text-xs ml-4 mb-2">→ Camera integration for task completion photos</div>
+
+                    <div class="prompt">app/components/IssueReportModal.tsx</div>
+                    <div class="success text-xs ml-4 mb-2">→ Modal for reporting maintenance/supply issues</div>
+
+                    <div class="comment text-xs mt-4 mb-3"># Files to Modify</div>
+                    <div class="prompt">lib/translations.ts</div>
+                    <div class="success text-xs ml-4 mb-2">→ Add staffPortal section with all UI text</div>
+
+                    <div class="prompt">app/admin/page.tsx</div>
+                    <div class="success text-xs ml-4 mb-2">→ Add navigation link to My Shift portal</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Future Enhancements -->
+        <div class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <h2 class="text-2xl font-light text-slate-900">Future Enhancements</h2>
+            </div>
+
+            <div class="ml-9 space-y-2">
+                <div class="p-3 bg-slate-50 rounded border border-slate-200 text-sm text-slate-600">
+                    <strong class="text-slate-700">Backend Integration:</strong> Replace mock data with API endpoints for real-time task sync
+                </div>
+                <div class="p-3 bg-slate-50 rounded border border-slate-200 text-sm text-slate-600">
+                    <strong class="text-slate-700">Push Notifications:</strong> Alert staff of urgent tasks and supervisor messages
+                </div>
+                <div class="p-3 bg-slate-50 rounded border border-slate-200 text-sm text-slate-600">
+                    <strong class="text-slate-700">Offline Mode:</strong> PWA with service worker for offline task viewing and sync
+                </div>
+                <div class="p-3 bg-slate-50 rounded border border-slate-200 text-sm text-slate-600">
+                    <strong class="text-slate-700">Shift Calendar:</strong> Weekly/monthly shift schedule view and swap requests
+                </div>
+                <div class="p-3 bg-slate-50 rounded border border-slate-200 text-sm text-slate-600">
+                    <strong class="text-slate-700">Performance Metrics:</strong> Track completion times, quality scores, guest feedback
+                </div>
+                <div class="p-3 bg-slate-50 rounded border border-slate-200 text-sm text-slate-600">
+                    <strong class="text-slate-700">Team Chat:</strong> Direct messaging between staff members and departments
+                </div>
+                <div class="p-3 bg-slate-50 rounded border border-slate-200 text-sm text-slate-600">
+                    <strong class="text-slate-700">Location Tracking:</strong> GPS-based task proximity alerts and route optimization
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-16 pt-8 border-t border-slate-200">
+            <div class="flex items-center justify-between text-sm text-slate-500">
+                <div>Implementation Plan v1.0</div>
+                <div>Generated: December 11, 2025</div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

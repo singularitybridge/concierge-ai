@@ -741,7 +741,7 @@ Use this document content to answer the user's questions.`;
         if (contextDataRef.current?.taskData) {
           setTimeout(() => {
             const taskData = contextDataRef.current?.taskData as Record<string, unknown>;
-            const contextUpdate = `[TASK CONTEXT]
+            const contextUpdate = `[TASK CONTEXT - RESPOND IMMEDIATELY]
 Title: ${taskData.title}
 Status: ${taskData.status}
 Priority: ${taskData.priority}
@@ -750,8 +750,18 @@ Notes: ${taskData.notes || 'No notes'}
 Location: ${taskData.location}
 Due: ${taskData.dueDate}
 Assigned To: ${(taskData.assignedTo as Record<string, string>)?.name}
+Category: ${taskData.category}
 
-Use this task information to assist the user. You can update the status, notes, or add comments using the available tools.`;
+IMPORTANT: Now that you have the task details, immediately:
+1. Greet the user warmly but briefly
+2. Summarize this task in one sentence (title, status, key detail)
+3. Suggest ONE specific action based on the current status:
+   - If pending: Offer to mark it as "in progress"
+   - If in-progress: Ask if they want to add an update or mark complete
+   - If completed: Ask if they want to add final notes
+   - If blocked: Ask what's blocking it
+
+Speak now with this brief and suggestion.`;
 
             console.log('📋 Sending task context via contextual update');
             elevenLabsConversation.sendContextualUpdate(contextUpdate);

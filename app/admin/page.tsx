@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { TrendingUp, Users, Wrench, Network, Cpu, Plus, X, Loader2, LogOut, BookOpen, Shield, Sparkles, ClipboardList, Building2, Calendar, ChefHat, Car } from 'lucide-react';
+import { TrendingUp, Users, Wrench, Network, Cpu, Plus, X, Loader2, LogOut, BookOpen, Shield, Sparkles, ClipboardList, Building2, Calendar, ChefHat, Car, ClipboardCheck } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import LanguageSelector from '../components/LanguageSelector';
 import { useLanguageStore } from '@/lib/use-language-store';
@@ -459,6 +459,20 @@ export default function AdminPage() {
                   <div className="mt-4 pt-4 border-t border-white/10">
                     <p className="text-xs text-white/40 mb-3">{t.staffManagement.title}</p>
                     <div className="space-y-2">
+                      <Link
+                        href="/my-shift"
+                        className="flex items-center gap-3 p-3 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-400/50 rounded-xl transition-all group"
+                      >
+                        <ClipboardCheck className="flex-shrink-0 w-5 h-5 text-emerald-400/70 group-hover:text-emerald-400 transition-colors" strokeWidth={1.5} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-white group-hover:text-emerald-100 transition-colors">
+                            My Shift
+                          </p>
+                          <p className="text-xs text-white/40 truncate">
+                            Staff task management portal
+                          </p>
+                        </div>
+                      </Link>
                       <Link
                         href="/admin/staff/kitchen"
                         className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-amber-400/30 rounded-xl transition-all group"
