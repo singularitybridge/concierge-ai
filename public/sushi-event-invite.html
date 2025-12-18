@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exclusive Sushi Experience | The 1898 Niseko</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Noto+Serif+JP:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'charcoal': '#1a1a1a',
+                        'warm-cream': '#f5f1eb',
+                        'gold': '#c9a962',
+                        'gold-light': '#dbc88e',
+                        'slate-dark': '#2d2d2d',
+                    },
+                    fontFamily: {
+                        'serif': ['Playfair Display', 'Noto Serif JP', 'serif'],
+                        'sans': ['Inter', 'sans-serif'],
+                        'japanese': ['Noto Serif JP', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hero-overlay {
+            background: linear-gradient(to bottom,
+                rgba(26, 26, 26, 0.3) 0%,
+                rgba(26, 26, 26, 0.1) 30%,
+                rgba(26, 26, 26, 0.1) 70%,
+                rgba(26, 26, 26, 0.6) 100%);
+        }
+        .text-shadow {
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+        }
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        .fade-in {
+            animation: fadeIn 1s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        .delay-4 { animation-delay: 0.8s; }
+
+        /* Print Button */
+        .print-button {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #c9a962;
+            color: #1a1a1a;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .print-button:hover {
+            background: #dbc88e;
+            transform: translateY(-2px);
+        }
+
+        /* Print Styles */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            html, body {
+                width: 210mm;
+                height: 297mm;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                background: #1a1a1a !important;
+            }
+
+            .print-button {
+                display: none !important;
+            }
+
+            /* Hero section for print */
+            section:first-of-type {
+                min-height: auto !important;
+                height: auto !important;
+                padding: 40px 30px !important;
+                page-break-after: avoid;
+            }
+
+            section:first-of-type .absolute.bottom-10 {
+                display: none !important;
+            }
+
+            /* Optimize all sections for print */
+            section {
+                padding: 30px !important;
+                page-break-inside: avoid;
+            }
+
+            /* Reduce text sizes slightly for print */
+            h1 {
+                font-size: 2.5rem !important;
+            }
+
+            h2 {
+                font-size: 1.75rem !important;
+            }
+
+            p {
+                font-size: 0.9rem !important;
+            }
+
+            /* Grid adjustments for print */
+            .grid {
+                gap: 1rem !important;
+            }
+
+            /* Hide animations in print */
+            .fade-in, .opacity-0 {
+                opacity: 1 !important;
+                animation: none !important;
+            }
+
+            .card-hover {
+                transform: none !important;
+            }
+
+            /* Reduce decorative background */
+            .text-\[40rem\] {
+                display: none !important;
+            }
+
+            /* Footer for print */
+            footer {
+                page-break-before: avoid;
+                padding: 20px !important;
+            }
+
+            /* Ensure links show their URLs in print */
+            a[href]:after {
+                content: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-charcoal text-warm-cream font-sans antialiased">
+
+    <!-- Print/PDF Button -->
+    <button class="print-button" onclick="window.print()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+        Save as PDF
+    </button>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <!-- Background Image -->
+        <div class="absolute inset-0">
+            <img
+                src="sushi-platter.png"
+                alt="Exquisite omakase sushi platter"
+                class="w-full h-full object-cover"
+            />
+            <div class="hero-overlay absolute inset-0"></div>
+        </div>
+
+        <!-- Content -->
+        <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
+            <!-- Japanese Decorative Element -->
+            <div class="mb-8 opacity-0 fade-in">
+                <span class="text-gold text-6xl font-japanese">鮨</span>
+            </div>
+
+            <!-- Hotel Name -->
+            <p class="text-gold tracking-[0.4em] uppercase text-sm mb-4 opacity-0 fade-in delay-1">
+                The 1898 Niseko presents
+            </p>
+
+            <!-- Main Title -->
+            <h1 class="font-serif text-5xl md:text-7xl font-semibold mb-6 text-shadow opacity-0 fade-in delay-2">
+                An Exclusive<br/>
+                <span class="text-gold">Sushi Experience</span>
+            </h1>
+
+            <!-- Subtitle -->
+            <p class="text-xl md:text-2xl font-light text-warm-cream/90 mb-12 max-w-2xl mx-auto opacity-0 fade-in delay-3">
+                A curated evening of exceptional omakase cuisine,
+                where tradition meets artistry
+            </p>
+
+            <!-- Date Badge -->
+            <div class="inline-flex items-center gap-4 bg-charcoal/60 backdrop-blur-sm border border-gold/30 rounded-full px-8 py-4 opacity-0 fade-in delay-4">
+                <i data-lucide="calendar" class="w-5 h-5 text-gold"></i>
+                <span class="text-lg">December 19, 2025</span>
+                <span class="text-gold/50">|</span>
+                <i data-lucide="clock" class="w-5 h-5 text-gold"></i>
+                <span class="text-lg">4:00 PM JST</span>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+                <i data-lucide="chevron-down" class="w-8 h-8 text-gold/70"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section class="py-24 px-6 bg-slate-dark">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <!-- Image -->
+                <div class="relative">
+                    <img
+                        src="sushi-chef.png"
+                        alt="Master sushi chef at work"
+                        class="w-full rounded-lg shadow-2xl"
+                    />
+                    <div class="absolute -bottom-6 -right-6 bg-gold text-charcoal px-6 py-3 rounded">
+                        <span class="font-serif text-lg">Omakase</span>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div>
+                    <span class="text-gold tracking-widest uppercase text-sm">The Experience</span>
+                    <h2 class="font-serif text-4xl md:text-5xl mt-4 mb-6">
+                        Crafted by a Master
+                    </h2>
+                    <p class="text-warm-cream/80 text-lg leading-relaxed mb-8">
+                        Join us for an intimate evening where our acclaimed chef presents
+                        a thoughtfully curated omakase journey. Each piece of sushi is
+                        meticulously prepared using the finest seasonal ingredients,
+                        sourced from Hokkaido's pristine waters and Tokyo's legendary
+                        Tsukiji market.
+                    </p>
+                    <p class="text-warm-cream/80 text-lg leading-relaxed mb-8">
+                        This exclusive experience is limited to just 12 guests,
+                        ensuring an intimate atmosphere where you can witness the
+                        artistry of sushi-making while savoring each exquisite creation.
+                    </p>
+
+                    <!-- Features -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="fish" class="w-5 h-5 text-gold"></i>
+                            <span class="text-warm-cream/90">12-Course Omakase</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="wine" class="w-5 h-5 text-gold"></i>
+                            <span class="text-warm-cream/90">Sake Pairing</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="users" class="w-5 h-5 text-gold"></i>
+                            <span class="text-warm-cream/90">12 Guests Only</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="mountain-snow" class="w-5 h-5 text-gold"></i>
+                            <span class="text-warm-cream/90">Mountain Views</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Preview Section -->
+    <section class="py-24 px-6 bg-charcoal">
+        <div class="max-w-4xl mx-auto text-center">
+            <span class="text-gold tracking-widest uppercase text-sm">The Menu</span>
+            <h2 class="font-serif text-4xl md:text-5xl mt-4 mb-16">
+                A Journey Through Flavor
+            </h2>
+
+            <!-- Menu Items -->
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card-hover bg-slate-dark p-8 rounded-lg border border-gold/10">
+                    <span class="text-5xl font-japanese text-gold/30 mb-4 block">一</span>
+                    <h3 class="font-serif text-xl mb-3">Opening Course</h3>
+                    <p class="text-warm-cream/70 text-sm">
+                        Seasonal appetizers featuring Hokkaido uni,
+                        fresh wasabi, and house-made pickles
+                    </p>
+                </div>
+
+                <div class="card-hover bg-slate-dark p-8 rounded-lg border border-gold/10">
+                    <span class="text-5xl font-japanese text-gold/30 mb-4 block">二</span>
+                    <h3 class="font-serif text-xl mb-3">Sashimi Selection</h3>
+                    <p class="text-warm-cream/70 text-sm">
+                        Premium cuts of otoro, hirame,
+                        and seasonal catches from Hakodate
+                    </p>
+                </div>
+
+                <div class="card-hover bg-slate-dark p-8 rounded-lg border border-gold/10">
+                    <span class="text-5xl font-japanese text-gold/30 mb-4 block">三</span>
+                    <h3 class="font-serif text-xl mb-3">Nigiri Course</h3>
+                    <p class="text-warm-cream/70 text-sm">
+                        Eight pieces of hand-pressed sushi showcasing
+                        the chef's signature preparations
+                    </p>
+                </div>
+            </div>
+
+            <p class="mt-12 text-warm-cream/60 italic">
+                Menu subject to seasonal availability. Please inform us of any dietary requirements.
+            </p>
+        </div>
+    </section>
+
+    <!-- Venue Section -->
+    <section class="py-24 px-6 bg-slate-dark">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <!-- Content -->
+                <div class="order-2 md:order-1">
+                    <span class="text-gold tracking-widest uppercase text-sm">The Setting</span>
+                    <h2 class="font-serif text-4xl md:text-5xl mt-4 mb-6">
+                        Where Mountains<br/>Meet the Sea
+                    </h2>
+                    <p class="text-warm-cream/80 text-lg leading-relaxed mb-8">
+                        Nestled in the heart of Niseko, The 1898 offers a dining
+                        experience that honors both the majestic Hokkaido landscape
+                        and the rich culinary traditions of Japan.
+                    </p>
+                    <p class="text-warm-cream/80 text-lg leading-relaxed mb-8">
+                        Our intimate dining room features panoramic views of
+                        Mount Yotei, creating the perfect backdrop for an
+                        unforgettable evening.
+                    </p>
+
+                    <!-- Location Details -->
+                    <div class="space-y-4 border-t border-gold/20 pt-8">
+                        <div class="flex items-start gap-4">
+                            <i data-lucide="map-pin" class="w-5 h-5 text-gold mt-1"></i>
+                            <div>
+                                <span class="font-medium">The 1898 Niseko</span>
+                                <p class="text-warm-cream/60 text-sm">Niseko, Hokkaido, Japan</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <i data-lucide="shirt" class="w-5 h-5 text-gold mt-1"></i>
+                            <div>
+                                <span class="font-medium">Dress Code</span>
+                                <p class="text-warm-cream/60 text-sm">Smart casual attire</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image -->
+                <div class="order-1 md:order-2 relative">
+                    <img
+                        src="restaurant-interior.png"
+                        alt="The 1898 Niseko restaurant interior"
+                        class="w-full rounded-lg shadow-2xl"
+                    />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RSVP Section -->
+    <section class="py-24 px-6 bg-charcoal relative overflow-hidden">
+        <!-- Decorative Background -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[40rem] font-japanese text-warm-cream">
+                鮨
+            </div>
+        </div>
+
+        <div class="max-w-2xl mx-auto text-center relative z-10">
+            <span class="text-gold tracking-widest uppercase text-sm">Reserve Your Place</span>
+            <h2 class="font-serif text-4xl md:text-5xl mt-4 mb-6">
+                An Evening Awaits
+            </h2>
+            <p class="text-warm-cream/80 text-lg leading-relaxed mb-4">
+                Seating is limited to ensure an intimate experience.
+            </p>
+
+            <!-- Event Details Box -->
+            <div class="bg-slate-dark border border-gold/20 rounded-lg p-8 mb-10">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                    <div>
+                        <i data-lucide="calendar" class="w-6 h-6 text-gold mx-auto mb-2"></i>
+                        <p class="text-sm text-warm-cream/60">Date</p>
+                        <p class="font-medium">Dec 19, 2025</p>
+                    </div>
+                    <div>
+                        <i data-lucide="clock" class="w-6 h-6 text-gold mx-auto mb-2"></i>
+                        <p class="text-sm text-warm-cream/60">Time</p>
+                        <p class="font-medium">4:00 PM JST</p>
+                    </div>
+                    <div>
+                        <i data-lucide="users" class="w-6 h-6 text-gold mx-auto mb-2"></i>
+                        <p class="text-sm text-warm-cream/60">Capacity</p>
+                        <p class="font-medium">12 Guests</p>
+                    </div>
+                    <div>
+                        <i data-lucide="sparkles" class="w-6 h-6 text-gold mx-auto mb-2"></i>
+                        <p class="text-sm text-warm-cream/60">Experience</p>
+                        <p class="font-medium">Omakase</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                    href="mailto:dining@the1898niseko.com?subject=Sushi%20Event%20Reservation%20-%20December%2019&body=I%20would%20like%20to%20reserve%20a%20seat%20for%20the%20Exclusive%20Sushi%20Experience%20on%20December%2019%2C%202025.%0A%0AGuest%20Name%3A%0ANumber%20of%20Guests%3A%0ADietary%20Requirements%3A%0A"
+                    class="inline-flex items-center justify-center gap-3 bg-gold hover:bg-gold-light text-charcoal font-medium px-10 py-4 rounded transition-all duration-300 hover:scale-105"
+                >
+                    <i data-lucide="mail" class="w-5 h-5"></i>
+                    Reserve by Email
+                </a>
+                <a
+                    href="tel:+81136555898"
+                    class="inline-flex items-center justify-center gap-3 bg-transparent hover:bg-gold/10 text-gold border border-gold font-medium px-10 py-4 rounded transition-all duration-300"
+                >
+                    <i data-lucide="phone" class="w-5 h-5"></i>
+                    Call to Reserve
+                </a>
+            </div>
+
+            <p class="mt-8 text-warm-cream/50 text-sm">
+                For inquiries, please contact our concierge at
+                <a href="mailto:concierge@the1898niseko.com" class="text-gold hover:underline">concierge@the1898niseko.com</a>
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 bg-slate-dark border-t border-gold/10">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="mb-6">
+                <span class="font-serif text-2xl text-gold">The 1898</span>
+                <span class="text-warm-cream/60 text-lg ml-2">Niseko</span>
+            </div>
+            <p class="text-warm-cream/50 text-sm mb-6">
+                A boutique hotel experience in the heart of Hokkaido
+            </p>
+            <div class="flex justify-center gap-6 text-warm-cream/40">
+                <a href="#" class="hover:text-gold transition-colors">
+                    <i data-lucide="instagram" class="w-5 h-5"></i>
+                </a>
+                <a href="#" class="hover:text-gold transition-colors">
+                    <i data-lucide="facebook" class="w-5 h-5"></i>
+                </a>
+                <a href="#" class="hover:text-gold transition-colors">
+                    <i data-lucide="globe" class="w-5 h-5"></i>
+                </a>
+            </div>
+            <p class="mt-8 text-warm-cream/30 text-xs">
+                &copy; 2025 The 1898 Niseko. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
