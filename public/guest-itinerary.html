@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Itinerary | The 1898 Niseko</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Cormorant:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .page-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Winter background with frost effect */
+        .winter-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #e8eef2 0%, #dce5eb 50%, #cfd8dc 100%);
+        }
+
+        .winter-background::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000'%3E%3Cdefs%3E%3ClinearGradient id='frost' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23b8c6cf;stop-opacity:0.3'/%3E%3Cstop offset='100%25' style='stop-color:%23d4dfe6;stop-opacity:0.1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0,200 Q150,180 200,250 T400,200 T600,280 T800,200 T1000,250' stroke='%23c5d3db' stroke-width='1' fill='none' opacity='0.5'/%3E%3Cpath d='M0,400 Q100,380 180,420 T350,380 T550,450 T750,400 T1000,420' stroke='%23bcc9d2' stroke-width='0.8' fill='none' opacity='0.4'/%3E%3Cpath d='M0,600 Q120,580 220,640 T420,600 T620,680 T820,620 T1000,650' stroke='%23c8d5dc' stroke-width='0.6' fill='none' opacity='0.3'/%3E%3Ccircle cx='50' cy='100' r='2' fill='%23d8e2e8' opacity='0.6'/%3E%3Ccircle cx='150' cy='80' r='1.5' fill='%23dce5eb' opacity='0.5'/%3E%3Ccircle cx='300' cy='150' r='2.5' fill='%23d4dfe6' opacity='0.4'/%3E%3Ccircle cx='450' cy='50' r='1.8' fill='%23e0e8ed' opacity='0.5'/%3E%3Ccircle cx='600' cy='120' r='2' fill='%23d8e2e8' opacity='0.4'/%3E%3Ccircle cx='750' cy='80' r='1.5' fill='%23dce5eb' opacity='0.6'/%3E%3Ccircle cx='900' cy='140' r='2.2' fill='%23d4dfe6' opacity='0.5'/%3E%3C/svg%3E");
+            background-size: cover;
+            opacity: 0.8;
+        }
+
+        /* Frost branches overlay */
+        .frost-branches {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 800'%3E%3Cg fill='none' stroke='%23a8b8c3' stroke-width='0.8' opacity='0.25'%3E%3Cpath d='M-20,0 Q30,100 20,200 Q10,300 40,400 Q70,500 30,600 Q-10,700 20,800'/%3E%3Cpath d='M20,200 Q80,180 120,220'/%3E%3Cpath d='M40,400 Q100,380 150,420'/%3E%3Cpath d='M30,600 Q90,580 130,620'/%3E%3C/g%3E%3Cg fill='none' stroke='%23b5c4ce' stroke-width='0.6' opacity='0.2'%3E%3Cpath d='M480,0 Q450,80 470,160 Q490,240 460,320 Q430,400 470,480 Q510,560 470,640 Q430,720 480,800'/%3E%3Cpath d='M470,160 Q410,140 380,180'/%3E%3Cpath d='M460,320 Q400,300 360,340'/%3E%3Cpath d='M470,480 Q410,460 370,500'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: cover;
+        }
+
+        /* Left content section */
+        .content-section {
+            padding: 60px 80px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        /* Hotel branding */
+        .hotel-brand {
+            margin-bottom: 50px;
+        }
+
+        .hotel-brand h1 {
+            font-family: 'Cormorant', serif;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #5a6c7a;
+            margin-bottom: 8px;
+        }
+
+        .hotel-brand .tagline {
+            font-size: 11px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: #8a9aa6;
+            text-transform: uppercase;
+        }
+
+        /* Date display */
+        .date-display {
+            margin-bottom: 60px;
+        }
+
+        .date-display .month {
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            color: #7a8a96;
+            margin-bottom: 8px;
+        }
+
+        .date-display .day {
+            font-size: 120px;
+            font-weight: 300;
+            line-height: 0.9;
+            color: #3d4f5f;
+            letter-spacing: -4px;
+        }
+
+        .date-display .year {
+            font-size: 18px;
+            font-weight: 400;
+            letter-spacing: 10px;
+            color: #7a8a96;
+            margin-top: 5px;
+        }
+
+        /* Itinerary sections */
+        .itinerary {
+            flex: 1;
+        }
+
+        .time-section {
+            margin-bottom: 50px;
+        }
+
+        .section-header {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: #8a9aa6;
+            margin-bottom: 25px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(138, 154, 166, 0.3);
+        }
+
+        .welcome-text {
+            font-size: 28px;
+            font-weight: 400;
+            color: #3d4f5f;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .event-item {
+            display: flex;
+            margin-bottom: 18px;
+            align-items: flex-start;
+        }
+
+        .event-time {
+            font-size: 15px;
+            font-weight: 500;
+            color: #5a6c7a;
+            min-width: 60px;
+            margin-right: 20px;
+        }
+
+        .event-details {
+            flex: 1;
+        }
+
+        .event-title {
+            font-size: 17px;
+            font-weight: 400;
+            color: #3d4f5f;
+            line-height: 1.4;
+        }
+
+        .event-subtitle {
+            font-size: 14px;
+            font-weight: 300;
+            color: #7a8a96;
+            margin-top: 3px;
+            font-style: italic;
+        }
+
+        .event-status {
+            font-size: 11px;
+            font-weight: 400;
+            color: #a8b8c3;
+            letter-spacing: 1px;
+            margin-left: 8px;
+        }
+
+        /* Right image section */
+        .image-section {
+            position: relative;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .dining-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(232, 238, 242, 0.4) 0%, transparent 20%);
+            pointer-events: none;
+        }
+
+        /* Footer */
+        .footer {
+            position: absolute;
+            bottom: 30px;
+            left: 80px;
+            font-size: 10px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            color: #a8b8c3;
+            text-transform: uppercase;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .content-section {
+                padding: 40px 50px;
+            }
+
+            .date-display .day {
+                font-size: 90px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .page-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+
+            .image-section {
+                order: -1;
+                height: 40vh;
+            }
+
+            .dining-image {
+                top: 0;
+                right: 0;
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
+
+            .image-overlay {
+                top: 0;
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+                background: linear-gradient(to top, rgba(232, 238, 242, 0.8) 0%, transparent 50%);
+            }
+
+            .content-section {
+                padding: 30px 40px;
+            }
+
+            .date-display .day {
+                font-size: 80px;
+            }
+
+            .footer {
+                position: relative;
+                left: 0;
+                margin-top: 40px;
+            }
+        }
+
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .page-container {
+                height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="winter-background"></div>
+    <div class="frost-branches"></div>
+
+    <div class="page-container">
+        <div class="content-section">
+            <div class="hotel-brand">
+                <h1>The 1898 Niseko</h1>
+                <div class="tagline">Luxury Mountain Retreat</div>
+            </div>
+
+            <div class="date-display">
+                <div class="month">December</div>
+                <div class="day">26</div>
+                <div class="year">2024</div>
+            </div>
+
+            <div class="itinerary">
+                <div class="time-section">
+                    <div class="section-header">Afternoon</div>
+                    <div class="welcome-text">Welcome to 1898</div>
+
+                    <div class="event-item">
+                        <div class="event-time">14:00</div>
+                        <div class="event-details">
+                            <div class="event-title">
+                                Pick up Hikmah family at Sapporo
+                                <span class="event-status">(TBC)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="event-item">
+                        <div class="event-time">16:00</div>
+                        <div class="event-details">
+                            <div class="event-title">
+                                Pick up Rasyid family at Chitose Airport
+                                <span class="event-status">(TBC)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="event-item">
+                        <div class="event-time">18:00</div>
+                        <div class="event-details">
+                            <div class="event-title">
+                                Arrived and check in to the hotel
+                                <span class="event-status">(TBC)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="time-section">
+                    <div class="section-header">Evening</div>
+                    <div class="welcome-text">Check In</div>
+
+                    <div class="event-item">
+                        <div class="event-time">18:00</div>
+                        <div class="event-details">
+                            <div class="event-title">
+                                Arrived and check in to the hotel
+                                <span class="event-status">(TBC)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="event-item">
+                        <div class="event-time">19:00</div>
+                        <div class="event-details">
+                            <div class="event-title">In House Dining</div>
+                            <div class="event-subtitle">Ichigo - Ichie</div>
+                            <div class="event-subtitle">Private Chef's Exquisite Menu</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">Guest Itinerary | Confidential</div>
+        </div>
+
+        <div class="image-section">
+            <img src="/avatars/00062.png" alt="The 1898 Niseko Private Dining" class="dining-image">
+            <div class="image-overlay"></div>
+        </div>
+    </div>
+</body>
+</html>
