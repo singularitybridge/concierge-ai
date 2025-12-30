@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LogOut, Sparkles, Calendar, Users, Briefcase, ShoppingBag } from 'lucide-react';
+import { LogOut, Sparkles, Calendar, Users, Briefcase, ShoppingBag, LayoutDashboard, BarChart3, UserCog } from 'lucide-react';
 
 export default function WelcomePage() {
   const router = useRouter();
@@ -41,6 +41,30 @@ export default function WelcomePage() {
   }
 
   const portals = [
+    {
+      href: '/operations',
+      icon: LayoutDashboard,
+      title: 'Operations Dashboard',
+      description: 'AI-powered hotel operations center'
+    },
+    {
+      href: '/front-office',
+      icon: Users,
+      title: 'Front Office',
+      description: 'Arrivals, departures & guest services'
+    },
+    {
+      href: '/revenue-intelligence',
+      icon: BarChart3,
+      title: 'Revenue Intelligence',
+      description: 'BI analytics for revenue managers'
+    },
+    {
+      href: '/employee-management',
+      icon: UserCog,
+      title: 'Employee Management',
+      description: 'Staff scheduling, tasks & performance'
+    },
     {
       href: '/register',
       icon: Calendar,
