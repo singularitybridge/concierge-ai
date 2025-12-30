@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.roomboss.com)",
+      "WebSearch",
+      "WebFetch(domain:docs.roomboss.com)",
+      "WebFetch(domain:duve.com)"
+    ]
+  }
+}

@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoomBoss Acquisition - CEO Questions</title>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --accent: #4f46e5;
+            --gold: #d97706;
+            --success: #059669;
+            --danger: #dc2626;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            color: white;
+            padding: 50px 40px;
+            border-radius: 16px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+
+        .header-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+        }
+
+        .header-meta {
+            display: flex;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Context Box */
+        .context-box {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .context-box h3 {
+            color: var(--accent);
+            font-size: 1rem;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .context-box p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .context-box ul {
+            margin-top: 12px;
+            padding-left: 20px;
+            color: #64748b;
+        }
+
+        .context-box li {
+            margin: 6px 0;
+        }
+
+        /* Question Section */
+        .question-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: #f8fafc;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .icon-api { background: #dbeafe; }
+        .icon-product { background: #dcfce7; }
+        .icon-business { background: #fef3c7; }
+        .icon-technical { background: #f3e8ff; }
+        .icon-strategic { background: #ffe4e6; }
+        .icon-integration { background: #e0f2fe; }
+
+        .section-title h2 {
+            font-size: 1.2rem;
+            color: #1e293b;
+            margin-bottom: 3px;
+        }
+
+        .section-title .count {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .questions-list {
+            padding: 10px 25px 25px;
+        }
+
+        .question-item {
+            padding: 18px 0;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            gap: 15px;
+        }
+
+        .question-item:last-child {
+            border-bottom: none;
+        }
+
+        .question-number {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .question-content {
+            flex: 1;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            color: #1e293b;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .question-context {
+            font-size: 0.85rem;
+            color: #64748b;
+            background: #f8fafc;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border-left: 3px solid #e2e8f0;
+        }
+
+        .question-context strong {
+            color: var(--accent);
+        }
+
+        .priority-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 10px;
+        }
+
+        .priority-critical {
+            background: #fef2f2;
+            color: var(--danger);
+        }
+
+        .priority-high {
+            background: #fffbeb;
+            color: var(--gold);
+        }
+
+        .priority-medium {
+            background: #f0fdf4;
+            color: var(--success);
+        }
+
+        /* Summary Section */
+        .summary-section {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .summary-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+        }
+
+        .deal-breakers {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .deal-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .deal-item .icon {
+            font-size: 1.2rem;
+        }
+
+        .deal-item .text {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Notes Section */
+        .notes-section {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .notes-section h3 {
+            color: var(--gold);
+            font-size: 1rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notes-section ul {
+            padding-left: 20px;
+            color: #92400e;
+            font-size: 0.9rem;
+        }
+
+        .notes-section li {
+            margin: 8px 0;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            .header {
+                background: #1e1b4b !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .question-section {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <span class="header-badge">Confidential - M&A Due Diligence</span>
+            <h1>RoomBoss Acquisition</h1>
+            <p class="subtitle">
+                Strategic questions for CEO meeting based on comprehensive API analysis,
+                competitive benchmarking, and product gap assessment.
+            </p>
+            <div class="header-meta">
+                <div class="meta-item">
+                    <span>&#128197;</span>
+                    <span>December 2024</span>
+                </div>
+                <div class="meta-item">
+                    <span>&#128203;</span>
+                    <span>30 Questions</span>
+                </div>
+                <div class="meta-item">
+                    <span>&#127919;</span>
+                    <span>6 Categories</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Context Box -->
+        <div class="context-box">
+            <h3>&#128269; Pre-Meeting Context</h3>
+            <p>Our technical analysis identified the following key findings that inform these questions:</p>
+            <ul>
+                <li><strong>23 API endpoints</strong> available across 3 APIs (GS Purchasing, Hotel, OTA Rates)</li>
+                <li><strong>18 critical gaps</strong> vs. competitors like Duve (mobile check-in, upselling, messaging, analytics)</li>
+                <li><strong>No webhook/event system</strong> - prevents proactive automation</li>
+                <li><strong>No reporting API</strong> - analytics requires custom data warehouse</li>
+                <li><strong>XML-based OTA API</strong> - older standard vs. modern REST/GraphQL</li>
+            </ul>
+        </div>
+
+        <!-- Section 1: API & Technical Capabilities -->
+        <div class="question-section">
+            <div class="section-header">
+                <div class="section-icon icon-api">&#128268;</div>
+                <div class="section-title">
+                    <h2>API & Technical Capabilities</h2>
+                    <span class="count">Questions 1-6</span>
+                </div>
+            </div>
+            <div class="questions-list">
+                <div class="question-item">
+                    <div class="question-number">1</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            What is your API roadmap for the next 12-24 months? Specifically, are there plans to add webhooks/event notifications for booking changes, check-ins, and payments?
+                            <span class="priority-tag priority-critical">Critical</span>
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Our AI agents need real-time event triggers for proactive guest communication. Currently we'd have to poll your APIs constantly, which is inefficient and introduces latency.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">2</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            We noticed no dedicated reporting/analytics API. Is there an enterprise data export capability, or plans to expose aggregated metrics (RevPAR, ADR, occupancy) via API?
+                            <span class="priority-tag priority-critical">Critical</span>
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Competitors like Mews provide real-time analytics APIs. We need this for our Revenue Intelligence agent (REN) to deliver value.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">3</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            The OTA Rates API uses XML/OpenTravel format. Are there plans to modernize to REST/JSON, or is there a parallel modern API available to enterprise customers?
+                            <span class="priority-tag priority-high">High</span>
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> XML parsing adds complexity and slows integration development. JSON APIs are 3-5x faster to implement.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">4</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            What's the current API rate limiting policy? Can we negotiate higher limits or dedicated infrastructure for enterprise deployments?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> AI agents may generate high API volume during peak check-in times. We need to ensure we won't be throttled.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">5</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            Is there a sandbox/staging environment with realistic test data for API development? What's the process for testing new integrations?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> We need a safe environment to test AI agent workflows without affecting production bookings.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">6</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            What's the typical API uptime SLA, and what redundancy/failover systems are in place? Have there been any significant outages in the past 24 months?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Our AI concierge will be guest-facing 24/7. API downtime directly impacts guest experience.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Product & Feature Gaps -->
+        <div class="question-section">
+            <div class="section-header">
+                <div class="section-icon icon-product">&#128640;</div>
+                <div class="section-title">
+                    <h2>Product & Feature Gaps</h2>
+                    <span class="count">Questions 7-12</span>
+                </div>
+            </div>
+            <div class="questions-list">
+                <div class="question-item">
+                    <div class="question-number">7</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            Duve and Canary offer mobile check-in with digital key integration. Is this on RoomBoss's roadmap, or is this intentionally left to partners?
+                            <span class="priority-tag priority-critical">Critical</span>
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> 39% of luxury guests expect mobile check-in. This is a table-stakes feature for our target market.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">8</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            We see no upselling/offer management functionality in the API. Is there an internal system for this, or how do your customers currently handle dynamic upselling?
+                            <span class="priority-tag priority-critical">Critical</span>
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Upselling drives $17K+/month per property for competitors. This is our biggest revenue opportunity gap.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">9</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            What guest messaging capabilities exist within RoomBoss? Is there any WhatsApp/SMS integration, or is communication handled externally?
+                            <span class="priority-tag priority-critical">Critical</span>
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Omnichannel messaging is core to modern guest experience. Duve's AI resolves tickets in under 1 minute via integrated messaging.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">10</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            The housekeeping API only allows status updates. Is there a task management system internally? Any plans to expose task creation, assignment, and tracking via API?
+                            <span class="priority-tag priority-high">High</span>
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Our Operations agent (KENJI) needs to automate housekeeping workflows and dispatch tasks to staff mobile apps.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">11</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            How do RoomBoss customers currently handle spa and F&B reservations? Is there internal functionality not exposed via API, or do they use third-party systems?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> We need unified booking for all guest services - accommodation, spa, dining, activities - from one AI interface.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">12</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            Is there a guest profile/preference system that persists across stays? Can we store and retrieve guest preferences (room temp, pillow type, dietary restrictions)?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Personalization requires remembering guest preferences. This is fundamental to luxury hospitality AI.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Integration Ecosystem -->
+        <div class="question-section">
+            <div class="section-header">
+                <div class="section-icon icon-integration">&#128279;</div>
+                <div class="section-title">
+                    <h2>Integration Ecosystem</h2>
+                    <span class="count">Questions 13-17</span>
+                </div>
+            </div>
+            <div class="questions-list">
+                <div class="question-item">
+                    <div class="question-number">13</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            How many active integrations does RoomBoss currently have? Is there a partner/marketplace program we could leverage or expand?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Duve has 150+ integrations, Mews has 600+. Integration breadth determines platform stickiness.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">14</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            Which digital key providers (ASSA ABLOY, Salto, etc.) have existing integrations with RoomBoss? What would be required to add mobile key support?
+                            <span class="priority-tag priority-high">High</span>
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Mobile keys are essential for contactless check-in. We need to understand the integration path.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">15</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            What payment gateway integrations exist? Can we process upsell payments, deposits, and refunds programmatically with full PCI compliance?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Seamless payment processing is critical for upselling and automated deposit collection.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">16</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            Which channel managers are integrated? How does RoomBoss handle rate parity and inventory sync across OTAs?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Our Revenue Intelligence agent needs visibility into channel performance and rate positioning.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">17</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            Is there any existing AI/chatbot integration, or has RoomBoss explored partnerships with conversational AI platforms?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> We want to understand if there's existing AI infrastructure we can build upon or if we're starting fresh.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Business & Market -->
+        <div class="question-section">
+            <div class="section-header">
+                <div class="section-icon icon-business">&#128176;</div>
+                <div class="section-title">
+                    <h2>Business & Market Position</h2>
+                    <span class="count">Questions 18-23</span>
+                </div>
+            </div>
+            <div class="questions-list">
+                <div class="question-item">
+                    <div class="question-number">18</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            What is RoomBoss's current market share in Japan, particularly in the ski resort / luxury boutique segment?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> We're focused on Niseko and Japanese luxury hospitality. Local market strength matters.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">19</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            Who do you consider your primary competitors in Asia-Pacific? How do you differentiate against Mews, Cloudbeds, or local players?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Understanding competitive positioning helps us assess market defensibility post-acquisition.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">20</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            What's the current customer count, and what's the breakdown by property type (hotels, vacation rentals, hostels) and size?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Customer concentration and segment mix affect valuation and growth strategy.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">21</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            What's the average revenue per customer, and what's the pricing model (per room, flat fee, transaction-based)?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> We need to understand unit economics and how pricing would work for our AI platform overlay.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">22</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            What's the customer churn rate, and what are the primary reasons customers leave?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Churn reasons often reveal product gaps. If customers leave for Duve/Canary features, that validates our thesis.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">23</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            Are there any existing white-label or reseller agreements? What flexibility exists for us to brand the platform for our managed properties?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> We want to offer a branded "The 1898 Niseko" experience, not expose RoomBoss branding to guests.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Technical Infrastructure -->
+        <div class="question-section">
+            <div class="section-header">
+                <div class="section-icon icon-technical">&#128421;</div>
+                <div class="section-title">
+                    <h2>Technical Infrastructure</h2>
+                    <span class="count">Questions 24-27</span>
+                </div>
+            </div>
+            <div class="questions-list">
+                <div class="question-item">
+                    <div class="question-number">24</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            What's the technology stack? Is the platform cloud-native, and where is data hosted (important for Japan data residency)?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Japan has data localization preferences. Cloud architecture affects scalability and our ability to extend the platform.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">25</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            What's the engineering team size and composition? Are there dedicated API/platform engineers, or is it primarily product-focused?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> We need to assess capacity to build the API enhancements we require post-acquisition.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">26</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            Is there technical debt that's blocking feature development? What would you prioritize if you had 2x engineering resources?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Honest assessment of technical debt helps us plan post-acquisition investments.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">27</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            What security certifications does RoomBoss hold (SOC 2, ISO 27001, PCI DSS)? How is guest PII protected?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Security compliance is non-negotiable for luxury hospitality. We need to ensure enterprise-grade standards.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: Strategic Vision -->
+        <div class="question-section">
+            <div class="section-header">
+                <div class="section-icon icon-strategic">&#127919;</div>
+                <div class="section-title">
+                    <h2>Strategic Vision</h2>
+                    <span class="count">Questions 28-30</span>
+                </div>
+            </div>
+            <div class="questions-list">
+                <div class="question-item">
+                    <div class="question-number">28</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            Duve just raised $60M to build AI-native guest experience. What's RoomBoss's AI strategy? Is this a priority, or is the focus elsewhere?
+                            <span class="priority-tag priority-critical">Critical</span>
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> This reveals whether our vision aligns. If AI isn't a priority for RoomBoss, we'd be building it ourselves post-acquisition.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">29</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            If we acquire RoomBoss with the goal of building the leading AI-powered hospitality platform for Asia-Pacific luxury properties, what would you see as the biggest obstacles?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> CEO perspective on challenges is invaluable. They know where the bodies are buried.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-item">
+                    <div class="question-number">30</div>
+                    <div class="question-content">
+                        <div class="question-text">
+                            What would success look like for you personally in this acquisition? Would you be interested in staying on to help realize the AI-native vision?
+                        </div>
+                        <div class="question-context">
+                            <strong>Why we ask:</strong> Founder/CEO retention can be critical for continuity. Understanding their motivation helps structure the deal.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deal Breakers Summary -->
+        <div class="summary-section">
+            <h3>&#128680; Potential Deal Breakers to Probe</h3>
+            <div class="deal-breakers">
+                <div class="deal-item">
+                    <span class="icon">&#10060;</span>
+                    <span class="text"><strong>No webhook roadmap</strong> - If events aren't planned, we can't build proactive AI</span>
+                </div>
+                <div class="deal-item">
+                    <span class="icon">&#10060;</span>
+                    <span class="text"><strong>Closed architecture</strong> - If we can't extend APIs, we're locked in</span>
+                </div>
+                <div class="deal-item">
+                    <span class="icon">&#10060;</span>
+                    <span class="text"><strong>No data export</strong> - If we can't access historical data, BI is impossible</span>
+                </div>
+                <div class="deal-item">
+                    <span class="icon">&#10060;</span>
+                    <span class="text"><strong>Technical debt crisis</strong> - If core platform needs rewrite, timeline explodes</span>
+                </div>
+                <div class="deal-item">
+                    <span class="icon">&#10060;</span>
+                    <span class="text"><strong>Key customer concentration</strong> - If top 3 customers = 50%+ revenue, risk is high</span>
+                </div>
+                <div class="deal-item">
+                    <span class="icon">&#10060;</span>
+                    <span class="text"><strong>Misaligned vision</strong> - If CEO doesn't believe in AI-native future, cultural clash awaits</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Negotiation Notes -->
+        <div class="notes-section">
+            <h3>&#128221; Negotiation Leverage Points</h3>
+            <ul>
+                <li><strong>API gaps are opportunities:</strong> Position our AI layer as the solution to their competitive disadvantage vs. Duve/Canary</li>
+                <li><strong>We bring distribution:</strong> Our hotel management contracts guarantee deployment to properties</li>
+                <li><strong>Engineering investment:</strong> We can accelerate their roadmap with dedicated AI/API engineering</li>
+                <li><strong>Market expansion:</strong> Our Niseko presence opens luxury ski resort vertical across Japan</li>
+                <li><strong>If they're defensive about gaps:</strong> Emphasize partnership to solve together, not criticism</li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p><strong>RoomBoss Acquisition - CEO Questions</strong></p>
+            <p>Prepared for M&A Due Diligence | December 2024</p>
+            <p style="margin-top: 15px;">
+                Based on: API Analysis Report | Competitive Gap Assessment | AI Agents Blueprint
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoomBoss - Confidential Briefing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #1a1a1a;
+            background: white;
+        }
+
+        .page {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 40px;
+        }
+
+        /* Cover */
+        .cover {
+            text-align: center;
+            padding: 40px 0 30px;
+            border-bottom: 2px solid #1a1a1a;
+            margin-bottom: 25px;
+        }
+
+        .cover-badge {
+            display: inline-block;
+            font-size: 9pt;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #666;
+            padding: 6px 15px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+
+        .cover h1 {
+            font-size: 32pt;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .cover .subtitle {
+            font-size: 14pt;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* TOC */
+        .toc {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .toc h2 {
+            font-size: 14pt;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px dotted #ccc;
+            font-size: 10pt;
+        }
+
+        .toc-list .chapter { font-weight: 600; }
+        .toc-list .page-num { color: #666; }
+
+        /* Chapters */
+        .chapter {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+
+        .chapter-header {
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #1a1a1a;
+        }
+
+        .chapter-number {
+            font-size: 9pt;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #2563eb;
+            margin-bottom: 4px;
+        }
+
+        .chapter-title {
+            font-size: 18pt;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section h3 {
+            font-size: 12pt;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            padding-left: 10px;
+            border-left: 3px solid #2563eb;
+        }
+
+        .section p {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        /* Key Box */
+        .key-box {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px 20px;
+            margin: 15px 0;
+        }
+
+        .key-box h4 {
+            font-size: 9pt;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+
+        .key-box ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .key-box li {
+            margin: 5px 0;
+            font-size: 10pt;
+        }
+
+        /* Problems List */
+        .problems-list {
+            list-style: none;
+        }
+
+        .problems-list li {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .problem-icon {
+            width: 22px;
+            height: 22px;
+            background: #fef2f2;
+            color: #b91c1c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10pt;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .problem-title {
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 3px;
+            font-size: 10pt;
+        }
+
+        .problem-desc {
+            font-size: 9pt;
+            color: #555;
+            margin-bottom: 4px;
+        }
+
+        .problem-impact {
+            font-size: 9pt;
+            color: #b91c1c;
+            font-style: italic;
+        }
+
+        /* Questions */
+        .questions-list {
+            counter-reset: question;
+        }
+
+        .question-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .question-text {
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 5px;
+            font-size: 10pt;
+        }
+
+        .question-text::before {
+            counter-increment: question;
+            content: counter(question) ". ";
+            color: #2563eb;
+            font-weight: 700;
+        }
+
+        .question-why {
+            font-size: 9pt;
+            color: #666;
+            padding-left: 20px;
+            font-style: italic;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            font-size: 7pt;
+            padding: 2px 6px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .priority-critical { background: #fef2f2; color: #b91c1c; }
+        .priority-high { background: #fffbeb; color: #b45309; }
+
+        /* Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9pt;
+            margin: 15px 0;
+        }
+
+        .comparison-table th {
+            background: #1a1a1a;
+            color: white;
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 8pt;
+            text-transform: uppercase;
+        }
+
+        .comparison-table td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            vertical-align: top;
+        }
+
+        .comparison-table tr:nth-child(even) { background: #f9f9f9; }
+
+        .feature-name { font-weight: 600; }
+        .check { color: #047857; font-weight: bold; }
+        .cross { color: #b91c1c; font-weight: bold; }
+        .partial { color: #b45309; font-weight: bold; }
+
+        /* Stats */
+        .summary-stats {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        .stat-value {
+            font-size: 24pt;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .stat-label {
+            font-size: 8pt;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* Competitor Cards */
+        .competitor-box {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px 15px;
+            margin: 10px 0;
+        }
+
+        .competitor-box h4 {
+            font-size: 11pt;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .competitor-box ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 9pt;
+        }
+
+        .competitor-box li { margin: 4px 0; }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid #ddd;
+            margin-top: 30px;
+            font-size: 9pt;
+            color: #666;
+        }
+
+        @media print {
+            .page { padding: 10px 30px; }
+            .chapter { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <!-- Cover -->
+        <div class="cover">
+            <div class="cover-badge">Confidential Briefing</div>
+            <h1>RoomBoss</h1>
+            <p class="subtitle">Summary</p>
+        </div>
+
+        <!-- TOC -->
+        <nav class="toc">
+            <h2>Contents</h2>
+            <ul class="toc-list">
+                <li><span class="chapter">1. System Overview</span><span class="page-num">What is RoomBoss</span></li>
+                <li><span class="chapter">2. Critical Gaps & Shortages</span><span class="page-num">Product Weaknesses</span></li>
+                <li><span class="chapter">3. Key Questions for CEO</span><span class="page-num">Key Questions</span></li>
+                <li><span class="chapter">4. Competitive Analysis</span><span class="page-num">vs. Leading PMS</span></li>
+            </ul>
+        </nav>
+
+        <!-- Chapter 1 -->
+        <div class="chapter">
+            <div class="chapter-header">
+                <div class="chapter-number">Chapter One</div>
+                <h2 class="chapter-title">System Overview</h2>
+            </div>
+
+            <div class="section">
+                <h3>What is RoomBoss?</h3>
+                <p>RoomBoss is a Property Management System (PMS) and guest services platform primarily serving hotels and vacation rentals in the Asia-Pacific region, with particular strength in Japan's ski resort market. The platform provides core property management functionality including reservations, inventory management, and guest services booking.</p>
+                <p>The system exposes three primary APIs: a <strong>Hotel API</strong> for accommodation management, a <strong>GS Purchasing API</strong> for activities and experiences (ski rentals, tours, transportation), and an <strong>OTA Rates API</strong> for rate and availability management using the OpenTravel XML standard.</p>
+            </div>
+
+            <div class="key-box">
+                <h4>Key Facts at a Glance</h4>
+                <ul>
+                    <li><strong>Market Focus:</strong> Japan, Asia-Pacific, ski resorts and vacation rentals</li>
+                    <li><strong>API Endpoints:</strong> 23 documented endpoints across 3 APIs</li>
+                    <li><strong>Core Strength:</strong> GS Purchasing for activities/experiences (ski, tours)</li>
+                    <li><strong>Technology:</strong> REST API (Hotel, GS) + XML/OTA (Rates)</li>
+                </ul>
+            </div>
+
+            <div class="summary-stats">
+                <div class="stat-item"><div class="stat-value">23</div><div class="stat-label">API Endpoints</div></div>
+                <div class="stat-item"><div class="stat-value">3</div><div class="stat-label">API Categories</div></div>
+                <div class="stat-item"><div class="stat-value">70+</div><div class="stat-label">Countries</div></div>
+                <div class="stat-item"><div class="stat-value">JP</div><div class="stat-label">Primary Market</div></div>
+            </div>
+        </div>
+
+        <!-- Chapter 2 -->
+        <div class="chapter">
+            <div class="chapter-header">
+                <div class="chapter-number">Chapter Two</div>
+                <h2 class="chapter-title">Critical Gaps & Shortages</h2>
+            </div>
+
+            <div class="section">
+                <p>Our technical analysis identified 18 significant capability gaps compared to modern guest experience platforms like Duve (recently raised $60M) and Canary (#1 in multiple Hotel Tech Report categories).</p>
+            </div>
+
+            <ul class="problems-list">
+                <li>
+                    <div class="problem-icon">!</div>
+                    <div class="problem-content">
+                        <div class="problem-title">No Webhook/Event System</div>
+                        <div class="problem-desc">No real-time notifications when bookings are created, modified, or when guests check in.</div>
+                        <div class="problem-impact">Impact: Cannot build proactive AI agents or real-time guest communication</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="problem-icon">!</div>
+                    <div class="problem-content">
+                        <div class="problem-title">No Analytics or Reporting API</div>
+                        <div class="problem-desc">No endpoints for RevPAR, ADR, occupancy trends, or historical data.</div>
+                        <div class="problem-impact">Impact: Revenue optimization requires significant custom development</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="problem-icon">!</div>
+                    <div class="problem-content">
+                        <div class="problem-title">No Mobile Check-in Capability</div>
+                        <div class="problem-desc">No guest-facing check-in flow, ID verification, or digital registration.</div>
+                        <div class="problem-impact">Impact: 39% of guests expect mobile check-in—table stakes for luxury</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="problem-icon">!</div>
+                    <div class="problem-content">
+                        <div class="problem-title">No Upselling Engine</div>
+                        <div class="problem-desc">No API for creating offers, targeting guests, or tracking conversions.</div>
+                        <div class="problem-impact">Impact: Missing est. ¥2.5M/month revenue opportunity per property</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="problem-icon">!</div>
+                    <div class="problem-content">
+                        <div class="problem-title">No Guest Messaging Infrastructure</div>
+                        <div class="problem-desc">No integrated WhatsApp, SMS, or email communication hub.</div>
+                        <div class="problem-impact">Impact: Cannot match Duve's 1-minute AI-powered ticket resolution</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="problem-icon">!</div>
+                    <div class="problem-content">
+                        <div class="problem-title">No Mobile Key Integration</div>
+                        <div class="problem-desc">No native integration with digital lock providers (Apple/Google Wallet).</div>
+                        <div class="problem-impact">Impact: Contactless experience incomplete—critical for luxury positioning</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="problem-icon">!</div>
+                    <div class="problem-content">
+                        <div class="problem-title">No Task Management API</div>
+                        <div class="problem-desc">Housekeeping API only updates status—cannot create/assign tasks.</div>
+                        <div class="problem-impact">Impact: Operations automation limited; staff mobile apps not possible</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="problem-icon">!</div>
+                    <div class="problem-content">
+                        <div class="problem-title">Legacy XML Rate API</div>
+                        <div class="problem-desc">OTA Rates API uses OpenTravel XML format (2003 standard).</div>
+                        <div class="problem-impact">Impact: 3-5x slower integration development vs modern APIs</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Chapter 3 -->
+        <div class="chapter">
+            <div class="chapter-header">
+                <div class="chapter-number">Chapter Three</div>
+                <h2 class="chapter-title">Key Questions for CEO</h2>
+            </div>
+
+            <div class="section">
+                <h3>API & Technical Architecture</h3>
+                <div class="questions-list">
+                    <div class="question-item">
+                        <div class="question-text">What is your roadmap for webhooks/event notifications?<span class="priority-badge priority-critical">Critical</span></div>
+                        <div class="question-why">Our AI agents require event-driven architecture for proactive guest communication.</div>
+                    </div>
+                    <div class="question-item">
+                        <div class="question-text">Is there a reporting/analytics API available to enterprise customers?<span class="priority-badge priority-critical">Critical</span></div>
+                        <div class="question-why">Revenue intelligence requires aggregated data access without building a full data warehouse.</div>
+                    </div>
+                    <div class="question-item">
+                        <div class="question-text">What's the plan to modernize the XML-based OTA Rates API to REST/JSON?<span class="priority-badge priority-high">High</span></div>
+                        <div class="question-why">Modern integrations expect JSON APIs; XML increases development costs significantly.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Product & Feature Gaps</h3>
+                <div class="questions-list">
+                    <div class="question-item">
+                        <div class="question-text">Is mobile check-in with digital key integration on the roadmap?<span class="priority-badge priority-critical">Critical</span></div>
+                        <div class="question-why">Competitors offer this as standard; 39% of luxury guests expect mobile check-in.</div>
+                    </div>
+                    <div class="question-item">
+                        <div class="question-text">How do your customers currently handle dynamic upselling?<span class="priority-badge priority-critical">Critical</span></div>
+                        <div class="question-why">Upselling drives $17K+/month per property for competitors.</div>
+                    </div>
+                    <div class="question-item">
+                        <div class="question-text">What guest messaging capabilities exist? Any WhatsApp/SMS integration plans?<span class="priority-badge priority-critical">Critical</span></div>
+                        <div class="question-why">Omnichannel messaging is core to Duve's value proposition.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Business & Strategic</h3>
+                <div class="questions-list">
+                    <div class="question-item">
+                        <div class="question-text">Duve raised $60M for AI-native guest experience. What is RoomBoss's AI strategy?<span class="priority-badge priority-critical">Critical</span></div>
+                        <div class="question-why">Reveals whether our vision aligns or if we'd be building AI layer ourselves.</div>
+                    </div>
+                    <div class="question-item">
+                        <div class="question-text">What's the customer churn rate, and primary reasons customers leave?</div>
+                        <div class="question-why">If customers leave for Duve/Canary features, it validates our gap analysis.</div>
+                    </div>
+                    <div class="question-item">
+                        <div class="question-text">What's the engineering team size? Is there technical debt blocking development?</div>
+                        <div class="question-why">Assesses capacity to build required API enhancements post-deal.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chapter 4 -->
+        <div class="chapter">
+            <div class="chapter-header">
+                <div class="chapter-number">Chapter Four</div>
+                <h2 class="chapter-title">Competitive Analysis</h2>
+            </div>
+
+            <div class="section">
+                <p>Comparison against leading cloud-based PMS platforms: Mews (#1 PMS 2024-2025), Cloudbeds (#1 Hotel Management 2024), and Oracle OPERA Cloud (enterprise standard).</p>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Capability</th>
+                        <th>RoomBoss</th>
+                        <th>Mews</th>
+                        <th>Cloudbeds</th>
+                        <th>OPERA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="feature-name">Cloud-Native</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+                    <tr><td class="feature-name">REST/JSON API</td><td><span class="partial">●</span> Partial</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+                    <tr><td class="feature-name">Webhooks/Events</td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+                    <tr><td class="feature-name">Analytics API</td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+                    <tr><td class="feature-name">Mobile Check-in</td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+                    <tr><td class="feature-name">Mobile/Digital Key</td><td><span class="cross">✗</span></td><td><span class="check">✓</span> Wallet</td><td><span class="partial">●</span></td><td><span class="partial">●</span></td></tr>
+                    <tr><td class="feature-name">Guest Messaging</td><td><span class="cross">✗</span></td><td><span class="partial">●</span></td><td><span class="check">✓</span></td><td><span class="partial">●</span></td></tr>
+                    <tr><td class="feature-name">Upselling Engine</td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="partial">●</span></td></tr>
+                    <tr><td class="feature-name">AI/ML Capabilities</td><td><span class="cross">✗</span></td><td><span class="check">✓</span> Atomize</td><td><span class="check">✓</span> Signals</td><td><span class="partial">●</span></td></tr>
+                    <tr><td class="feature-name">Integrations</td><td><span class="partial">●</span> Limited</td><td><span class="check">✓</span> 600+</td><td><span class="check">✓</span> 400+</td><td><span class="check">✓</span> 2000+</td></tr>
+                    <tr><td class="feature-name">Activities/Ski</td><td><span class="check">✓</span> <strong>Strong</strong></td><td><span class="partial">●</span></td><td><span class="partial">●</span></td><td><span class="partial">●</span></td></tr>
+                    <tr><td class="feature-name">Japan Market</td><td><span class="check">✓</span> <strong>Primary</strong></td><td><span class="partial">●</span></td><td><span class="partial">●</span></td><td><span class="partial">●</span></td></tr>
+                </tbody>
+            </table>
+
+            <div class="competitor-box">
+                <h4>Mews — #1 PMS 2024 & 2025</h4>
+                <ul>
+                    <li>5,000+ customers, 85 countries, includes Choice Hotels</li>
+                    <li>First PMS with native Apple/Google Wallet room keys</li>
+                    <li>Atomize AI-powered revenue management</li>
+                </ul>
+            </div>
+
+            <div class="competitor-box">
+                <h4>Cloudbeds — #1 Hotel Management 2024</h4>
+                <ul>
+                    <li>150 countries, "Signals" AI trained on billions of data points</li>
+                    <li>88% less staff training time, 80% reduction in manual tasks</li>
+                    <li>400+ marketplace partners, fully open API</li>
+                </ul>
+            </div>
+
+            <div class="competitor-box">
+                <h4>Oracle OPERA Cloud — Enterprise Standard</h4>
+                <ul>
+                    <li>Powers Accor (110 countries), enterprise hotel chains</li>
+                    <li>2,000+ pre-built integration "recipes"</li>
+                    <li>Multi-property with shared reservations, sales, loyalty</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <strong>Confidential Briefing</strong> — RoomBoss Strategic Assessment<br>
+            Sources: RoomBoss API Documentation | Duve.com | Hotel Tech Report | Mews.com | Cloudbeds.com | Oracle Hospitality<br>
+            December 2025
+        </footer>
+    </div>
+</body>
+</html>
