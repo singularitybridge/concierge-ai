@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
@@ -79,8 +80,15 @@ import {
   StopCircle,
   Map,
   Locate,
+  Home,
+  Mic,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import VoiceSessionChat from '../components/VoiceSessionChat';
+import Tooltip, { HotelTerms } from '../components/Tooltip';
+import EmployeeAIInsights from '../components/EmployeeAIInsights';
+import HousekeepingAIInsights from '../components/HousekeepingAIInsights';
+import DriversAIInsights from '../components/DriversAIInsights';
 import {
   useEmployeeManagementStore,
   Department,
@@ -104,10 +112,10 @@ import {
   VehicleStatus,
 } from '../store/employeeManagementStore';
 
-export default function EmployeeManagementDashboard() {
+function EmployeeManagementContent() {
   const { isAuthenticated, logout } = useAuth();
+  const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
-  const [aiPanelOpen, setAiPanelOpen] = useState(false);
   const [aiQuestion, setAiQuestion] = useState('');
   const [aiMessages, setAiMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -176,7 +184,7 @@ export default function EmployeeManagementDashboard() {
   // Department Management Modal states
   const [deptModalOpen, setDeptModalOpen] = useState(false);
   const [deptModalDept, setDeptModalDept] = useState<Department | null>(null);
-  const [deptModalView, setDeptModalView] = useState<'overview' | 'employees' | 'shifts' | 'tasks' | 'kpis'>('overview');
+  const [deptModalView, setDeptModalView] = useState<'overview' | 'employees' | 'shifts' | 'tasks' | 'kpis' | 'operations'>('overview');
   const [deptAiQuestion, setDeptAiQuestion] = useState('');
   const [deptAiMessages, setDeptAiMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
   const [deptSelectedEmployee, setDeptSelectedEmployee] = useState<Employee | null>(null);
@@ -208,9 +216,10 @@ export default function EmployeeManagementDashboard() {
 
   const menuItems = [
     { label: 'Operations', href: '/operations' },
+    { label: 'Front Office', href: '/front-office' },
     { label: 'Revenue BI', href: '/revenue-intelligence' },
-    { label: 'Staff Portal', href: '/admin/staff' },
     { label: 'Employees', href: '/employee-management', active: true },
+    { label: 'Marketplace', href: '/marketplace' },
   ];
 
   useEffect(() => {
@@ -700,6 +709,17 @@ export default function EmployeeManagementDashboard() {
     setDeptEditedEmployee({});
     setDeptEditingShift(null);
   };
+
+  // Auto-open department modal from URL query parameter
+  useEffect(() => {
+    const deptParam = searchParams.get('dept');
+    if (deptParam && mounted) {
+      const validDepts: Department[] = ['housekeeping', 'front_desk', 'maintenance', 'food_beverage', 'security', 'drivers', 'concierge', 'spa'];
+      if (validDepts.includes(deptParam as Department)) {
+        openDeptModal(deptParam as Department);
+      }
+    }
+  }, [searchParams, mounted]);
 
   // Department AI Response generator
   const getDeptAiResponse = (question: string, dept: Department): string => {
@@ -1191,19 +1211,27 @@ Ask me about:
       <div className={`relative z-10 h-screen flex flex-col transition-opacity duration-700 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
 
         {/* Top Navigation */}
-        <nav className="flex items-center justify-between px-6 py-3 flex-shrink-0 border-b border-white/10">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-400 to-purple-600 flex items-center justify-center shadow-lg">
-              <Users className="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <h1 className="text-lg font-medium text-white tracking-wide leading-tight">
-                Employee Management
-              </h1>
-              <p className="text-[9px] uppercase tracking-[0.2em] text-white/50">Workforce Dashboard</p>
-            </div>
-          </Link>
+        <nav className="flex items-center justify-between px-6 py-3 flex-shrink-0 border-b border-white/10 bg-black/20 backdrop-blur-xl pr-[400px]">
+          {/* Left - Breadcrumbs */}
+          <div className="flex items-center gap-4">
+            {/* Home Button */}
+            <Link
+              href="/"
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-all group"
+              title="Back to Main Menu"
+            >
+              <Home className="w-5 h-5 text-white/70 group-hover:text-blue-400 transition-colors" />
+            </Link>
 
+            {/* Breadcrumbs */}
+            <div className="flex items-center gap-2 text-sm">
+              <Link href="/" className="text-white/50 hover:text-white transition-colors">Home</Link>
+              <ChevronRight className="w-4 h-4 text-white/30" />
+              <span className="text-blue-400 font-medium">Employee Management</span>
+            </div>
+          </div>
+
+          {/* Center - Menu Items */}
           <div className="flex items-center gap-1 bg-white/5 backdrop-blur-md rounded-full px-2 py-1 border border-white/10">
             {menuItems.map((item) => (
               <Link
@@ -1211,7 +1239,7 @@ Ask me about:
                 href={item.href}
                 className={`px-4 py-1.5 rounded-full text-sm transition-all ${
                   item.active
-                    ? 'bg-indigo-500/20 text-indigo-300 font-medium'
+                    ? 'bg-blue-500/20 text-blue-300 font-medium'
                     : 'text-white/70 hover:text-white hover:bg-white/10'
                 }`}
               >
@@ -1220,14 +1248,8 @@ Ask me about:
             ))}
           </div>
 
+          {/* Right Side */}
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setAiPanelOpen(!aiPanelOpen)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-xs font-medium rounded-lg border border-purple-500/30 transition-colors"
-            >
-              <Bot className="w-3.5 h-3.5" />
-              HR Assistant
-            </button>
             <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
               <RefreshCw className="w-4 h-4 text-white/60" />
             </button>
@@ -1238,8 +1260,8 @@ Ask me about:
         </nav>
 
         {/* Main Dashboard */}
-        <div className="flex-1 overflow-y-auto p-4">
-          <div className="max-w-[1800px] mx-auto space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 pr-[400px]">
+          <div className="space-y-4">
 
             {/* AI Alerts Banner */}
             {aiInsights.filter(i => !i.acknowledged && i.priority === 'high').length > 0 && (
@@ -1264,6 +1286,20 @@ Ask me about:
                 ))}
               </div>
             )}
+
+            {/* AI Staff Insights */}
+            <EmployeeAIInsights
+              departmentMetrics={departmentMetrics}
+              timeOffRequests={timeOffRequests}
+              totalEmployees={employees.length}
+              totalOnDuty={totalOnDuty}
+              totalOnBreak={totalOnBreak}
+              totalOnLeave={totalOnLeave}
+              totalTasks={tasks.length}
+              completedTasks={tasks.filter(t => t.status === 'completed').length}
+              pendingTasks={tasks.filter(t => t.status === 'pending').length}
+              urgentTasks={tasks.filter(t => t.priority === 'urgent' && t.status !== 'completed').length}
+            />
 
             {/* Top Row - Staff Overview Cards */}
             <div className="grid grid-cols-5 gap-3">
@@ -1318,10 +1354,10 @@ Ask me about:
               </div>
             </div>
 
-            {/* Second Row - Department Overview & Housekeeping KPIs */}
+            {/* Second Row - Department Overview */}
             <div className="grid grid-cols-12 gap-4">
               {/* Department Overview */}
-              <div className="col-span-7 bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 p-4">
+              <div className="col-span-12 bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 p-4">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-medium text-white">Department Overview</h3>
                   <div className="flex items-center gap-2 relative z-10">
@@ -1385,162 +1421,6 @@ Ask me about:
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Housekeeping Operations - Comprehensive Panel */}
-              <div className="col-span-5 bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <BedDouble className="w-4 h-4 text-blue-400" />
-                    <h3 className="text-sm font-medium text-white">Housekeeping Operations</h3>
-                  </div>
-                  <div className="flex items-center gap-1 bg-white/5 rounded-lg p-0.5">
-                    <button
-                      onClick={() => setHousekeepingView('rooms')}
-                      className={`px-2 py-1 text-[10px] rounded transition-colors ${housekeepingView === 'rooms' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white'}`}
-                    >
-                      Rooms
-                    </button>
-                    <button
-                      onClick={() => setHousekeepingView('attendants')}
-                      className={`px-2 py-1 text-[10px] rounded transition-colors ${housekeepingView === 'attendants' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white'}`}
-                    >
-                      Attendants
-                    </button>
-                    <button
-                      onClick={() => setHousekeepingView('kpis')}
-                      className={`px-2 py-1 text-[10px] rounded transition-colors ${housekeepingView === 'kpis' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white'}`}
-                    >
-                      KPIs
-                    </button>
-                  </div>
-                </div>
-
-                {/* Room Status Summary */}
-                <div className="flex items-center gap-2 mb-3 flex-wrap">
-                  {Object.entries(roomStatusConfig).map(([status, config]) => (
-                    <button
-                      key={status}
-                      onClick={() => setRoomStatusFilter(roomStatusFilter === status ? 'all' : status as RoomCleaningStatus)}
-                      className={`flex items-center gap-1 px-2 py-1 rounded text-[9px] transition-colors ${
-                        roomStatusFilter === status ? config.bgColor + ' ring-1 ring-white/30' : 'bg-white/5 hover:bg-white/10'
-                      }`}
-                    >
-                      <span>{config.icon}</span>
-                      <span className={config.color}>{roomStats[status === 'in_progress' ? 'inProgress' : status === 'out_of_order' ? 'outOfOrder' : status === 'do_not_disturb' ? 'dnd' : status as keyof typeof roomStats]}</span>
-                    </button>
-                  ))}
-                </div>
-
-                {/* Rooms View */}
-                {housekeepingView === 'rooms' && (
-                  <div>
-                    {/* Floor Filter */}
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[10px] text-white/40">Floor:</span>
-                      <select
-                        value={selectedFloor}
-                        onChange={(e) => setSelectedFloor(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
-                        className="bg-slate-800 border border-white/20 rounded px-2 py-1 text-[10px] text-white"
-                      >
-                        <option value="all">All Floors</option>
-                        <option value="2">Floor 2</option>
-                        <option value="3">Floor 3</option>
-                        <option value="4">Floor 4</option>
-                        <option value="5">Floor 5</option>
-                      </select>
-                    </div>
-
-                    {/* Room Grid */}
-                    <div className="grid grid-cols-6 gap-1.5 max-h-[180px] overflow-y-auto">
-                      {filteredRooms.slice(0, 24).map(room => (
-                        <div
-                          key={room.id}
-                          onClick={() => setSelectedRoom(room)}
-                          className={`p-1.5 rounded border cursor-pointer transition-all hover:scale-105 ${roomStatusConfig[room.cleaningStatus].bgColor} border-white/10`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-medium text-white">{room.roomNumber}</span>
-                            {room.priority !== 'normal' && (
-                              <span className={`text-[8px] px-1 rounded ${roomPriorityConfig[room.priority].color}`}>
-                                {room.priority === 'vip' ? '★' : room.priority === 'early_checkin' ? '⏰' : ''}
-                              </span>
-                            )}
-                          </div>
-                          <p className={`text-[8px] ${roomStatusConfig[room.cleaningStatus].color}`}>
-                            {roomStatusConfig[room.cleaningStatus].label}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Attendants View */}
-                {housekeepingView === 'attendants' && (
-                  <div className="space-y-2 max-h-[220px] overflow-y-auto">
-                    {housekeepingAttendants.map(attendant => (
-                      <div key={attendant.employeeId} className="flex items-center gap-2 p-2 bg-white/5 rounded-lg border border-white/10">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-[10px] font-medium text-white">
-                          {attendant.name.split(' ').map(n => n[0]).join('')}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[11px] text-white truncate">{attendant.name}</p>
-                          <p className="text-[9px] text-white/40">{attendant.zone} • Floor {attendant.floor}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[10px] text-white">{attendant.roomsCleaned}/{attendant.roomsAssigned}</p>
-                          <p className="text-[8px] text-white/40">{attendant.avgCleaningTime}min avg</p>
-                        </div>
-                        <div className={`w-2 h-2 rounded-full ${
-                          attendant.status === 'cleaning' ? 'bg-amber-500' :
-                          attendant.status === 'available' ? 'bg-emerald-500' :
-                          attendant.status === 'break' ? 'bg-purple-500' : 'bg-blue-500'
-                        }`} />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* KPIs View */}
-                {housekeepingView === 'kpis' && (
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-white/5 rounded-lg p-2 border border-white/10">
-                      <p className="text-[9px] text-white/40">Rooms Progress</p>
-                      <p className="text-lg font-bold text-white">{housekeepingMetrics.roomsCleanedToday}/{housekeepingMetrics.totalRooms}</p>
-                      <div className="mt-1 h-1 bg-white/10 rounded-full">
-                        <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(housekeepingMetrics.roomsCleanedToday / housekeepingMetrics.totalRooms) * 100}%` }} />
-                      </div>
-                    </div>
-                    <div className="bg-white/5 rounded-lg p-2 border border-white/10">
-                      <p className="text-[9px] text-white/40">Avg Clean Time</p>
-                      <p className={`text-lg font-bold ${housekeepingMetrics.avgCleaningTime <= housekeepingMetrics.targetCleaningTime ? 'text-emerald-400' : 'text-amber-400'}`}>
-                        {housekeepingMetrics.avgCleaningTime}min
-                      </p>
-                      <p className="text-[8px] text-white/40">Target: {housekeepingMetrics.targetCleaningTime}min</p>
-                    </div>
-                    <div className="bg-white/5 rounded-lg p-2 border border-white/10">
-                      <p className="text-[9px] text-white/40">Inspection Pass</p>
-                      <p className="text-lg font-bold text-emerald-400">{housekeepingMetrics.inspectionPassRate}%</p>
-                      <p className="text-[8px] text-white/40">{housekeepingMetrics.reCleaningRequests} re-cleans</p>
-                    </div>
-                    <div className="bg-white/5 rounded-lg p-2 border border-white/10">
-                      <p className="text-[9px] text-white/40">Rooms/Attendant</p>
-                      <p className="text-lg font-bold text-white">{housekeepingMetrics.roomsPerAttendant}</p>
-                      <p className="text-[8px] text-white/40">{housekeepingMetrics.attendantsOnDuty} on duty</p>
-                    </div>
-                    <div className="bg-white/5 rounded-lg p-2 border border-white/10">
-                      <p className="text-[9px] text-white/40">Turnaround</p>
-                      <p className="text-lg font-bold text-white">{housekeepingMetrics.turnaroundTime}min</p>
-                      <p className="text-[8px] text-white/40">+{housekeepingMetrics.movingAroundTime}min moving</p>
-                    </div>
-                    <div className="bg-white/5 rounded-lg p-2 border border-white/10">
-                      <p className="text-[9px] text-white/40">Quality Score</p>
-                      <p className="text-lg font-bold text-emerald-400">{housekeepingMetrics.qualityScore}%</p>
-                      <p className="text-[8px] text-white/40">{housekeepingMetrics.guestComplaints} complaints</p>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -1924,163 +1804,32 @@ Ask me about:
           </div>
         </div>
 
-        {/* AI Assistant Panel */}
-        {aiPanelOpen && (
-          <div className="fixed inset-y-0 right-0 w-96 bg-slate-900/98 backdrop-blur-xl border-l border-white/20 shadow-2xl z-50 flex flex-col">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                  <Bot className="w-4 h-4 text-purple-400" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-white">HR Assistant</h3>
-                  <p className="text-[10px] text-white/40">Ask about staffing, performance & scheduling</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setAiPanelOpen(false)}
-                className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-              >
-                <X className="w-4 h-4 text-white/60" />
-              </button>
-            </div>
-
-            <div className="px-4 py-3 border-b border-white/10">
-              <p className="text-[10px] text-white/40 mb-2">Frequently Asked:</p>
-              <div className="space-y-2">
-                <div className="flex flex-wrap gap-1.5">
-                  <span className="text-[9px] text-indigo-400 w-full mb-0.5">Staffing</span>
-                  {[
-                    { label: 'Coverage status', q: 'What is our current staffing coverage?' },
-                    { label: 'Who is on duty?', q: 'Who is currently on duty?' },
-                    { label: 'Staff shortages', q: 'Are there any staffing shortages?' },
-                  ].map((faq, i) => (
-                    <button
-                      key={i}
-                      onClick={() => {
-                        setAiMessages(prev => [
-                          ...prev,
-                          { role: 'user', content: faq.q },
-                          { role: 'assistant', content: getAiResponse(faq.q) }
-                        ]);
-                      }}
-                      className="px-2 py-1 text-[10px] bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20 transition-colors"
-                    >
-                      {faq.label}
-                    </button>
-                  ))}
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  <span className="text-[9px] text-emerald-400 w-full mb-0.5">Performance</span>
-                  {[
-                    { label: 'Top performers', q: 'Who are the top performers?' },
-                    { label: 'Housekeeping KPIs', q: 'What is housekeeping performance?' },
-                    { label: 'Training status', q: 'What is the training completion rate?' },
-                  ].map((faq, i) => (
-                    <button
-                      key={i}
-                      onClick={() => {
-                        setAiMessages(prev => [
-                          ...prev,
-                          { role: 'user', content: faq.q },
-                          { role: 'assistant', content: getAiResponse(faq.q) }
-                        ]);
-                      }}
-                      className="px-2 py-1 text-[10px] bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 rounded-full border border-emerald-500/20 transition-colors"
-                    >
-                      {faq.label}
-                    </button>
-                  ))}
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  <span className="text-[9px] text-amber-400 w-full mb-0.5">Operations</span>
-                  {[
-                    { label: 'Overtime report', q: 'Show overtime analysis' },
-                    { label: 'Pending tasks', q: 'What tasks are pending?' },
-                    { label: 'Schedule gaps', q: 'Are there any schedule gaps?' },
-                  ].map((faq, i) => (
-                    <button
-                      key={i}
-                      onClick={() => {
-                        setAiMessages(prev => [
-                          ...prev,
-                          { role: 'user', content: faq.q },
-                          { role: 'assistant', content: getAiResponse(faq.q) }
-                        ]);
-                      }}
-                      className="px-2 py-1 text-[10px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/20 transition-colors"
-                    >
-                      {faq.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {aiMessages.length === 0 && (
-                <div className="text-center py-8">
-                  <Bot className="w-12 h-12 text-white/20 mx-auto mb-3" />
-                  <p className="text-sm text-white/40">Ask me anything about</p>
-                  <p className="text-sm text-white/40">workforce management</p>
-                </div>
-              )}
-              {aiMessages.map((msg, i) => (
-                <div
-                  key={i}
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[85%] rounded-lg p-3 ${
-                      msg.role === 'user'
-                        ? 'bg-indigo-500/20 border border-indigo-500/30'
-                        : 'bg-white/5 border border-white/10'
-                    }`}
-                  >
-                    <p className="text-xs text-white/90 whitespace-pre-wrap">{msg.content}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="p-4 border-t border-white/10">
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={aiQuestion}
-                  onChange={(e) => setAiQuestion(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && aiQuestion.trim()) {
-                      setAiMessages(prev => [
-                        ...prev,
-                        { role: 'user', content: aiQuestion },
-                        { role: 'assistant', content: getAiResponse(aiQuestion) }
-                      ]);
-                      setAiQuestion('');
-                    }
-                  }}
-                  placeholder="Ask about staffing, performance..."
-                  className="flex-1 px-3 py-2 bg-white/5 border border-white/20 rounded-lg text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50"
-                />
-                <button
-                  onClick={() => {
-                    if (aiQuestion.trim()) {
-                      setAiMessages(prev => [
-                        ...prev,
-                        { role: 'user', content: aiQuestion },
-                        { role: 'assistant', content: getAiResponse(aiQuestion) }
-                      ]);
-                      setAiQuestion('');
-                    }
-                  }}
-                  className="p-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 rounded-lg transition-colors"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* AI Assistant Panel with Voice Support - Always Visible */}
+        <div className="fixed inset-y-0 right-0 w-96 bg-gradient-to-b from-blue-900/95 to-slate-900/98 backdrop-blur-xl border-l border-blue-500/20 shadow-2xl z-40 flex flex-col">
+          {/* Voice-enabled AI Chat */}
+          <VoiceSessionChat
+            agentId="employee-management-assistant"
+            title="HR Assistant"
+            subtitle="Voice-enabled workforce assistant"
+            avatar="/avatars/assistant-avatar.jpg"
+            variant="dark"
+            welcomeMessage="I'm your HR assistant. I can help you with staffing coverage, employee scheduling, performance tracking, task management, and workforce analytics. What would you like to know?"
+            suggestions={[
+              "Who is on duty now?",
+              "Show overtime report",
+              "What tasks are pending?",
+            ]}
+            contextData={{
+              totalEmployees: employees.length,
+              onDuty: totalOnDuty,
+              onBreak: totalOnBreak,
+              offDuty: totalOffDuty,
+              onLeave: totalOnLeave,
+              pendingTasks: tasks.filter(t => t.status === 'pending').length,
+              departmentMetrics: departmentMetrics,
+            }}
+          />
+        </div>
 
         {/* Employee Detail Modal */}
         {selectedEmployee && (
@@ -2962,6 +2711,28 @@ Ask me about:
                       </button>
                     ))}
                   </>
+                ) : deptModalDept === 'housekeeping' ? (
+                  // Housekeeping department tabs (includes operations)
+                  <>
+                    {(['overview', 'operations', 'employees', 'shifts', 'tasks', 'kpis'] as const).map(tab => (
+                      <button
+                        key={tab}
+                        onClick={() => setDeptModalView(tab)}
+                        className={`px-4 py-2 text-xs rounded-lg transition-colors ${
+                          deptModalView === tab
+                            ? 'bg-white/10 text-white'
+                            : 'text-white/50 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        {tab === 'overview' && 'Overview'}
+                        {tab === 'operations' && '🛏️ Room Operations'}
+                        {tab === 'employees' && 'Employees'}
+                        {tab === 'shifts' && 'Shift Schedule'}
+                        {tab === 'tasks' && 'Tasks & Assignments'}
+                        {tab === 'kpis' && 'KPIs & Metrics'}
+                      </button>
+                    ))}
+                  </>
                 ) : (
                   // Standard department tabs
                   <>
@@ -2994,6 +2765,13 @@ Ask me about:
                     {/* Dispatch Board */}
                     {driverView === 'dispatch' && (
                       <div className="space-y-4">
+                        {/* AI Fleet Insights */}
+                        <DriversAIInsights
+                          metrics={driverMetrics}
+                          trips={driverTrips}
+                          vehicles={vehicles}
+                        />
+
                         {/* Quick Stats */}
                         <div className="grid grid-cols-6 gap-3">
                           <div className="bg-emerald-500/10 rounded-xl p-3 border border-emerald-500/20">
@@ -4277,7 +4055,16 @@ Ask me about:
                   <>
                 {/* Overview Tab */}
                 {deptModalView === 'overview' && (
-                  <div className="grid grid-cols-12 gap-4">
+                  <div className="space-y-4">
+                    {/* AI Housekeeping Insights - Only for Housekeeping */}
+                    {deptModalDept === 'housekeeping' && (
+                      <HousekeepingAIInsights
+                        metrics={housekeepingMetrics}
+                        rooms={housekeepingRooms}
+                      />
+                    )}
+
+                    <div className="grid grid-cols-12 gap-4">
                     {/* Department Stats */}
                     <div className="col-span-8 space-y-4">
                       {/* Key Metrics Grid */}
@@ -4449,6 +4236,7 @@ Ask me about:
                         </button>
                       </div>
                     </div>
+                  </div>
                   </div>
                 )}
 
@@ -4999,6 +4787,251 @@ Ask me about:
                     </div>
                   </div>
                 )}
+
+                {/* Operations Tab - Housekeeping Only */}
+                {deptModalView === 'operations' && deptModalDept === 'housekeeping' && (
+                  <div className="space-y-4">
+                    {/* AI Housekeeping Insights */}
+                    <HousekeepingAIInsights
+                      metrics={housekeepingMetrics}
+                      rooms={housekeepingRooms}
+                    />
+
+                    {/* View Toggle */}
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-medium text-white flex items-center gap-2">
+                        <BedDouble className="w-4 h-4 text-blue-400" />
+                        Room Operations
+                      </h4>
+                      <div className="flex items-center gap-1 bg-white/5 rounded-lg p-0.5">
+                        <button
+                          onClick={() => setHousekeepingView('rooms')}
+                          className={`px-3 py-1.5 text-xs rounded transition-colors ${housekeepingView === 'rooms' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white'}`}
+                        >
+                          🏠 Rooms
+                        </button>
+                        <button
+                          onClick={() => setHousekeepingView('attendants')}
+                          className={`px-3 py-1.5 text-xs rounded transition-colors ${housekeepingView === 'attendants' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white'}`}
+                        >
+                          👤 Attendants
+                        </button>
+                        <button
+                          onClick={() => setHousekeepingView('kpis')}
+                          className={`px-3 py-1.5 text-xs rounded transition-colors ${housekeepingView === 'kpis' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white'}`}
+                        >
+                          📊 KPIs
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Room Status Summary */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {Object.entries(roomStatusConfig).map(([status, config]) => (
+                        <button
+                          key={status}
+                          onClick={() => setRoomStatusFilter(roomStatusFilter === status ? 'all' : status as RoomCleaningStatus)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors ${
+                            roomStatusFilter === status ? config.bgColor + ' ring-1 ring-white/30' : 'bg-white/5 hover:bg-white/10'
+                          }`}
+                        >
+                          <span>{config.icon}</span>
+                          <span className={config.color}>
+                            {roomStats[status === 'in_progress' ? 'inProgress' : status === 'out_of_order' ? 'outOfOrder' : status === 'do_not_disturb' ? 'dnd' : status as keyof typeof roomStats]}
+                          </span>
+                          <span className="text-white/40">{config.label}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Rooms View */}
+                    {housekeepingView === 'rooms' && (
+                      <div className="space-y-3">
+                        {/* Floor Filter */}
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs text-white/40">Filter by Floor:</span>
+                          <div className="flex gap-1">
+                            <button
+                              onClick={() => setSelectedFloor('all')}
+                              className={`px-3 py-1 text-xs rounded transition-colors ${selectedFloor === 'all' ? 'bg-blue-500/20 text-blue-400' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
+                            >
+                              All
+                            </button>
+                            {[2, 3, 4, 5].map(floor => (
+                              <button
+                                key={floor}
+                                onClick={() => setSelectedFloor(floor)}
+                                className={`px-3 py-1 text-xs rounded transition-colors ${selectedFloor === floor ? 'bg-blue-500/20 text-blue-400' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
+                              >
+                                F{floor}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Room Grid */}
+                        <div className="grid grid-cols-8 gap-2">
+                          {filteredRooms.map(room => (
+                            <div
+                              key={room.id}
+                              onClick={() => setSelectedRoom(room)}
+                              className={`p-2 rounded-lg border cursor-pointer transition-all hover:scale-105 ${roomStatusConfig[room.cleaningStatus].bgColor} border-white/10`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-medium text-white">{room.roomNumber}</span>
+                                {room.priority !== 'normal' && (
+                                  <span className={`text-[9px] px-1 rounded ${roomPriorityConfig[room.priority].color}`}>
+                                    {room.priority === 'vip' ? '★' : room.priority === 'early_checkin' ? '⏰' : ''}
+                                  </span>
+                                )}
+                              </div>
+                              <p className={`text-[10px] ${roomStatusConfig[room.cleaningStatus].color}`}>
+                                {roomStatusConfig[room.cleaningStatus].label}
+                              </p>
+                              {room.assignedTo && (
+                                <p className="text-[9px] text-white/40 truncate mt-0.5">{room.assignedTo}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Attendants View */}
+                    {housekeepingView === 'attendants' && (
+                      <div className="grid grid-cols-2 gap-3">
+                        {housekeepingAttendants.map(attendant => (
+                          <div key={attendant.employeeId} className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-xs font-medium text-white">
+                              {attendant.name.split(' ').map(n => n[0]).join('')}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm text-white truncate">{attendant.name}</p>
+                              <p className="text-[10px] text-white/40">{attendant.zone} • Floor {attendant.floor}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm text-white font-medium">{attendant.roomsCleaned}/{attendant.roomsAssigned}</p>
+                              <p className="text-[9px] text-white/40">{attendant.avgCleaningTime}min avg</p>
+                            </div>
+                            <div className={`w-3 h-3 rounded-full ${
+                              attendant.status === 'cleaning' ? 'bg-amber-500' :
+                              attendant.status === 'available' ? 'bg-emerald-500' :
+                              attendant.status === 'break' ? 'bg-purple-500' : 'bg-blue-500'
+                            }`} title={attendant.status} />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* KPIs View */}
+                    {housekeepingView === 'kpis' && (
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                          <p className="text-xs text-white/40">Rooms Progress</p>
+                          <p className="text-2xl font-bold text-white mt-1">{housekeepingMetrics.roomsCleanedToday}/{housekeepingMetrics.totalRooms}</p>
+                          <div className="mt-2 h-1.5 bg-white/10 rounded-full">
+                            <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(housekeepingMetrics.roomsCleanedToday / housekeepingMetrics.totalRooms) * 100}%` }} />
+                          </div>
+                          <p className="text-[10px] text-white/40 mt-1">{Math.round((housekeepingMetrics.roomsCleanedToday / housekeepingMetrics.totalRooms) * 100)}% complete</p>
+                        </div>
+                        <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                          <p className="text-xs text-white/40">Avg Clean Time</p>
+                          <p className={`text-2xl font-bold mt-1 ${housekeepingMetrics.avgCleaningTime <= housekeepingMetrics.targetCleaningTime ? 'text-emerald-400' : 'text-amber-400'}`}>
+                            {housekeepingMetrics.avgCleaningTime}min
+                          </p>
+                          <p className="text-[10px] text-white/40 mt-1">Target: {housekeepingMetrics.targetCleaningTime}min</p>
+                        </div>
+                        <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                          <p className="text-xs text-white/40">Inspection Pass Rate</p>
+                          <p className="text-2xl font-bold text-emerald-400 mt-1">{housekeepingMetrics.inspectionPassRate}%</p>
+                          <p className="text-[10px] text-white/40 mt-1">{housekeepingMetrics.reCleaningRequests} re-cleans needed</p>
+                        </div>
+                        <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                          <p className="text-xs text-white/40">Rooms per Attendant</p>
+                          <p className="text-2xl font-bold text-white mt-1">{housekeepingMetrics.roomsPerAttendant}</p>
+                          <p className="text-[10px] text-white/40 mt-1">{housekeepingMetrics.attendantsOnDuty} on duty</p>
+                        </div>
+                        <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                          <p className="text-xs text-white/40">Turnaround Time</p>
+                          <p className="text-2xl font-bold text-white mt-1">{housekeepingMetrics.turnaroundTime}min</p>
+                          <p className="text-[10px] text-white/40 mt-1">+{housekeepingMetrics.movingAroundTime}min transit</p>
+                        </div>
+                        <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                          <p className="text-xs text-white/40">Quality Score</p>
+                          <p className="text-2xl font-bold text-emerald-400 mt-1">{housekeepingMetrics.qualityScore}%</p>
+                          <p className="text-[10px] text-white/40 mt-1">{housekeepingMetrics.guestComplaints} complaints</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Selected Room Detail Panel */}
+                    {selectedRoom && (
+                      <div className="bg-white/5 rounded-xl border border-white/10 p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h5 className="text-sm font-medium text-white">Room {selectedRoom.roomNumber} Details</h5>
+                          <button
+                            onClick={() => setSelectedRoom(null)}
+                            className="p-1 hover:bg-white/10 rounded transition-colors"
+                          >
+                            <X className="w-4 h-4 text-white/60" />
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-4 gap-3">
+                          <div>
+                            <p className="text-[10px] text-white/40">Status</p>
+                            <p className={`text-sm font-medium ${roomStatusConfig[selectedRoom.cleaningStatus].color}`}>
+                              {roomStatusConfig[selectedRoom.cleaningStatus].label}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-white/40">Room Type</p>
+                            <p className="text-sm text-white">{selectedRoom.roomType}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-white/40">Floor</p>
+                            <p className="text-sm text-white">Floor {selectedRoom.floor}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-white/40">Priority</p>
+                            <p className={`text-sm ${roomPriorityConfig[selectedRoom.priority].color}`}>
+                              {roomPriorityConfig[selectedRoom.priority].label}
+                            </p>
+                          </div>
+                          {selectedRoom.assignedTo && (
+                            <div>
+                              <p className="text-[10px] text-white/40">Assigned To</p>
+                              <p className="text-sm text-white">{selectedRoom.assignedTo}</p>
+                            </div>
+                          )}
+                          {selectedRoom.estimatedCompletion && (
+                            <div>
+                              <p className="text-[10px] text-white/40">Est. Completion</p>
+                              <p className="text-sm text-white">{selectedRoom.estimatedCompletion}</p>
+                            </div>
+                          )}
+                          {selectedRoom.lastCleaned && (
+                            <div>
+                              <p className="text-[10px] text-white/40">Last Cleaned</p>
+                              <p className="text-sm text-white">{new Date(selectedRoom.lastCleaned).toLocaleString()}</p>
+                            </div>
+                          )}
+                          {selectedRoom.guestCheckout && (
+                            <div>
+                              <p className="text-[10px] text-white/40">Guest Checkout</p>
+                              <p className="text-sm text-white">{selectedRoom.guestCheckout}</p>
+                            </div>
+                          )}
+                        </div>
+                        {selectedRoom.notes && (
+                          <div className="mt-3 pt-3 border-t border-white/10">
+                            <p className="text-[10px] text-white/40">Notes</p>
+                            <p className="text-xs text-white/70 mt-1">{selectedRoom.notes}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
                   </>
                 )}
               </div>
@@ -5116,5 +5149,18 @@ Ask me about:
         )}
       </div>
     </div>
+  );
+}
+
+// Wrapper component with Suspense boundary for useSearchParams
+export default function EmployeeManagementDashboard() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-stone-900 flex items-center justify-center">
+        <div className="text-white/50 text-sm">Loading...</div>
+      </div>
+    }>
+      <EmployeeManagementContent />
+    </Suspense>
   );
 }
