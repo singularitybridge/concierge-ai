@@ -85,11 +85,27 @@ And return:
 
 ### 5. Run Development Server
 
+#### Option A: Using PM2 (Recommended)
+
+```bash
+pm2 start ecosystem.config.js
+```
+
+Useful PM2 commands:
+```bash
+pm2 logs ai-realtime-chat    # View logs
+pm2 restart ai-realtime-chat # Restart app
+pm2 stop ai-realtime-chat    # Stop app
+pm2 status                   # Check all processes
+```
+
+#### Option B: Using npm directly
+
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:4024](http://localhost:4024)
 
 ## Usage
 
