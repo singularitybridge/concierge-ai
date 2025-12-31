@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 const AGENT_HUB_API_URL = process.env.AGENT_HUB_API_URL || 'https://agent-hub-api.services.silverbullet.cloud';
 const AGENT_HUB_API_KEY = process.env.AGENT_HUB_API_KEY || '';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const agentId = '68e1af59dd4ab3bce91a07dc'; // integration-expert
 

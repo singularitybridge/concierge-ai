@@ -106,7 +106,7 @@ export default function GuestPage() {
       setMounted(true);
     } else {
       setIsAuthenticated(false);
-      router.push('/login');
+      router.push('/demo');
     }
   }, [router]);
 
@@ -154,7 +154,7 @@ export default function GuestPage() {
   const handleLogout = () => {
     localStorage.removeItem('niseko_authenticated');
     localStorage.removeItem('niseko_role');
-    router.push('/login');
+    router.push('/demo');
   };
 
   const handleQuickAction = (serviceType: string) => {
@@ -166,9 +166,9 @@ export default function GuestPage() {
 
   // Navigation menu items
   const menuItems = [
-    { label: 'Register', href: '/register' },
-    { label: 'Staff Portal', href: '/admin' },
-    { label: 'Shop', href: '/shop' },
+    { label: 'My Room', href: '/guest/room' },
+    { label: 'Services', href: '/guest/services' },
+    { label: 'Offers', href: '/guest/offers' },
   ];
 
   if (isAuthenticated === null) {
