@@ -214,6 +214,19 @@ The script sends text messages to VAPI, which triggers the webhook flow just lik
 - Adjust VAPI voice settings in dashboard
 - Consider upgrading VAPI plan
 
+## Deployment
+
+This project is configured for automatic deployment via Vercel:
+
+- **Platform**: Vercel
+- **Auto-deploy**: Pushes to `main` branch trigger automatic deployment
+- **GitHub**: [singularitybridge/concierge-ai](https://github.com/singularitybridge/concierge-ai)
+
+To deploy manually:
+```bash
+npm run build
+```
+
 ## Cost Estimate
 
 Based on 10,000 minutes/month:

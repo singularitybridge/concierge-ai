@@ -62,6 +62,12 @@ docs/
 - **Config**: `ecosystem.config.js`
 - **Logs**: `./logs/pm2-out.log`, `./logs/pm2-error.log`
 
+## Deployment
+
+- **Platform**: Vercel (auto-deploy on push to main)
+- **GitHub Repo**: `singularitybridge/concierge-ai`
+- **Production URL**: Automatically deployed from `main` branch
+
 ## Environment Variables
 
 Required in `.env.local`:
