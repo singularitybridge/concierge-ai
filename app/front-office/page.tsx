@@ -54,8 +54,13 @@ import {
   DoorOpen,
   Clock3,
   TrendingUp,
+  PanelRightClose,
+  PanelRightOpen,
+  Mic,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import VoiceSessionChat from '../components/VoiceSessionChat';
+import Tooltip, { HotelTerms } from '../components/Tooltip';
 import { useFrontOfficeStore, Reservation, GuestRequest, UpsellOffer, Guest, RoomInfo, RoomUpgradeOption, GuestBilling, PaymentMethod, ChargeCategory } from '../store/frontOfficeStore';
 
 export default function FrontOfficeDashboard() {
@@ -64,6 +69,7 @@ export default function FrontOfficeDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'arrivals' | 'departures' | 'inhouse'>('arrivals');
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+  const [aiPanelVisible, setAiPanelVisible] = useState(true); // AI assistant visible by default
 
   // Check-in modal state
   const [checkInModalOpen, setCheckInModalOpen] = useState(false);
@@ -114,6 +120,8 @@ export default function FrontOfficeDashboard() {
     { label: 'Operations', href: '/operations' },
     { label: 'Front Office', href: '/front-office', active: true },
     { label: 'Revenue BI', href: '/revenue-intelligence' },
+    { label: 'Employees', href: '/employee-management' },
+    { label: 'Marketplace', href: '/marketplace' },
   ];
 
   useEffect(() => {
@@ -386,19 +394,27 @@ export default function FrontOfficeDashboard() {
       <div className={`relative z-10 h-screen flex flex-col transition-opacity duration-700 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
 
         {/* Top Navigation */}
-        <nav className="flex items-center justify-between px-6 py-3 flex-shrink-0 border-b border-white/10">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg">
-              <Users className="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <h1 className="text-lg font-medium text-white tracking-wide leading-tight">
-                Front Office
-              </h1>
-              <p className="text-[9px] uppercase tracking-[0.2em] text-white/50">Guest Services Dashboard</p>
-            </div>
-          </Link>
+        <nav className="flex items-center justify-between px-6 py-3 flex-shrink-0 border-b border-white/10 bg-black/20 backdrop-blur-xl">
+          {/* Left - Breadcrumbs */}
+          <div className="flex items-center gap-4">
+            {/* Home Button */}
+            <Link
+              href="/"
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-all group"
+              title="Back to Main Menu"
+            >
+              <Home className="w-5 h-5 text-white/70 group-hover:text-emerald-400 transition-colors" />
+            </Link>
 
+            {/* Breadcrumbs */}
+            <div className="flex items-center gap-2 text-sm">
+              <Link href="/" className="text-white/50 hover:text-white transition-colors">Home</Link>
+              <ChevronRight className="w-4 h-4 text-white/30" />
+              <span className="text-emerald-400 font-medium">Front Office</span>
+            </div>
+          </div>
+
+          {/* Center - Menu Items */}
           <div className="flex items-center gap-1 bg-white/5 backdrop-blur-md rounded-full px-2 py-1 border border-white/10">
             {menuItems.map((item) => (
               <Link
@@ -415,7 +431,24 @@ export default function FrontOfficeDashboard() {
             ))}
           </div>
 
+          {/* Right Side */}
           <div className="flex items-center gap-3">
+            {/* AI Assistant Toggle */}
+            <button
+              onClick={() => setAiPanelVisible(!aiPanelVisible)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all ${
+                aiPanelVisible
+                  ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-300'
+                  : 'bg-white/5 border-white/10 text-white/70 hover:text-white hover:bg-white/10'
+              }`}
+              title={aiPanelVisible ? 'Hide AI Assistant' : 'Show AI Assistant'}
+            >
+              {aiPanelVisible ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
+              <span className="text-xs font-medium">AI</span>
+            </button>
+
+            <div className="h-6 w-px bg-white/10" />
+
             {/* Current Shift Badge */}
             <div className="px-3 py-1 bg-white/10 rounded-full border border-white/20">
               <span className="text-xs text-white/70 capitalize">{currentShift} Shift</span>
@@ -427,8 +460,8 @@ export default function FrontOfficeDashboard() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search guest, room, confirmation..."
-                className="pl-9 pr-4 py-1.5 bg-white/10 border border-white/20 rounded-lg text-xs text-white placeholder-white/40 w-64 focus:outline-none focus:border-emerald-500/50"
+                placeholder="Search guest, room..."
+                className="pl-9 pr-4 py-1.5 bg-white/10 border border-white/20 rounded-lg text-xs text-white placeholder-white/40 w-48 focus:outline-none focus:border-emerald-500/50"
               />
             </div>
             <button
@@ -522,7 +555,9 @@ export default function FrontOfficeDashboard() {
                 {/* Occupancy Today */}
                 <div className="bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-white/50">Occupancy</span>
+                    <Tooltip content={HotelTerms.OCC}>
+                      <span className="text-xs text-white/50">Occupancy</span>
+                    </Tooltip>
                     <BedDouble className="w-4 h-4 text-white/40" />
                   </div>
                   <p className="text-2xl font-bold text-white">{occupancyMetrics.today.percentage}%</p>
@@ -542,7 +577,9 @@ export default function FrontOfficeDashboard() {
                 {/* ADR */}
                 <div className="bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-white/50">ADR</span>
+                    <Tooltip content={HotelTerms.ADR}>
+                      <span className="text-xs text-white/50">ADR</span>
+                    </Tooltip>
                     <CreditCard className="w-4 h-4 text-white/40" />
                   </div>
                   <p className="text-xl font-bold text-white">{formatCurrency(adr)}</p>
@@ -899,6 +936,33 @@ export default function FrontOfficeDashboard() {
 
             </div>
           </div>
+
+          {/* AI Assistant Panel */}
+          {aiPanelVisible && (
+            <div className="w-80 border-l border-white/10 bg-gradient-to-b from-emerald-900/20 to-slate-900/40 backdrop-blur-xl flex flex-col">
+              <VoiceSessionChat
+                agentId="front-office-assistant"
+                title="Front Office AI"
+                subtitle="Voice-enabled assistant"
+                avatar="/avatars/assistant-avatar.jpg"
+                variant="dark"
+                welcomeMessage="I'm your front office assistant. I can help you with check-ins, check-outs, room assignments, guest requests, and more. How can I help you today?"
+                suggestions={[
+                  "Who's arriving today?",
+                  "Check in John Smith",
+                  "Any VIP arrivals?",
+                ]}
+                contextData={{
+                  arrivals: todayArrivals.length,
+                  departures: todayDepartures.length,
+                  inHouse: inHouseGuests.length,
+                  pendingRequests: pendingRequests,
+                  urgentRequests: urgentRequests,
+                  occupancy: occupancyMetrics.today.percentage,
+                }}
+              />
+            </div>
+          )}
 
           {/* Right Sidebar - Selected Reservation Details */}
           {selectedReservation && (

@@ -41,14 +41,21 @@ import {
   ChevronUp,
   CalendarDays,
   Send,
+  Home,
+  PanelRightClose,
+  PanelRightOpen,
+  Mic,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import VoiceSessionChat from '../components/VoiceSessionChat';
+import Tooltip, { HotelTerms } from '../components/Tooltip';
+import RevenueAIInsights from '../components/RevenueAIInsights';
 import { useRevenueIntelligenceStore } from '../store/revenueIntelligenceStore';
 
 export default function RevenueIntelligenceDashboard() {
   const { isAuthenticated, logout } = useAuth();
   const [mounted, setMounted] = useState(false);
-  const [aiPanelOpen, setAiPanelOpen] = useState(false);
+  const [aiPanelOpen, setAiPanelOpen] = useState(true); // AI assistant visible by default
   const [aiQuestion, setAiQuestion] = useState('');
   const [aiMessages, setAiMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
   const [forecastViewMode, setForecastViewMode] = useState<'chart' | 'table'>('chart');
@@ -91,9 +98,10 @@ export default function RevenueIntelligenceDashboard() {
 
   const menuItems = [
     { label: 'Operations', href: '/operations' },
+    { label: 'Front Office', href: '/front-office' },
     { label: 'Revenue BI', href: '/revenue-intelligence', active: true },
     { label: 'Employees', href: '/employee-management' },
-    { label: 'Staff Portal', href: '/admin/staff' },
+    { label: 'Marketplace', href: '/marketplace' },
   ];
 
   useEffect(() => {
@@ -648,19 +656,27 @@ Ask me about:
       <div className={`relative z-10 h-screen flex flex-col transition-opacity duration-700 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
 
         {/* Top Navigation */}
-        <nav className="flex items-center justify-between px-6 py-3 flex-shrink-0 border-b border-white/10">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-lg">
-              <BarChart3 className="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <h1 className="text-lg font-medium text-white tracking-wide leading-tight">
-                Revenue Intelligence
-              </h1>
-              <p className="text-[9px] uppercase tracking-[0.2em] text-white/50">Business Analytics</p>
-            </div>
-          </Link>
+        <nav className="flex items-center justify-between px-6 py-3 flex-shrink-0 border-b border-white/10 bg-black/20 backdrop-blur-xl">
+          {/* Left - Breadcrumbs */}
+          <div className="flex items-center gap-4">
+            {/* Home Button */}
+            <Link
+              href="/"
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-all group"
+              title="Back to Main Menu"
+            >
+              <Home className="w-5 h-5 text-white/70 group-hover:text-indigo-400 transition-colors" />
+            </Link>
 
+            {/* Breadcrumbs */}
+            <div className="flex items-center gap-2 text-sm">
+              <Link href="/" className="text-white/50 hover:text-white transition-colors">Home</Link>
+              <ChevronRight className="w-4 h-4 text-white/30" />
+              <span className="text-indigo-400 font-medium">Revenue Intelligence</span>
+            </div>
+          </div>
+
+          {/* Center - Menu Items */}
           <div className="flex items-center gap-1 bg-white/5 backdrop-blur-md rounded-full px-2 py-1 border border-white/10">
             {menuItems.map((item) => (
               <Link
@@ -668,7 +684,7 @@ Ask me about:
                 href={item.href}
                 className={`px-4 py-1.5 rounded-full text-sm transition-all ${
                   item.active
-                    ? 'bg-blue-500/20 text-blue-300 font-medium'
+                    ? 'bg-indigo-500/20 text-indigo-300 font-medium'
                     : 'text-white/70 hover:text-white hover:bg-white/10'
                 }`}
               >
@@ -677,7 +693,24 @@ Ask me about:
             ))}
           </div>
 
+          {/* Right Side */}
           <div className="flex items-center gap-3">
+            {/* AI Assistant Toggle */}
+            <button
+              onClick={() => setAiPanelOpen(!aiPanelOpen)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all ${
+                aiPanelOpen
+                  ? 'bg-indigo-500/20 border-indigo-500/30 text-indigo-300'
+                  : 'bg-white/5 border-white/10 text-white/70 hover:text-white hover:bg-white/10'
+              }`}
+              title={aiPanelOpen ? 'Hide AI Assistant' : 'Show AI Assistant'}
+            >
+              {aiPanelOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
+              <span className="text-xs font-medium">AI</span>
+            </button>
+
+            <div className="h-6 w-px bg-white/10" />
+
             {/* Period Selector */}
             <select
               value={selectedPeriod}
@@ -741,12 +774,36 @@ Ask me about:
               </div>
             )}
 
+            {/* AI Revenue Insights */}
+            <RevenueAIInsights
+              currentMetrics={{
+                occupancy: currentMetrics.occupancy,
+                adr: currentMetrics.adr,
+                revpar: currentMetrics.revpar,
+                trevpar: currentMetrics.trevpar,
+                goppar: currentMetrics.goppar,
+                totalRevenue: currentMetrics.totalRevenue,
+              }}
+              yoyMetrics={{
+                occupancyChange: yoyMetrics.occupancyChange,
+                adrChange: yoyMetrics.adrChange,
+                revparChange: yoyMetrics.revparChange,
+                revenueChange: yoyMetrics.revenueChange,
+              }}
+              benchmarkIndices={benchmarkIndices}
+              segmentData={segmentData}
+              forecastSummary={forecastSummary}
+              channelData={channelData}
+            />
+
             {/* Top Row - Key Metrics */}
             <div className="grid grid-cols-6 gap-3">
               {/* Occupancy */}
               <div className="bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 p-4 group relative">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-white/50">Occupancy</span>
+                  <Tooltip content={HotelTerms.OCC}>
+                    <span className="text-xs text-white/50">Occupancy</span>
+                  </Tooltip>
                   <BedDouble className="w-4 h-4 text-blue-400" />
                 </div>
                 <p className="text-2xl font-bold text-white">{currentMetrics.occupancy}%</p>
@@ -755,7 +812,9 @@ Ask me about:
                     {yoyMetrics.occupancyChange >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                     <span className="text-xs">{formatPercent(yoyMetrics.occupancyChange)}</span>
                   </div>
-                  <span className="text-[10px] text-white/40">vs LY</span>
+                  <Tooltip content={HotelTerms.YoY}>
+                    <span className="text-[10px] text-white/40">vs LY</span>
+                  </Tooltip>
                 </div>
                 <Sparkline data={trendData.map(d => d.occupancy)} color="#3b82f6" />
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -766,7 +825,9 @@ Ask me about:
               {/* ADR */}
               <div className="bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 p-4 group relative">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-white/50">ADR</span>
+                  <Tooltip content={HotelTerms.ADR}>
+                    <span className="text-xs text-white/50">ADR</span>
+                  </Tooltip>
                   <DollarSign className="w-4 h-4 text-emerald-400" />
                 </div>
                 <p className="text-2xl font-bold text-white">{formatCurrency(currentMetrics.adr)}</p>
@@ -775,7 +836,9 @@ Ask me about:
                     {yoyMetrics.adrChange >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                     <span className="text-xs">{formatPercent(yoyMetrics.adrChange)}</span>
                   </div>
-                  <span className="text-[10px] text-white/40">vs LY</span>
+                  <Tooltip content={HotelTerms.YoY}>
+                    <span className="text-[10px] text-white/40">vs LY</span>
+                  </Tooltip>
                 </div>
                 <Sparkline data={trendData.map(d => d.adr)} color="#22c55e" />
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -786,7 +849,9 @@ Ask me about:
               {/* RevPAR */}
               <div className="bg-gradient-to-br from-blue-600/30 to-purple-600/30 backdrop-blur-xl rounded-xl border border-blue-500/30 p-4 group relative">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-white/50">RevPAR</span>
+                  <Tooltip content={HotelTerms.RevPAR}>
+                    <span className="text-xs text-white/50">RevPAR</span>
+                  </Tooltip>
                   <Activity className="w-4 h-4 text-purple-400" />
                 </div>
                 <p className="text-2xl font-bold text-white">{formatCurrency(currentMetrics.revpar)}</p>
@@ -795,7 +860,9 @@ Ask me about:
                     {yoyMetrics.revparChange >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                     <span className="text-xs">{formatPercent(yoyMetrics.revparChange)}</span>
                   </div>
-                  <span className="text-[10px] text-white/40">vs LY</span>
+                  <Tooltip content={HotelTerms.YoY}>
+                    <span className="text-[10px] text-white/40">vs LY</span>
+                  </Tooltip>
                 </div>
                 <Sparkline data={trendData.map(d => d.revpar)} color="#a855f7" />
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -806,7 +873,9 @@ Ask me about:
               {/* TRevPAR */}
               <div className="bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-white/50">TRevPAR</span>
+                  <Tooltip content={HotelTerms.TRevPAR}>
+                    <span className="text-xs text-white/50">TRevPAR</span>
+                  </Tooltip>
                   <BarChart3 className="w-4 h-4 text-amber-400" />
                 </div>
                 <p className="text-2xl font-bold text-white">{formatCurrency(currentMetrics.trevpar)}</p>
@@ -816,7 +885,9 @@ Ask me about:
               {/* GOPPAR */}
               <div className="bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-white/50">GOPPAR</span>
+                  <Tooltip content={HotelTerms.GOPPAR}>
+                    <span className="text-xs text-white/50">GOPPAR</span>
+                  </Tooltip>
                   <Target className="w-4 h-4 text-green-400" />
                 </div>
                 <p className="text-2xl font-bold text-white">{formatCurrency(currentMetrics.goppar)}</p>
@@ -852,7 +923,13 @@ Ask me about:
                   {benchmarkIndices.map((index) => (
                     <div key={index.name} className="text-center">
                       <IndexGauge value={index.value} name={index.name} />
-                      <p className="text-xs font-medium text-white mt-2">{index.name}</p>
+                      <Tooltip content={
+                        index.name === 'MPI' ? HotelTerms.MPI :
+                        index.name === 'ARI' ? HotelTerms.ARI :
+                        index.name === 'RGI' ? HotelTerms.RGI : index.description
+                      }>
+                        <p className="text-xs font-medium text-white mt-2">{index.name}</p>
+                      </Tooltip>
                       <p className="text-[9px] text-white/40">{index.description.split(' - ')[1]}</p>
                     </div>
                   ))}
@@ -1289,122 +1366,40 @@ Ask me about:
               </div>
             </div>
 
-            {/* AI Assistant Panel (Slide-out) */}
+            {/* AI Assistant Panel (Slide-out) with Voice Support */}
             {aiPanelOpen && (
-              <div className="fixed inset-y-0 right-0 w-96 bg-slate-900/98 backdrop-blur-xl border-l border-white/20 shadow-2xl z-50 flex flex-col">
-                {/* Panel Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                      <Bot className="w-4 h-4 text-purple-400" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-white">Revenue AI Assistant</h3>
-                      <p className="text-[10px] text-white/40">Ask about forecasts, trends & recommendations</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setAiPanelOpen(false)}
-                    className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-                  >
-                    <X className="w-4 h-4 text-white/60" />
-                  </button>
-                </div>
+              <div className="fixed inset-y-0 right-0 w-96 bg-gradient-to-b from-indigo-900/95 to-slate-900/98 backdrop-blur-xl border-l border-indigo-500/20 shadow-2xl z-50 flex flex-col">
+                {/* Close Button */}
+                <button
+                  onClick={() => setAiPanelOpen(false)}
+                  className="absolute top-3 right-3 z-10 p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+                >
+                  <X className="w-4 h-4 text-white/60" />
+                </button>
 
-                {/* Quick Questions */}
-                <div className="px-4 py-3 border-b border-white/10">
-                  <p className="text-[10px] text-white/40 mb-2">Quick questions:</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {[
-                      'Why is Jan 15 high demand?',
-                      'Rate strategy for weekends?',
-                      'Which segments need focus?',
-                      'Competitor pricing analysis',
-                    ].map((q, i) => (
-                      <button
-                        key={i}
-                        onClick={() => {
-                          setAiQuestion(q);
-                          // Simulate AI response
-                          setAiMessages(prev => [
-                            ...prev,
-                            { role: 'user', content: q },
-                            { role: 'assistant', content: getAiResponse(q, forecastData, forecastSummary) }
-                          ]);
-                          setAiQuestion('');
-                        }}
-                        className="px-2 py-1 text-[10px] bg-white/5 hover:bg-white/10 text-white/70 rounded-lg border border-white/10 transition-colors"
-                      >
-                        {q}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Chat Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                  {aiMessages.length === 0 && (
-                    <div className="text-center py-8">
-                      <Bot className="w-12 h-12 text-white/20 mx-auto mb-3" />
-                      <p className="text-sm text-white/40">Ask me anything about your</p>
-                      <p className="text-sm text-white/40">revenue forecasts and performance</p>
-                    </div>
-                  )}
-                  {aiMessages.map((msg, i) => (
-                    <div
-                      key={i}
-                      className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-[85%] rounded-lg p-3 ${
-                          msg.role === 'user'
-                            ? 'bg-blue-500/20 border border-blue-500/30'
-                            : 'bg-white/5 border border-white/10'
-                        }`}
-                      >
-                        <p className="text-xs text-white/90 whitespace-pre-wrap">{msg.content}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Input */}
-                <div className="p-4 border-t border-white/10">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={aiQuestion}
-                      onChange={(e) => setAiQuestion(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && aiQuestion.trim()) {
-                          setAiMessages(prev => [
-                            ...prev,
-                            { role: 'user', content: aiQuestion },
-                            { role: 'assistant', content: getAiResponse(aiQuestion, forecastData, forecastSummary) }
-                          ]);
-                          setAiQuestion('');
-                        }
-                      }}
-                      placeholder="Ask about forecasts, trends, recommendations..."
-                      className="flex-1 px-3 py-2 bg-white/5 border border-white/20 rounded-lg text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50"
-                    />
-                    <button
-                      onClick={() => {
-                        if (aiQuestion.trim()) {
-                          setAiMessages(prev => [
-                            ...prev,
-                            { role: 'user', content: aiQuestion },
-                            { role: 'assistant', content: getAiResponse(aiQuestion, forecastData, forecastSummary) }
-                          ]);
-                          setAiQuestion('');
-                        }
-                      }}
-                      className="p-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 rounded-lg transition-colors"
-                    >
-                      <Send className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
+                {/* Voice-enabled AI Chat */}
+                <VoiceSessionChat
+                  agentId="revenue-intelligence-assistant"
+                  title="Revenue AI"
+                  subtitle="Voice-enabled analytics assistant"
+                  avatar="/avatars/assistant-avatar.jpg"
+                  variant="dark"
+                  welcomeMessage="I'm your revenue intelligence assistant. I can help you analyze forecasts, market trends, competitor rates, and provide strategic recommendations. What would you like to know?"
+                  suggestions={[
+                    "Why is Jan 15 high demand?",
+                    "Rate strategy for weekends?",
+                    "Competitor pricing analysis",
+                  ]}
+                  contextData={{
+                    currentMetrics: currentMetrics,
+                    occupancy: currentMetrics.occupancy,
+                    adr: currentMetrics.adr,
+                    revpar: currentMetrics.revpar,
+                    yoyChange: yoyMetrics,
+                    forecastSummary: forecastSummary,
+                    benchmarkIndices: benchmarkIndices,
+                  }}
+                />
               </div>
             )}
 

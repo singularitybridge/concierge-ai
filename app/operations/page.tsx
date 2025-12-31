@@ -29,8 +29,14 @@ import {
   UserCheck,
   Send,
   MoreHorizontal,
+  Home,
+  PanelRightClose,
+  PanelRightOpen,
+  Mic,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import VoiceSessionChat from '../components/VoiceSessionChat';
+import Tooltip, { HotelTerms } from '../components/Tooltip';
 import {
   useOperationsDashboardStore,
   RoomStatus,
@@ -48,6 +54,7 @@ export default function OperationsDashboard() {
   const [mounted, setMounted] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [aiQueryInput, setAiQueryInput] = useState('');
+  const [aiPanelVisible, setAiPanelVisible] = useState(true); // AI assistant visible by default
 
   const {
     rooms,
@@ -69,10 +76,10 @@ export default function OperationsDashboard() {
   // Navigation menu items
   const menuItems = [
     { label: 'Operations', href: '/operations', active: true },
+    { label: 'Front Office', href: '/front-office' },
     { label: 'Revenue BI', href: '/revenue-intelligence' },
     { label: 'Employees', href: '/employee-management' },
-    { label: 'Staff Portal', href: '/admin/staff' },
-    { label: 'Guests', href: '/guest' },
+    { label: 'Marketplace', href: '/marketplace' },
   ];
 
   useEffect(() => {
@@ -206,22 +213,25 @@ export default function OperationsDashboard() {
       <div className={`relative z-10 h-screen flex flex-col transition-opacity duration-700 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
 
         {/* Top Navigation Bar */}
-        <nav className="flex items-center justify-between px-6 py-3 flex-shrink-0 border-b border-white/10">
-          {/* Left - Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-xs" style={{ fontFamily: 'var(--font-cormorant)' }}>18</span>
+        <nav className="flex items-center justify-between px-6 py-3 flex-shrink-0 border-b border-white/10 bg-black/20 backdrop-blur-xl">
+          {/* Left - Breadcrumbs & Logo */}
+          <div className="flex items-center gap-4">
+            {/* Home Button */}
+            <Link
+              href="/"
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-all group"
+              title="Back to Main Menu"
+            >
+              <Home className="w-5 h-5 text-white/70 group-hover:text-amber-400 transition-colors" />
+            </Link>
+
+            {/* Breadcrumbs */}
+            <div className="flex items-center gap-2 text-sm">
+              <Link href="/" className="text-white/50 hover:text-white transition-colors">Home</Link>
+              <ChevronRight className="w-4 h-4 text-white/30" />
+              <span className="text-amber-400 font-medium">Operations Dashboard</span>
             </div>
-            <div>
-              <h1
-                className="text-lg font-light text-white tracking-wide leading-tight group-hover:text-amber-200 transition-colors"
-                style={{ fontFamily: 'var(--font-cormorant)' }}
-              >
-                THE 1898
-              </h1>
-              <p className="text-[9px] uppercase tracking-[0.2em] text-white/50">Operations Center</p>
-            </div>
-          </Link>
+          </div>
 
           {/* Center - Menu Items */}
           <div className="flex items-center gap-1 bg-white/5 backdrop-blur-md rounded-full px-2 py-1 border border-white/10">
@@ -231,7 +241,7 @@ export default function OperationsDashboard() {
                 href={item.href}
                 className={`px-4 py-1.5 rounded-full text-sm transition-all ${
                   item.active
-                    ? 'bg-white/15 text-white font-medium'
+                    ? 'bg-amber-500/20 text-amber-300 font-medium'
                     : 'text-white/70 hover:text-white hover:bg-white/10'
                 }`}
               >
@@ -240,8 +250,24 @@ export default function OperationsDashboard() {
             ))}
           </div>
 
-          {/* Right - Time & Logout */}
-          <div className="flex items-center gap-4">
+          {/* Right - AI Toggle, Time & Logout */}
+          <div className="flex items-center gap-3">
+            {/* AI Assistant Toggle */}
+            <button
+              onClick={() => setAiPanelVisible(!aiPanelVisible)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all ${
+                aiPanelVisible
+                  ? 'bg-purple-500/20 border-purple-500/30 text-purple-300'
+                  : 'bg-white/5 border-white/10 text-white/70 hover:text-white hover:bg-white/10'
+              }`}
+              title={aiPanelVisible ? 'Hide AI Assistant' : 'Show AI Assistant'}
+            >
+              {aiPanelVisible ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
+              <span className="text-xs font-medium">AI</span>
+            </button>
+
+            <div className="h-6 w-px bg-white/10" />
+
             <div className="text-right">
               <p className="text-sm text-white font-medium">
                 {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
@@ -270,7 +296,9 @@ export default function OperationsDashboard() {
               {/* Occupancy */}
               <div className="bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-white/50">Occupancy</span>
+                  <Tooltip content={HotelTerms.OCC}>
+                    <span className="text-xs text-white/50">Occupancy</span>
+                  </Tooltip>
                   <BedDouble className="w-4 h-4 text-white/40" />
                 </div>
                 <p className="text-2xl font-light text-white">{metrics.occupancy}%</p>
@@ -283,7 +311,9 @@ export default function OperationsDashboard() {
               {/* ADR */}
               <div className="bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-white/50">ADR</span>
+                  <Tooltip content={HotelTerms.ADR}>
+                    <span className="text-xs text-white/50">ADR</span>
+                  </Tooltip>
                   <DollarSign className="w-4 h-4 text-white/40" />
                 </div>
                 <p className="text-2xl font-light text-white">{formatCurrency(metrics.adr)}</p>
@@ -296,7 +326,9 @@ export default function OperationsDashboard() {
               {/* RevPAR */}
               <div className="bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-white/50">RevPAR</span>
+                  <Tooltip content={HotelTerms.RevPAR}>
+                    <span className="text-xs text-white/50">RevPAR</span>
+                  </Tooltip>
                   <TrendingUp className="w-4 h-4 text-white/40" />
                 </div>
                 <p className="text-2xl font-light text-white">{formatCurrency(metrics.revpar)}</p>
@@ -613,78 +645,69 @@ export default function OperationsDashboard() {
           </div>
 
           {/* Right Column - AI & Requests */}
-          <div className="w-[420px] flex-shrink-0 flex flex-col gap-4 min-h-0">
+          <div className={`flex-shrink-0 flex flex-col gap-4 min-h-0 transition-all duration-300 ${aiPanelVisible ? 'w-[420px]' : 'w-[320px]'}`}>
 
-            {/* AI Agent Activity */}
-            <div className="bg-gradient-to-br from-purple-900/30 to-blue-900/30 backdrop-blur-xl rounded-xl border border-purple-500/20 flex flex-col min-h-0" style={{ height: '45%' }}>
-              <div className="p-4 border-b border-white/10 flex items-center justify-between flex-shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-                    <Bot className="w-4 h-4 text-white" />
+            {/* AI Assistant with Voice Support */}
+            {aiPanelVisible && (
+              <div className="bg-gradient-to-br from-purple-900/40 to-blue-900/40 backdrop-blur-xl rounded-xl border border-purple-500/30 flex flex-col min-h-0 overflow-hidden" style={{ height: '50%' }}>
+                <VoiceSessionChat
+                  agentId="operations-assistant"
+                  title="Operations AI"
+                  subtitle="Voice-enabled assistant"
+                  avatar="/avatars/assistant-avatar.jpg"
+                  variant="dark"
+                  welcomeMessage="I'm your operations assistant. I can help you manage rooms, coordinate housekeeping, and handle guest requests. Ask me anything about hotel operations."
+                  suggestions={[
+                    "Show me dirty rooms on floor 3",
+                    "List urgent guest requests",
+                    "What's today's occupancy?",
+                  ]}
+                  contextData={{
+                    metrics: metrics,
+                    occupancy: metrics.occupancy,
+                    openRequests: metrics.openRequests,
+                    roomsToClean: metrics.roomsToClean,
+                    aiTasksToday: metrics.aiTasksToday,
+                  }}
+                />
+              </div>
+            )}
+
+            {/* AI Agent Activity - Compact view when AI panel is visible */}
+            <div className={`bg-gradient-to-br from-purple-900/20 to-blue-900/20 backdrop-blur-xl rounded-xl border border-purple-500/20 flex flex-col min-h-0 ${aiPanelVisible ? '' : 'flex-1'}`} style={aiPanelVisible ? { height: '25%' } : {}}>
+              <div className="p-3 border-b border-white/10 flex items-center justify-between flex-shrink-0">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+                    <Bot className="w-3 h-3 text-white" />
                   </div>
-                  <div>
-                    <h2 className="text-sm font-medium text-white">AI Agent Activity</h2>
-                    <p className="text-[10px] text-white/50">Real-time orchestration</p>
-                  </div>
+                  <h2 className="text-xs font-medium text-white">AI Activity</h2>
                 </div>
-                <div className="flex items-center gap-1 px-2 py-1 bg-emerald-500/20 rounded-full">
-                  <CircleDot className="w-2.5 h-2.5 text-emerald-400 animate-pulse" />
-                  <span className="text-[10px] text-emerald-400">Live</span>
+                <div className="flex items-center gap-1 px-2 py-0.5 bg-emerald-500/20 rounded-full">
+                  <CircleDot className="w-2 h-2 text-emerald-400 animate-pulse" />
+                  <span className="text-[9px] text-emerald-400">Live</span>
                 </div>
               </div>
-
-              {/* Activity List */}
               <div className="flex-1 overflow-y-auto p-2">
-                {agentActivities.map((activity) => {
+                {agentActivities.slice(0, aiPanelVisible ? 3 : 10).map((activity) => {
                   const AgentIcon = getAgentIcon(activity.agentType);
                   return (
-                    <div key={activity.id} className="p-3 hover:bg-white/5 rounded-lg transition-colors mb-1">
-                      <div className="flex items-start gap-3">
-                        <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${getAgentColor(activity.agentType)}`}>
-                          <AgentIcon className="w-3.5 h-3.5" />
+                    <div key={activity.id} className="p-2 hover:bg-white/5 rounded-lg transition-colors mb-1">
+                      <div className="flex items-start gap-2">
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${getAgentColor(activity.agentType)}`}>
+                          <AgentIcon className="w-3 h-3" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-medium text-white">{activity.action}</span>
-                            {activity.automated && (
-                              <Zap className="w-3 h-3 text-amber-400" />
-                            )}
+                          <div className="flex items-center gap-1">
+                            <span className="text-[11px] font-medium text-white truncate">{activity.action}</span>
+                            {activity.automated && <Zap className="w-2.5 h-2.5 text-amber-400 flex-shrink-0" />}
+                            {activity.outcome === 'success' && <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400 flex-shrink-0" />}
                           </div>
-                          <p className="text-[11px] text-white/60 mt-0.5 line-clamp-2">{activity.details}</p>
-                          <div className="flex items-center gap-2 mt-1.5">
-                            <span className="text-[10px] text-white/40">{formatTimeAgo(activity.timestamp)}</span>
-                            {activity.roomNumber && (
-                              <span className="text-[10px] text-white/40">• Room {activity.roomNumber}</span>
-                            )}
-                            {activity.outcome === 'success' && (
-                              <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                            )}
-                            {activity.outcome === 'escalated' && (
-                              <AlertTriangle className="w-3 h-3 text-amber-400" />
-                            )}
-                          </div>
+                          <p className="text-[10px] text-white/50 truncate">{activity.details}</p>
                         </div>
                       </div>
                     </div>
                   );
                 })}
-              </div>
-
-              {/* AI Query Input */}
-              <div className="p-3 border-t border-white/10 flex-shrink-0">
-                <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
-                  <Sparkles className="w-4 h-4 text-purple-400" />
-                  <input
-                    type="text"
-                    placeholder="Ask the AI anything..."
-                    value={aiQueryInput}
-                    onChange={(e) => setAiQueryInput(e.target.value)}
-                    className="flex-1 bg-transparent text-sm text-white placeholder-white/40 outline-none"
-                  />
-                  <button className="p-1 hover:bg-white/10 rounded">
-                    <Send className="w-4 h-4 text-white/60" />
-                  </button>
-                </div>
               </div>
             </div>
 
@@ -752,7 +775,7 @@ export default function OperationsDashboard() {
                   <Users className="w-4 h-4 text-white/60" />
                   <h3 className="text-sm font-medium text-white">Housekeeping Team</h3>
                 </div>
-                <Link href="/admin/staff" className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-1">
+                <Link href="/employee-management?dept=housekeeping" className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-1">
                   View All <ArrowUpRight className="w-3 h-3" />
                 </Link>
               </div>

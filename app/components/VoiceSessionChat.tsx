@@ -1065,63 +1065,78 @@ Use this data to answer questions about guests. When asked about a specific gues
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Bottom Controls */}
+      {/* Bottom Controls - Always show both text and voice options */}
       <div className={`p-4 flex-shrink-0 ${isDark ? 'border-t border-white/10' : 'border-t border-stone-100'}`}>
-        {!isCallActive ? (
-          /* Speak Button - Initial State */
-          <button
-            id="voice-call-button"
-            onClick={startCall}
-            disabled={isVapiLoading}
-            className={`w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-xl transition-all disabled:opacity-50 ${
+        {/* Text Input - Always visible */}
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Type your message..."
+            disabled={isLoading}
+            className={`flex-1 px-4 py-2 rounded-full text-sm focus:outline-none disabled:opacity-50 ${
               isDark
-                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-400 hover:to-amber-500 shadow-lg'
-                : 'bg-stone-800 text-white hover:bg-stone-700 rounded-full'
+                ? 'bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:ring-2 focus:ring-amber-400/50'
+                : 'bg-white border border-stone-200 text-stone-800 placeholder:text-stone-400 focus:ring-2 focus:ring-stone-300'
             }`}
+          />
+          <button
+            onClick={sendMessage}
+            disabled={isLoading || !input.trim()}
+            className={`p-2 disabled:opacity-30 transition-colors ${
+              isDark ? 'text-white/60 hover:text-white' : 'text-stone-600 hover:text-stone-800'
+            }`}
+            aria-label="Send message"
           >
-            {isVapiLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <>
-                <Phone className="w-4 h-4" />
-                <span>Speak with Concierge</span>
-              </>
-            )}
+            <Send className="w-4 h-4" />
           </button>
-        ) : (
-          /* Chat Active - Input with Send and End buttons */
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Type your message..."
-              disabled={isLoading}
-              className={`flex-1 px-4 py-2 rounded-full text-sm focus:outline-none disabled:opacity-50 ${
-                isDark
-                  ? 'bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:ring-2 focus:ring-amber-400/50'
-                  : 'bg-white border border-stone-200 text-stone-800 placeholder:text-stone-400 focus:ring-2 focus:ring-stone-300'
-              }`}
-            />
+
+          {/* Voice Button */}
+          {!isCallActive ? (
             <button
-              onClick={sendMessage}
-              disabled={isLoading || !input.trim()}
-              className={`p-2 disabled:opacity-30 transition-colors ${
-                isDark ? 'text-white/60 hover:text-white' : 'text-stone-600 hover:text-stone-800'
+              id="voice-call-button"
+              onClick={startCall}
+              disabled={isVapiLoading}
+              className={`p-2.5 rounded-full transition-all disabled:opacity-50 ${
+                isDark
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-400 hover:to-amber-500 shadow-lg'
+                  : 'bg-stone-800 text-white hover:bg-stone-700'
               }`}
-              aria-label="Send message"
+              aria-label="Start voice call"
+              title="Start voice conversation"
             >
-              <Send className="w-4 h-4" />
+              {isVapiLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Mic className="w-4 h-4" />
+              )}
             </button>
+          ) : (
             <button
               id="voice-call-button"
               onClick={endCall}
-              className="p-2 text-red-400 hover:text-red-300 transition-colors"
-              aria-label="End call"
+              className={`p-2.5 rounded-full transition-colors ${
+                isDark
+                  ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30'
+                  : 'bg-red-50 text-red-500 hover:bg-red-100'
+              }`}
+              aria-label="End voice call"
+              title="End voice conversation"
             >
               <PhoneOff className="w-4 h-4" />
             </button>
+          )}
+        </div>
+
+        {/* Voice Status Indicator */}
+        {isCallActive && (
+          <div className={`flex items-center justify-center gap-2 mt-2 py-1.5 rounded-lg text-xs ${
+            isDark ? 'bg-emerald-500/10 text-emerald-400' : 'bg-green-50 text-green-600'
+          }`}>
+            <span className="w-2 h-2 bg-current rounded-full animate-pulse" />
+            <span>Voice active - listening...</span>
           </div>
         )}
       </div>
