@@ -4,7 +4,12 @@
       "WebFetch(domain:www.roomboss.com)",
       "WebSearch",
       "WebFetch(domain:docs.roomboss.com)",
-      "WebFetch(domain:duve.com)"
+      "WebFetch(domain:duve.com)",
+      "Bash(pm2:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\ndocs: Add PM2 setup and CLAUDE.md project context\n\n- Add PM2 instructions to README with useful commands\n- Fix incorrect localhost port \\(3000 → 4024\\)\n- Fix ecosystem.config.js cwd path\n- Create CLAUDE.md with project overview for Claude Code\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(gh api:*)",
+      "Bash(cat:*)"
     ]
   }
 }
