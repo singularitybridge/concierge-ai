@@ -4,7 +4,7 @@ module.exports = {
       name: 'ai-realtime-chat',
       script: 'npm',
       args: 'run dev',
-      cwd: '/Users/avi/dev/avio/sb-projects/concierge-ai',
+      cwd: '/Users/avio/dev/sb-projects/concierge-ai',
       env: {
         NODE_ENV: 'development',
         PORT: 4024

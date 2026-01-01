@@ -85,11 +85,27 @@ And return:
 
 ### 5. Run Development Server
 
+#### Option A: Using PM2 (Recommended)
+
+```bash
+pm2 start ecosystem.config.js
+```
+
+Useful PM2 commands:
+```bash
+pm2 logs ai-realtime-chat    # View logs
+pm2 restart ai-realtime-chat # Restart app
+pm2 stop ai-realtime-chat    # Stop app
+pm2 status                   # Check all processes
+```
+
+#### Option B: Using npm directly
+
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:4024](http://localhost:4024)
 
 ## Usage
 
@@ -197,6 +213,19 @@ The script sends text messages to VAPI, which triggers the webhook flow just lik
 - Check internet connection
 - Adjust VAPI voice settings in dashboard
 - Consider upgrading VAPI plan
+
+## Deployment
+
+This project is configured for automatic deployment via Vercel:
+
+- **Platform**: Vercel
+- **Auto-deploy**: Pushes to `main` branch trigger automatic deployment
+- **GitHub**: [singularitybridge/concierge-ai](https://github.com/singularitybridge/concierge-ai)
+
+To deploy manually:
+```bash
+npm run build
+```
 
 ## Cost Estimate
 
