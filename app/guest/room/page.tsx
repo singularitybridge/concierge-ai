@@ -27,114 +27,6 @@ const quickServices = [
   { icon: Coffee, label: 'Room Service', url: '/guest/services?category=room_service' },
 ];
 
-// SVG for Mt. Fuji with Cherry Blossoms - Laser Engraved Style
-const JapaneseSceneSVG = () => (
-  <svg
-    viewBox="0 0 400 200"
-    className="absolute inset-0 w-full h-full"
-    preserveAspectRatio="xMidYMid slice"
-  >
-    <defs>
-      {/* Gold gradient for engraved effect */}
-      <linearGradient id="goldEngraved" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#592203" stopOpacity="0.15" />
-        <stop offset="50%" stopColor="#F2AC57" stopOpacity="0.25" />
-        <stop offset="100%" stopColor="#592203" stopOpacity="0.15" />
-      </linearGradient>
-
-      {/* Lighter gold for highlights */}
-      <linearGradient id="goldHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stopColor="#F2AC57" stopOpacity="0.3" />
-        <stop offset="100%" stopColor="#592203" stopOpacity="0.1" />
-      </linearGradient>
-    </defs>
-
-    {/* Mt. Fuji - Main Mountain */}
-    <path
-      d="M200 40 L280 160 L120 160 Z"
-      fill="url(#goldEngraved)"
-      stroke="#592203"
-      strokeWidth="0.5"
-      strokeOpacity="0.4"
-    />
-    {/* Snow cap */}
-    <path
-      d="M200 40 L220 70 L180 70 Z"
-      fill="url(#goldHighlight)"
-      stroke="#F2AC57"
-      strokeWidth="0.3"
-      strokeOpacity="0.5"
-    />
-
-    {/* Distant mountain left */}
-    <path
-      d="M50 80 L100 160 L0 160 Z"
-      fill="url(#goldEngraved)"
-      stroke="#592203"
-      strokeWidth="0.3"
-      strokeOpacity="0.3"
-    />
-
-    {/* Torii Gate */}
-    <g stroke="#733858" strokeWidth="1" fill="none" strokeOpacity="0.5">
-      <line x1="60" y1="120" x2="60" y2="160" />
-      <line x1="90" y1="120" x2="90" y2="160" />
-      <path d="M55 120 Q75 110 95 120" />
-      <line x1="55" y1="130" x2="95" y2="130" />
-    </g>
-
-    {/* Cherry Blossom Tree - Right side */}
-    <g fill="url(#goldEngraved)" stroke="#592203" strokeWidth="0.3" strokeOpacity="0.4">
-      {/* Trunk */}
-      <path d="M350 200 Q360 150 355 100 Q350 80 340 60" fill="none" strokeWidth="2" strokeOpacity="0.5" />
-      {/* Branches */}
-      <path d="M355 100 Q320 90 300 70" fill="none" strokeWidth="1" />
-      <path d="M350 120 Q310 110 280 100" fill="none" strokeWidth="0.8" />
-      <path d="M340 80 Q370 60 390 50" fill="none" strokeWidth="0.8" />
-    </g>
-
-    {/* Cherry blossoms clusters */}
-    <g fill="#733858" fillOpacity="0.3">
-      <circle cx="300" cy="65" r="15" />
-      <circle cx="280" cy="80" r="12" />
-      <circle cx="320" cy="55" r="10" />
-      <circle cx="270" cy="95" r="14" />
-      <circle cx="295" cy="90" r="10" />
-      <circle cx="390" cy="45" r="12" />
-      <circle cx="370" cy="55" r="10" />
-      <circle cx="250" cy="75" r="8" />
-    </g>
-
-    {/* Cherry Blossom Tree - Left side */}
-    <g fill="url(#goldEngraved)" stroke="#592203" strokeWidth="0.3" strokeOpacity="0.4">
-      <path d="M30 200 Q20 150 25 120" fill="none" strokeWidth="1.5" strokeOpacity="0.4" />
-      <path d="M25 120 Q50 100 80 90" fill="none" strokeWidth="0.6" />
-      <path d="M25 130 Q60 120 90 115" fill="none" strokeWidth="0.5" />
-    </g>
-
-    {/* Left blossoms */}
-    <g fill="#733858" fillOpacity="0.25">
-      <circle cx="85" cy="85" r="12" />
-      <circle cx="70" cy="95" r="10" />
-      <circle cx="95" cy="110" r="8" />
-      <circle cx="55" cy="80" r="8" />
-    </g>
-
-    {/* Water/Lake reflection lines */}
-    <g stroke="#592203" strokeOpacity="0.2" strokeWidth="0.5" fill="none">
-      <path d="M0 170 Q100 165 200 170 Q300 175 400 168" />
-      <path d="M0 180 Q150 175 300 180 Q350 182 400 178" />
-      <path d="M50 190 Q150 185 250 190" />
-    </g>
-
-    {/* Flying birds */}
-    <g stroke="#592203" strokeWidth="0.5" strokeOpacity="0.4" fill="none">
-      <path d="M150 50 Q155 45 160 50 Q165 45 170 50" />
-      <path d="M180 60 Q183 57 186 60 Q189 57 192 60" />
-      <path d="M130 65 Q134 61 138 65 Q142 61 146 65" />
-    </g>
-  </svg>
-);
 
 export default function GuestRoomPage() {
   const router = useRouter();
@@ -208,59 +100,48 @@ export default function GuestRoomPage() {
                 className={`w-full h-full transition-transform duration-700 ease-in-out ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}
                 style={{ transformStyle: 'preserve-3d' }}
               >
-                {/* Front Side - Golden Metal Card with Laser Engraved Scene */}
+                {/* Front Side - Japanese Woodblock Print Card */}
                 <div
                   className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl shadow-[#401F03]/40"
                   style={{ backfaceVisibility: 'hidden' }}
                 >
-                  {/* Base gold metallic gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#D99A45] via-[#F2AC57] to-[#D99A45]" />
-
-                  {/* Brushed metal texture */}
-                  <div
-                    className="absolute inset-0 opacity-30"
-                    style={{
-                      backgroundImage: `repeating-linear-gradient(
-                        90deg,
-                        transparent,
-                        transparent 1px,
-                        rgba(255,255,255,0.03) 1px,
-                        rgba(255,255,255,0.03) 2px
-                      )`
-                    }}
+                  {/* Background Image - Mt. Fuji Woodblock Print */}
+                  <Image
+                    src="/card-bg-fuji.jpg"
+                    alt="Mt. Fuji"
+                    fill
+                    className="object-cover"
+                    priority
                   />
 
-                  {/* Gold shine overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[#F7C67E]/20 to-transparent" />
-
-                  {/* Laser engraved Japanese scene */}
-                  <JapaneseSceneSVG />
+                  {/* Warm overlay for brand colors */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#F2AC57]/20 via-transparent to-[#592203]/30" />
 
                   {/* Dark overlay for text readability */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
 
                   {/* Card Content */}
                   <div className="relative h-full flex flex-col justify-between p-5">
                     {/* Top Section - Brand */}
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-[9px] text-[#401F03]/80 tracking-[0.25em] mb-0.5 drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)]">ROOM</p>
-                        <h1 className="text-3xl font-light text-[#260A1C] tracking-wider drop-shadow-[0_1px_2px_rgba(255,255,255,0.4)]">{guestSession.room.number}</h1>
+                        <p className="text-[9px] text-white/70 tracking-[0.25em] mb-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">ROOM</p>
+                        <h1 className="text-3xl font-light text-white tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{guestSession.room.number}</h1>
                       </div>
                       <div className="text-right">
-                        <p className="text-[#401F03] text-sm tracking-[0.2em] font-light drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)]">NISEKO</p>
-                        <p className="text-[#592203]/80 text-[10px] tracking-[0.15em] drop-shadow-[0_1px_1px_rgba(255,255,255,0.2)]">1898</p>
+                        <p className="text-white text-sm tracking-[0.2em] font-light drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">NISEKO</p>
+                        <p className="text-[#F2AC57] text-[10px] tracking-[0.15em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">1898</p>
                       </div>
                     </div>
 
                     {/* Center - Guest Name */}
                     <div className="flex-1 flex items-center justify-center">
                       <div className="text-center">
-                        <h2 className="text-lg text-[#260A1C] font-light tracking-[0.15em] drop-shadow-[0_1px_2px_rgba(255,255,255,0.4)]">{guestSession.name}</h2>
+                        <h2 className="text-lg text-white font-light tracking-[0.15em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{guestSession.name}</h2>
                         <div className="flex items-center justify-center gap-1 mt-1">
-                          <Star className="h-2.5 w-2.5 text-[#733858] fill-[#733858] drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)]" />
-                          <p className="text-[9px] text-[#592203]/90 tracking-[0.2em] drop-shadow-[0_1px_1px_rgba(255,255,255,0.2)]">PREMIUM GUEST</p>
-                          <Star className="h-2.5 w-2.5 text-[#733858] fill-[#733858] drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)]" />
+                          <Star className="h-2.5 w-2.5 text-[#F2AC57] fill-[#F2AC57] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" />
+                          <p className="text-[9px] text-white/80 tracking-[0.2em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">PREMIUM GUEST</p>
+                          <Star className="h-2.5 w-2.5 text-[#F2AC57] fill-[#F2AC57] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" />
                         </div>
                       </div>
                     </div>
@@ -269,26 +150,26 @@ export default function GuestRoomPage() {
                     <div className="flex items-end justify-between">
                       <button
                         onClick={handleUnlock}
-                        className={`relative h-11 w-11 rounded-full flex items-center justify-center transition-all border ${
+                        className={`relative h-11 w-11 rounded-full flex items-center justify-center transition-all border backdrop-blur-sm ${
                           keyActive
                             ? 'bg-emerald-500/30 border-emerald-400/50'
-                            : 'bg-[#401F03]/20 border-[#592203]/50 hover:border-[#592203]/60'
+                            : 'bg-black/20 border-white/30 hover:border-white/50'
                         }`}
                       >
-                        <Key className={`h-4 w-4 transition-all drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)] ${keyActive ? 'text-emerald-300 rotate-45' : 'text-[#401F03]'}`} />
+                        <Key className={`h-4 w-4 transition-all drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] ${keyActive ? 'text-emerald-300 rotate-45' : 'text-white'}`} />
                         {keyActive && (
                           <span className="absolute inset-0 rounded-full ring-2 ring-emerald-400 animate-ping" />
                         )}
                       </button>
-                      <div className="flex items-center gap-1 text-[9px] text-[#401F03]/80 drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)]">
+                      <div className="flex items-center gap-1 text-[9px] text-white/70 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                         <RotateCcw className="h-2.5 w-2.5" />
                         <span className="tracking-[0.15em]">DETAILS</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Metallic edge highlight */}
-                  <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-[#F7C67E]/30" />
+                  {/* Subtle border */}
+                  <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10" />
                 </div>
 
                 {/* Back Side - Golden Metal Details */}
