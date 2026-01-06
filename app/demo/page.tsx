@@ -76,7 +76,7 @@ export default function DemoPage() {
         <header className="border-b border-white/10 bg-white/5 backdrop-blur-sm">
           <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+              <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-[#F2AC57] to-[#592203] flex items-center justify-center shadow-lg shadow-[#F2AC57]/20">
                 <span className="text-white font-bold" style={{ fontFamily: 'var(--font-cormorant)' }}>18</span>
               </div>
               <div>
@@ -96,7 +96,7 @@ export default function DemoPage() {
                 className="text-4xl md:text-5xl font-light text-white tracking-wide mb-4"
                 style={{ fontFamily: 'var(--font-cormorant)' }}
               >
-                Welcome to <span className="text-amber-400">THE 1898</span>
+                Welcome to <span className="text-[#F2AC57]">THE 1898</span>
               </h2>
               <p className="text-lg text-white/60 max-w-2xl mx-auto">
                 Your digital gateway to seamless hotel experiences. Check in with ease,
@@ -111,7 +111,7 @@ export default function DemoPage() {
                   onClick={() => setActiveTab('guest')}
                   className={`flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-medium transition-all ${
                     activeTab === 'guest'
-                      ? 'bg-amber-500 text-white shadow-lg'
+                      ? 'bg-[#F2AC57] text-[#260A1C] shadow-lg'
                       : 'text-white/70 hover:text-white'
                   }`}
                 >
@@ -122,7 +122,7 @@ export default function DemoPage() {
                   onClick={() => setActiveTab('staff')}
                   className={`flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-medium transition-all ${
                     activeTab === 'staff'
-                      ? 'bg-amber-500 text-white shadow-lg'
+                      ? 'bg-[#733858] text-white shadow-lg'
                       : 'text-white/70 hover:text-white'
                   }`}
                 >
@@ -137,10 +137,10 @@ export default function DemoPage() {
               <>
                 <div className="grid md:grid-cols-2 gap-6">
                   {/* QR Code Check-in */}
-                  <div className="bg-white/10 backdrop-blur-xl rounded-2xl border-2 border-amber-400/30 hover:border-amber-400/50 transition-colors overflow-hidden">
+                  <div className="bg-white/10 backdrop-blur-xl rounded-2xl border-2 border-[#F2AC57]/30 hover:border-[#F2AC57]/50 transition-colors overflow-hidden">
                     <div className="p-6 border-b border-white/10">
                       <h3 className="flex items-center gap-2 text-xl font-medium text-white" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                        <ScanLine className="h-5 w-5 text-amber-400" />
+                        <ScanLine className="h-5 w-5 text-[#F2AC57]" />
                         Scan QR Code
                       </h3>
                       <p className="text-sm text-white/50 mt-1">
@@ -149,8 +149,8 @@ export default function DemoPage() {
                     </div>
                     <div className="p-6">
                       <div className="flex flex-col items-center py-6">
-                        <div className="h-32 w-32 border-2 border-dashed border-amber-400/40 rounded-xl flex items-center justify-center mb-4 bg-white/5">
-                          <ScanLine className="h-12 w-12 text-amber-400/40" />
+                        <div className="h-32 w-32 border-2 border-dashed border-[#F2AC57]/40 rounded-xl flex items-center justify-center mb-4 bg-white/5">
+                          <ScanLine className="h-12 w-12 text-[#F2AC57]/40" />
                         </div>
                         <button className="flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-white transition-colors">
                           Open Camera
@@ -164,7 +164,7 @@ export default function DemoPage() {
                   <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden">
                     <div className="p-6 border-b border-white/10">
                       <h3 className="flex items-center gap-2 text-xl font-medium text-white" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                        <KeyRound className="h-5 w-5 text-amber-400" />
+                        <KeyRound className="h-5 w-5 text-[#F2AC57]" />
                         Enter Code
                       </h3>
                       <p className="text-sm text-white/50 mt-1">
@@ -183,13 +183,13 @@ export default function DemoPage() {
                             placeholder="e.g. NIS-2025-DEMO"
                             value={checkInCode}
                             onChange={(e) => setCheckInCode(e.target.value.toUpperCase())}
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white text-center text-lg tracking-widest placeholder:text-white/30 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white text-center text-lg tracking-widest placeholder:text-white/30 focus:outline-none focus:border-[#F2AC57]/50 focus:ring-1 focus:ring-[#F2AC57]/50"
                             maxLength={15}
                           />
                         </div>
                         <button
                           type="submit"
-                          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 rounded-xl text-white font-medium transition-colors"
+                          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#F2AC57] hover:bg-[#D99A45] rounded-xl text-[#260A1C] font-medium transition-colors"
                         >
                           Check In
                           <ArrowRight className="h-4 w-4" />
@@ -206,7 +206,7 @@ export default function DemoPage() {
                   </p>
                   <button
                     onClick={handleDemoCheckIn}
-                    className="text-amber-400 hover:text-amber-300 font-medium transition-colors"
+                    className="text-[#F2AC57] hover:text-[#F7C67E] font-medium transition-colors"
                   >
                     Try Demo Check-in →
                   </button>
@@ -218,10 +218,10 @@ export default function DemoPage() {
             {activeTab === 'staff' && (
               <>
                 <div className="max-w-md mx-auto">
-                  <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden">
+                  <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-[#733858]/30 overflow-hidden">
                     <div className="p-6 border-b border-white/10">
                       <h3 className="flex items-center gap-2 text-xl font-medium text-white" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                        <Lock className="h-5 w-5 text-amber-400" />
+                        <Lock className="h-5 w-5 text-[#733858]" />
                         Staff Login
                       </h3>
                       <p className="text-sm text-white/50 mt-1">
@@ -240,7 +240,7 @@ export default function DemoPage() {
                             placeholder="staff@the1898.com"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-[#733858]/50 focus:ring-1 focus:ring-[#733858]/50"
                           />
                         </div>
                         <div className="space-y-2">
@@ -253,12 +253,12 @@ export default function DemoPage() {
                             placeholder="Enter your password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-[#733858]/50 focus:ring-1 focus:ring-[#733858]/50"
                           />
                         </div>
                         <button
                           type="submit"
-                          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 rounded-xl text-white font-medium transition-colors"
+                          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#733858] hover:bg-[#5A2B45] rounded-xl text-white font-medium transition-colors"
                         >
                           Sign In
                           <ArrowRight className="h-4 w-4" />
@@ -275,7 +275,7 @@ export default function DemoPage() {
                   </p>
                   <button
                     onClick={handleAdminDemo}
-                    className="text-amber-400 hover:text-amber-300 font-medium transition-colors"
+                    className="text-[#F2AC57] hover:text-[#F7C67E] font-medium transition-colors"
                   >
                     View Admin Demo →
                   </button>
@@ -295,8 +295,8 @@ export default function DemoPage() {
                   key={feature.label}
                   className="text-center p-4 rounded-xl bg-white/5 border border-white/10"
                 >
-                  <div className="h-12 w-12 mx-auto rounded-full bg-amber-500/10 flex items-center justify-center mb-3">
-                    <feature.icon className="h-6 w-6 text-amber-400" />
+                  <div className="h-12 w-12 mx-auto rounded-full bg-[#F2AC57]/10 flex items-center justify-center mb-3">
+                    <feature.icon className="h-6 w-6 text-[#F2AC57]" />
                   </div>
                   <h3 className="font-medium text-white">{feature.label}</h3>
                   <p className="text-xs text-white/50">{feature.desc}</p>

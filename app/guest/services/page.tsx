@@ -100,7 +100,7 @@ function ServicesContent() {
               placeholder="Search services..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 py-3 pl-12 pr-4 text-white placeholder-white/40 focus:outline-none focus:border-amber-400/50"
+              className="w-full bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 py-3 pl-12 pr-4 text-white placeholder-white/40 focus:outline-none focus:border-[#F2AC57]/50"
             />
           </div>
 
@@ -110,7 +110,7 @@ function ServicesContent() {
               onClick={() => handleCategoryClick(null)}
               className={`flex-shrink-0 px-4 py-2 rounded-full text-sm transition-all ${
                 !selectedCategory
-                  ? 'bg-amber-500/20 text-amber-400 border border-amber-400/30'
+                  ? 'bg-[#F2AC57]/20 text-[#F2AC57] border border-[#F2AC57]/30'
                   : 'bg-white/10 text-white/70 border border-white/10 hover:bg-white/15'
               }`}
             >
@@ -124,7 +124,7 @@ function ServicesContent() {
                   onClick={() => handleCategoryClick(cat.key)}
                   className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-all ${
                     selectedCategory === cat.key
-                      ? 'bg-amber-500/20 text-amber-400 border border-amber-400/30'
+                      ? 'bg-[#F2AC57]/20 text-[#F2AC57] border border-[#F2AC57]/30'
                       : 'bg-white/10 text-white/70 border border-white/10 hover:bg-white/15'
                   }`}
                 >

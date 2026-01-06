@@ -3,6 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Custom Color Palette */
+  --color-gold: #F2AC57;
+  --color-mauve: #733858;
+  --color-wine: #260A1C;
+  --color-espresso: #401F03;
+  --color-copper: #592203;
 }
 
 @theme inline {
@@ -10,6 +17,20 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
+
+  /* Custom Brand Colors */
+  --color-gold: #F2AC57;
+  --color-gold-light: #F7C67E;
+  --color-gold-dark: #D99A45;
+  --color-mauve: #733858;
+  --color-mauve-light: #8E4A6D;
+  --color-mauve-dark: #5A2B45;
+  --color-wine: #260A1C;
+  --color-wine-light: #3D1530;
+  --color-espresso: #401F03;
+  --color-espresso-light: #5A2E08;
+  --color-copper: #592203;
+  --color-copper-light: #7A3005;
 }
 
 @media (prefers-color-scheme: dark) {
