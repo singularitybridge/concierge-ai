@@ -6,11 +6,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
   LogOut, ChevronRight,
-  User, Building2, Mail, Phone, Users, Car, UtensilsCrossed, BedDouble, MessageSquare, Check, X
+  User, Building2, Mail, Phone, Users, Car, UtensilsCrossed, BedDouble, MessageSquare, Check, X, ExternalLink
 } from 'lucide-react';
+import QRCode from 'react-qr-code';
 import VoiceSessionChat from '../components/VoiceSessionChat';
 import LanguageSelector from '../components/LanguageSelector';
 import { useLanguageStore } from '@/lib/use-language-store';
+import { useGuestStore } from '@/lib/stores/guest-store';
+import { generateGuestId, buildGuestRoomUrl } from '@/lib/utils/guest-url';
+import { RegisteredGuestData } from '@/types/guest';
 
 // Get current date/time in Japan timezone
 const getJapanDateTime = () => {
@@ -60,10 +64,10 @@ const hotelInfo = {
   },
   dining: {
     title: 'Culinary Experience',
-    description: 'Chef Watanabe celebrates Hokkaido\'s exceptional ingredients.',
+    description: "Chef Watanabe celebrates Hokkaido's exceptional ingredients.",
     items: [
       { name: 'Kaiseki Dinner', description: '8-12 course seasonal cuisine. ¥18,000-35,000 per person.' },
-      { name: 'Sushi Omakase', description: 'Chef\'s selection, 12 pieces. ¥15,000.' },
+      { name: 'Sushi Omakase', description: "Chef's selection, 12 pieces. ¥15,000." },
       { name: 'Teppanyaki', description: 'Premium A5 Wagyu, Hokkaido scallops. ¥25,000 per person.' },
       { name: 'In-Room Dining', description: '24-hour service, full menu until 10:30 PM.' },
     ]
@@ -129,8 +133,11 @@ export default function CheckInPage() {
   const [infoPanel, setInfoPanel] = useState<InfoPanelType>(null);
   const [isComplete, setIsComplete] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [guestId, setGuestId] = useState<string | null>(null);
+  const [registrationData, setRegistrationData] = useState<RegisteredGuestData | null>(null);
   const router = useRouter();
   const { language, translations: t } = useLanguageStore();
+  const { setGuestSessionFromRegistration } = useGuestStore();
 
   useEffect(() => {
     const auth = localStorage.getItem('niseko_authenticated');
@@ -153,6 +160,11 @@ export default function CheckInPage() {
   // Count filled fields for progress
   const filledCount = Object.values(checkIn).filter(v => v && v.trim() !== '').length;
   const totalFields = checkInFields.length;
+
+  // Build guest room URL for QR code
+  const guestRoomUrl = guestId && registrationData
+    ? (typeof window !== 'undefined' ? window.location.origin : '') + buildGuestRoomUrl(guestId, registrationData)
+    : '';
 
   // Listen for agent events
   useEffect(() => {
@@ -178,8 +190,45 @@ export default function CheckInPage() {
 
     // Mark check-in complete
     const handleComplete = () => {
+      console.log('🎉 [REGISTER] Check-in complete event received');
+
+      // Generate unique guest ID
+      const newGuestId = generateGuestId();
+      console.log('🆔 [REGISTER] Generated guest ID:', newGuestId);
+      setGuestId(newGuestId);
+
+      // Create registration data from form
+      // TODO: In production, save to database:
+      // await fetch('/api/guests', { method: 'POST', body: JSON.stringify(registrationData) });
+      const data: RegisteredGuestData = {
+        guestId: newGuestId,
+        name: checkIn.name || 'Guest',
+        email: checkIn.email || '',
+        phone: checkIn.phone || '',
+        partySize: parseInt(checkIn.partySize) || 1,
+        children: parseInt(checkIn.children) || 0,
+        arrivalDate: checkIn.arrivalDate || new Date().toISOString().split('T')[0],
+        departureDate: checkIn.departureDate || new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
+        roomPreference: checkIn.roomPreference || 'standard',
+        transportation: checkIn.transportation || '',
+        dietary: checkIn.dietary || '',
+        remarks: checkIn.remarks || '',
+        registeredAt: new Date().toISOString(),
+      };
+
+      console.log('📦 [REGISTER] Created registration data:', JSON.stringify(data, null, 2));
+      setRegistrationData(data);
+
+      // Store in Zustand for fallback access
+      console.log('💾 [REGISTER] Storing to Zustand...');
+      setGuestSessionFromRegistration(data);
+
+      const roomUrl = buildGuestRoomUrl(newGuestId, data);
+      console.log('🔗 [REGISTER] Generated room URL:', roomUrl);
+
       setIsComplete(true);
       setInfoPanel(null);
+      console.log('✅ [REGISTER] Registration complete, showing QR code');
     };
 
     // Reset check-in
@@ -187,6 +236,8 @@ export default function CheckInPage() {
       setCheckIn(emptyCheckIn);
       setIsComplete(false);
       setInfoPanel(null);
+      setGuestId(null);
+      setRegistrationData(null);
     };
 
     // Legacy navigate-tab support
@@ -212,7 +263,7 @@ export default function CheckInPage() {
       window.removeEventListener('reset-registration', handleReset as EventListener);
       window.removeEventListener('navigate-tab', handleNavigateTab as EventListener);
     };
-  }, []);
+  }, [checkIn, setGuestSessionFromRegistration]);
 
   if (isAuthenticated === null) {
     return (
@@ -361,9 +412,37 @@ export default function CheckInPage() {
                   <p className="text-xl text-white mb-2" style={{ fontFamily: 'var(--font-cormorant)' }}>
                     {t.checkIn.welcomeMessage}, {checkIn.name || 'Guest'}!
                   </p>
-                  <p className="text-sm text-white/50 mb-4">
+                  <p className="text-sm text-white/50 mb-6">
                     {t.checkIn.checkInSuccess}
                   </p>
+
+                  {/* QR Code Section */}
+                  {guestRoomUrl && (
+                    <div className="flex flex-col items-center gap-4 mb-6">
+                      <div className="bg-white p-4 rounded-xl shadow-lg">
+                        <QRCode
+                          value={guestRoomUrl}
+                          size={180}
+                          level="M"
+                        />
+                      </div>
+                      <p className="text-xs text-white/40 text-center max-w-xs">
+                        Scan this QR code to access your personal room portal with digital key, services, and more.
+                      </p>
+
+                      {/* Dev-only direct link button */}
+                      {process.env.NODE_ENV === 'development' && guestId && registrationData && (
+                        <Link
+                          href={buildGuestRoomUrl(guestId, registrationData)}
+                          className="flex items-center gap-2 px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded-lg text-sm transition-colors border border-amber-500/30"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          <span>Open Room Portal (Dev)</span>
+                        </Link>
+                      )}
+                    </div>
+                  )}
+
                   <p className="text-xs text-white/40 max-w-sm text-center">
                     {t.checkIn.confirmationEmail}
                   </p>
