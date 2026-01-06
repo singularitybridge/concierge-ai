@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Waves, UtensilsCrossed, Snowflake, Car, Coffee, Search } from 'lucide-react';
 import { GuestHeader } from '@/app/components/guest/GuestHeader';
 import { ServiceCard } from '@/app/components/guest/ServiceCard';
+import { FoodCard } from '@/app/components/guest/FoodCard';
 import { mockServices, serviceCategories, getPopularServices } from '@/lib/mock-data/services-data';
 import { ServiceCategory, GuestService } from '@/types/guest';
 
@@ -168,13 +169,21 @@ function ServicesContent() {
                 : 'All Services'}
             </h2>
             {filteredServices.length > 0 ? (
-              <div className="space-y-3">
+              <div className={selectedCategory === 'restaurant' ? 'space-y-4' : 'space-y-3'}>
                 {filteredServices.map((service) => (
-                  <ServiceCard
-                    key={service.id}
-                    service={service}
-                    onClick={() => handleServiceClick(service)}
-                  />
+                  service.category === 'restaurant' && service.image ? (
+                    <FoodCard
+                      key={service.id}
+                      service={service}
+                      onClick={() => handleServiceClick(service)}
+                    />
+                  ) : (
+                    <ServiceCard
+                      key={service.id}
+                      service={service}
+                      onClick={() => handleServiceClick(service)}
+                    />
+                  )
                 ))}
               </div>
             ) : (
