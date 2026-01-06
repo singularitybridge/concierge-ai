@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 // ============================================
 // RoomBoss-based Data Models
@@ -136,6 +137,56 @@ export interface CartService {
   totalPrice: number;
 }
 
+// Cart Product (merchandise, add-ons)
+export interface CartProduct {
+  id: string;
+  productId: string;
+  productName: string;
+  category: string;
+  description: string;
+  quantity: number;
+  pricePerUnit: number;
+  totalPrice: number;
+  image?: string;
+}
+
+// Product (merchandise for upselling)
+export interface Product {
+  id: string;
+  name: string;
+  nameJapanese: string;
+  description: string;
+  category: string;
+  price: number;
+  currency: string;
+  image: string;
+  featured: boolean;
+  inStock: boolean;
+}
+
+// Booking Flow Types
+export type BookingFlow = 'accommodation_first' | 'products_first';
+
+export type BookingStep =
+  | 'search'
+  | 'results'
+  | 'upsell_post_room'    // New: Upsell gate after room selection
+  | 'services'
+  | 'upsell_pre_checkout' // New: Upsell gate before checkout
+  | 'cart'
+  | 'checkout'
+  | 'confirmation';
+
+// Applied Discount
+export interface AppliedDiscount {
+  id: string;
+  code: string;
+  type: 'percentage' | 'fixed';
+  value: number;
+  description: string;
+  appliesTo: 'all' | 'accommodation' | 'services' | 'products';
+}
+
 // Guest Information
 export interface GuestInfo {
   firstName: string;
@@ -156,10 +207,15 @@ export interface SearchParams {
   nights: number;
   adults: number;
   children: number;
+  childAges: number[];  // Ages of children for better recommendations
 }
 
 // Booking Store State
 interface BookingState {
+  // Flow Control
+  currentFlow: BookingFlow;
+  currentStep: BookingStep;
+
   // Search
   searchParams: SearchParams;
   searchResults: Property[];
@@ -168,13 +224,16 @@ interface BookingState {
   ratePlans: RatePlan[];
   availability: RoomAvailability[];
 
-  // Services
+  // Services & Products
   availableServices: GuestService[];
+  availableProducts: Product[];
   selectedServiceCategory: ServiceCategory | 'all';
 
-  // Cart
+  // Unified Cart
   cartAccommodations: CartAccommodation[];
   cartServices: CartService[];
+  cartProducts: CartProduct[];
+  appliedDiscounts: AppliedDiscount[];
 
   // Guest & Checkout
   guestInfo: GuestInfo;
@@ -183,28 +242,68 @@ interface BookingState {
   bookingReference: string | null;
 
   // UI State
-  currentStep: 'search' | 'results' | 'services' | 'cart' | 'checkout' | 'confirmation';
   isLoading: boolean;
   language: 'en' | 'ja';
   currency: 'JPY' | 'USD' | 'AUD';
 
-  // Actions
+  // Upsell Tracking
+  upsellGateShown: {
+    postRoom: boolean;
+    preCheckout: boolean;
+    noAccommodation: boolean;
+  };
+
+  // Actions - Flow Control
+  setCurrentFlow: (flow: BookingFlow) => void;
+  setCurrentStep: (step: BookingStep) => void;
+
+  // Actions - Search
   setSearchParams: (params: Partial<SearchParams>) => void;
   searchAccommodations: () => void;
   selectProperty: (property: Property) => void;
+
+  // Actions - Cart (Accommodations)
   addAccommodationToCart: (accommodation: CartAccommodation) => void;
   removeAccommodationFromCart: (id: string) => void;
+
+  // Actions - Cart (Services)
   addServiceToCart: (service: CartService) => void;
   removeServiceFromCart: (id: string) => void;
   updateServiceQuantity: (id: string, quantity: number) => void;
+
+  // Actions - Cart (Products)
+  addProductToCart: (product: CartProduct) => void;
+  removeProductFromCart: (id: string) => void;
+  updateProductQuantity: (id: string, quantity: number) => void;
+
+  // Actions - Discounts
+  applyDiscount: (discount: AppliedDiscount) => void;
+  removeDiscount: (id: string) => void;
+
+  // Actions - Guest & Checkout
   setGuestInfo: (info: Partial<GuestInfo>) => void;
-  setCurrentStep: (step: BookingState['currentStep']) => void;
+  processBooking: () => Promise<void>;
+  resetBooking: () => void;
+
+  // Actions - UI
   setServiceCategory: (category: ServiceCategory | 'all') => void;
   setLanguage: (lang: 'en' | 'ja') => void;
   setCurrency: (currency: 'JPY' | 'USD' | 'AUD') => void;
-  processBooking: () => Promise<void>;
-  resetBooking: () => void;
+
+  // Actions - Upsell Tracking
+  markUpsellGateShown: (gate: 'postRoom' | 'preCheckout' | 'noAccommodation') => void;
+  resetUpsellTracking: () => void;
+
+  // Computed Values
   getCartTotal: () => number;
+  getAccommodationTotal: () => number;
+  getServicesTotal: () => number;
+  getProductsTotal: () => number;
+  getDiscountTotal: () => number;
+  getCartItemCount: () => number;
+  hasAccommodation: () => boolean;
+  hasServices: () => boolean;
+  hasProducts: () => boolean;
 }
 
 // ============================================
@@ -889,6 +988,108 @@ const mockGuestServices: GuestService[] = [
 ];
 
 // ============================================
+// Mock Data - Products (Merchandise/Add-ons)
+// ============================================
+const mockProducts: Product[] = [
+  {
+    id: 'prod-1',
+    name: 'Premium Niseko Sake Set',
+    nameJapanese: 'プレミアム二世古酒セット',
+    description: 'Local craft sake collection featuring 3 award-winning varieties from Hokkaido breweries.',
+    category: 'beverages',
+    price: 8500,
+    currency: 'JPY',
+    image: '/hotel1.jpg',
+    featured: true,
+    inStock: true,
+  },
+  {
+    id: 'prod-2',
+    name: 'Onsen Bath Kit',
+    nameJapanese: '温泉バスキット',
+    description: 'Traditional Japanese bath essentials including yukata, tenugui towel, and organic bath salts.',
+    category: 'wellness',
+    price: 4500,
+    currency: 'JPY',
+    image: '/hotel2.jpg',
+    featured: true,
+    inStock: true,
+  },
+  {
+    id: 'prod-3',
+    name: 'Hokkaido Chocolate Collection',
+    nameJapanese: '北海道チョコレートコレクション',
+    description: 'Artisanal chocolates made with fresh Hokkaido milk. Perfect apres-ski treat.',
+    category: 'food',
+    price: 3200,
+    currency: 'JPY',
+    image: '/hotel3.jpg',
+    featured: false,
+    inStock: true,
+  },
+  {
+    id: 'prod-4',
+    name: 'Mountain Pine Candle',
+    nameJapanese: '山松キャンドル',
+    description: 'Hand-poured soy candle with authentic Hokkaido pine and cedar scent.',
+    category: 'home',
+    price: 2800,
+    currency: 'JPY',
+    image: '/hotel1.jpg',
+    featured: false,
+    inStock: true,
+  },
+  {
+    id: 'prod-5',
+    name: 'Niseko Fleece Robe',
+    nameJapanese: 'ニセコフリースローブ',
+    description: 'Ultra-soft fleece robe with Niseko embroidery. Perfect for chalet lounging.',
+    category: 'apparel',
+    price: 12000,
+    currency: 'JPY',
+    image: '/hotel2.jpg',
+    featured: true,
+    inStock: true,
+  },
+  {
+    id: 'prod-6',
+    name: 'Local Honey Gift Set',
+    nameJapanese: 'ローカルハニーギフトセット',
+    description: 'Three varieties of pure Hokkaido wildflower honey from local apiaries.',
+    category: 'food',
+    price: 3800,
+    currency: 'JPY',
+    image: '/hotel3.jpg',
+    featured: false,
+    inStock: true,
+  },
+  {
+    id: 'prod-7',
+    name: 'Premium Ski Wax Kit',
+    nameJapanese: 'プレミアムスキーワックスキット',
+    description: 'Professional-grade wax kit optimized for Niseko powder conditions.',
+    category: 'sports',
+    price: 5500,
+    currency: 'JPY',
+    image: '/hotel1.jpg',
+    featured: false,
+    inStock: true,
+  },
+  {
+    id: 'prod-8',
+    name: 'Traditional Tea Set',
+    nameJapanese: '伝統茶器セット',
+    description: 'Handcrafted ceramic tea set with matcha whisk and organic green tea.',
+    category: 'beverages',
+    price: 18000,
+    currency: 'JPY',
+    image: '/hotel2.jpg',
+    featured: true,
+    inStock: true,
+  },
+];
+
+// ============================================
 // Initial State
 // ============================================
 const initialSearchParams: SearchParams = {
@@ -898,6 +1099,7 @@ const initialSearchParams: SearchParams = {
   nights: 3,
   adults: 2,
   children: 0,
+  childAges: [],
 };
 
 const initialGuestInfo: GuestInfo = {
@@ -912,10 +1114,23 @@ const initialGuestInfo: GuestInfo = {
 };
 
 // ============================================
+// Initial Upsell Tracking State
+// ============================================
+const initialUpsellTracking = {
+  postRoom: false,
+  preCheckout: false,
+  noAccommodation: false,
+};
+
+// ============================================
 // Store Implementation
 // ============================================
 export const useBookingStore = create<BookingState>((set, get) => ({
-  // Initial State
+  // Flow Control
+  currentFlow: 'accommodation_first',
+  currentStep: 'search',
+
+  // Search
   searchParams: initialSearchParams,
   searchResults: [],
   selectedProperty: null,
@@ -923,23 +1138,45 @@ export const useBookingStore = create<BookingState>((set, get) => ({
   ratePlans: mockRatePlans,
   availability: [],
 
+  // Services & Products
   availableServices: mockGuestServices,
+  availableProducts: mockProducts,
   selectedServiceCategory: 'all',
 
+  // Unified Cart
   cartAccommodations: [],
   cartServices: [],
+  cartProducts: [],
+  appliedDiscounts: [],
 
+  // Guest & Checkout
   guestInfo: initialGuestInfo,
   orderType: 'reservation',
   orderStatus: 'draft',
   bookingReference: null,
 
-  currentStep: 'search',
+  // UI State
   isLoading: false,
   language: 'en',
   currency: 'JPY',
 
-  // Actions
+  // Upsell Tracking
+  upsellGateShown: initialUpsellTracking,
+
+  // ============================================
+  // Actions - Flow Control
+  // ============================================
+  setCurrentFlow: (flow) => {
+    set({ currentFlow: flow });
+  },
+
+  setCurrentStep: (step) => {
+    set({ currentStep: step });
+  },
+
+  // ============================================
+  // Actions - Search
+  // ============================================
   setSearchParams: (params) => {
     set((state) => ({
       searchParams: { ...state.searchParams, ...params },
@@ -947,7 +1184,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
   },
 
   searchAccommodations: () => {
-    set({ isLoading: true });
+    set({ isLoading: true, currentFlow: 'accommodation_first' });
 
     // Simulate API call
     setTimeout(() => {
@@ -972,6 +1209,9 @@ export const useBookingStore = create<BookingState>((set, get) => ({
     });
   },
 
+  // ============================================
+  // Actions - Cart (Accommodations)
+  // ============================================
   addAccommodationToCart: (accommodation) => {
     set((state) => ({
       cartAccommodations: [...state.cartAccommodations, accommodation],
@@ -984,9 +1224,14 @@ export const useBookingStore = create<BookingState>((set, get) => ({
     }));
   },
 
+  // ============================================
+  // Actions - Cart (Services)
+  // ============================================
   addServiceToCart: (service) => {
     set((state) => ({
       cartServices: [...state.cartServices, service],
+      // If adding service without accommodation, switch to products_first flow
+      currentFlow: state.cartAccommodations.length === 0 ? 'products_first' : state.currentFlow,
     }));
   },
 
@@ -1006,26 +1251,66 @@ export const useBookingStore = create<BookingState>((set, get) => ({
     }));
   },
 
+  // ============================================
+  // Actions - Cart (Products)
+  // ============================================
+  addProductToCart: (product) => {
+    set((state) => {
+      // Check if product already in cart
+      const existing = state.cartProducts.find((p) => p.productId === product.productId);
+      if (existing) {
+        return {
+          cartProducts: state.cartProducts.map((p) =>
+            p.productId === product.productId
+              ? { ...p, quantity: p.quantity + product.quantity, totalPrice: (p.quantity + product.quantity) * p.pricePerUnit }
+              : p
+          ),
+        };
+      }
+      return {
+        cartProducts: [...state.cartProducts, product],
+      };
+    });
+  },
+
+  removeProductFromCart: (id) => {
+    set((state) => ({
+      cartProducts: state.cartProducts.filter((p) => p.id !== id),
+    }));
+  },
+
+  updateProductQuantity: (id, quantity) => {
+    set((state) => ({
+      cartProducts: state.cartProducts.map((p) =>
+        p.id === id
+          ? { ...p, quantity, totalPrice: p.pricePerUnit * quantity }
+          : p
+      ),
+    }));
+  },
+
+  // ============================================
+  // Actions - Discounts
+  // ============================================
+  applyDiscount: (discount) => {
+    set((state) => ({
+      appliedDiscounts: [...state.appliedDiscounts, discount],
+    }));
+  },
+
+  removeDiscount: (id) => {
+    set((state) => ({
+      appliedDiscounts: state.appliedDiscounts.filter((d) => d.id !== id),
+    }));
+  },
+
+  // ============================================
+  // Actions - Guest & Checkout
+  // ============================================
   setGuestInfo: (info) => {
     set((state) => ({
       guestInfo: { ...state.guestInfo, ...info },
     }));
-  },
-
-  setCurrentStep: (step) => {
-    set({ currentStep: step });
-  },
-
-  setServiceCategory: (category) => {
-    set({ selectedServiceCategory: category });
-  },
-
-  setLanguage: (lang) => {
-    set({ language: lang });
-  },
-
-  setCurrency: (currency) => {
-    set({ currency });
   },
 
   processBooking: async () => {
@@ -1046,30 +1331,108 @@ export const useBookingStore = create<BookingState>((set, get) => ({
 
   resetBooking: () => {
     set({
+      currentFlow: 'accommodation_first',
+      currentStep: 'search',
       searchParams: initialSearchParams,
       searchResults: [],
       selectedProperty: null,
       availableRoomTypes: [],
       cartAccommodations: [],
       cartServices: [],
+      cartProducts: [],
+      appliedDiscounts: [],
       guestInfo: initialGuestInfo,
       orderType: 'reservation',
       orderStatus: 'draft',
       bookingReference: null,
-      currentStep: 'search',
+      upsellGateShown: initialUpsellTracking,
     });
   },
 
+  // ============================================
+  // Actions - UI
+  // ============================================
+  setServiceCategory: (category) => {
+    set({ selectedServiceCategory: category });
+  },
+
+  setLanguage: (lang) => {
+    set({ language: lang });
+  },
+
+  setCurrency: (currency) => {
+    set({ currency });
+  },
+
+  // ============================================
+  // Actions - Upsell Tracking
+  // ============================================
+  markUpsellGateShown: (gate) => {
+    set((state) => ({
+      upsellGateShown: { ...state.upsellGateShown, [gate]: true },
+    }));
+  },
+
+  resetUpsellTracking: () => {
+    set({ upsellGateShown: initialUpsellTracking });
+  },
+
+  // ============================================
+  // Computed Values
+  // ============================================
   getCartTotal: () => {
     const state = get();
-    const accommodationTotal = state.cartAccommodations.reduce(
-      (sum, a) => sum + a.totalPrice,
-      0
-    );
-    const servicesTotal = state.cartServices.reduce(
-      (sum, s) => sum + s.totalPrice,
-      0
-    );
-    return accommodationTotal + servicesTotal;
+    const accommodationTotal = state.getAccommodationTotal();
+    const servicesTotal = state.getServicesTotal();
+    const productsTotal = state.getProductsTotal();
+    const discountTotal = state.getDiscountTotal();
+    return accommodationTotal + servicesTotal + productsTotal - discountTotal;
+  },
+
+  getAccommodationTotal: () => {
+    const state = get();
+    return state.cartAccommodations.reduce((sum, a) => sum + a.totalPrice, 0);
+  },
+
+  getServicesTotal: () => {
+    const state = get();
+    return state.cartServices.reduce((sum, s) => sum + s.totalPrice, 0);
+  },
+
+  getProductsTotal: () => {
+    const state = get();
+    return state.cartProducts.reduce((sum, p) => sum + p.totalPrice, 0);
+  },
+
+  getDiscountTotal: () => {
+    const state = get();
+    const subtotal = state.getAccommodationTotal() + state.getServicesTotal() + state.getProductsTotal();
+
+    return state.appliedDiscounts.reduce((sum, d) => {
+      if (d.type === 'percentage') {
+        if (d.appliesTo === 'all') return sum + (subtotal * d.value / 100);
+        if (d.appliesTo === 'accommodation') return sum + (state.getAccommodationTotal() * d.value / 100);
+        if (d.appliesTo === 'services') return sum + (state.getServicesTotal() * d.value / 100);
+        if (d.appliesTo === 'products') return sum + (state.getProductsTotal() * d.value / 100);
+      }
+      return sum + d.value;
+    }, 0);
+  },
+
+  getCartItemCount: () => {
+    const state = get();
+    return state.cartAccommodations.length + state.cartServices.length + state.cartProducts.length;
+  },
+
+  hasAccommodation: () => {
+    return get().cartAccommodations.length > 0;
+  },
+
+  hasServices: () => {
+    return get().cartServices.length > 0;
+  },
+
+  hasProducts: () => {
+    return get().cartProducts.length > 0;
   },
 }));
