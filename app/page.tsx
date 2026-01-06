@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LogOut, Sparkles, Calendar, Users, Briefcase, ShoppingBag, LayoutDashboard, BarChart3, UserCog, Store } from 'lucide-react';
+import { LogOut, Sparkles, Calendar, Users, Briefcase, ShoppingBag, LayoutDashboard, BarChart3, UserCog, Store, KeyRound } from 'lucide-react';
 
 export default function WelcomePage() {
   const router = useRouter();
@@ -88,6 +88,12 @@ export default function WelcomePage() {
       icon: ShoppingBag,
       title: 'Hotel Boutique',
       description: 'Curated local products'
+    },
+    {
+      href: '/demo',
+      icon: KeyRound,
+      title: 'Digital Key Demo',
+      description: 'Guest mobile experience'
     }
   ];
 
