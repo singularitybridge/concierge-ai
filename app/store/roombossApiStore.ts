@@ -2,10 +2,10 @@ import { create } from 'zustand';
 
 // RoomBoss API Configuration
 export const ROOMBOSS_CONFIG = {
-  baseUrl: 'https://api.roomboss.com',
+  baseUrl: process.env.NEXT_PUBLIC_ROOMBOSS_API_URL || 'https://api.roomboss.com',
   credentials: {
-    username: 'ACCOMDEMO_API',
-    password: 'a6e672637f85af7c1348b2d003e5c75e',
+    username: process.env.NEXT_PUBLIC_ROOMBOSS_USERNAME || '',
+    password: process.env.NEXT_PUBLIC_ROOMBOSS_PASSWORD || '',
   },
 };
 

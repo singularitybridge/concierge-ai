@@ -140,7 +140,7 @@ function handleGetRecommendations(context?: BookingContext): ToolResponse {
   };
 }
 
-function handleSearchProperties(args: Record<string, unknown>): ToolResponse {
+function handleSearchProperties(_args: Record<string, unknown>): ToolResponse {
   return {
     result: "I can show you our available properties! We have ski-in/ski-out chalets, luxury resorts, and cozy family lodges. What's most important to you - proximity to lifts, amenities, or budget?",
     action: 'navigate_to',
@@ -196,8 +196,6 @@ export async function OPTIONS() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    console.log('📥 VAPI Booking webhook:', JSON.stringify(body, null, 2));
-
     const message: VapiMessage = body.message || body;
     const bookingContext = message.call?.metadata?.bookingContext;
 
@@ -214,8 +212,6 @@ export async function POST(req: NextRequest) {
         } catch {
           args = {};
         }
-
-        console.log(`🔧 Tool call: ${functionName}`, args);
 
         let response: ToolResponse;
 
@@ -252,8 +248,7 @@ export async function POST(req: NextRequest) {
 
     // Handle function calls (older format)
     if (message.functionCall) {
-      const { name, parameters } = message.functionCall;
-      console.log(`🔧 Function call: ${name}`, parameters);
+      const { name } = message.functionCall;
 
       let response: ToolResponse;
 
@@ -274,8 +269,7 @@ export async function POST(req: NextRequest) {
     // Default acknowledgment
     return NextResponse.json({ status: 'received' }, { headers: corsHeaders });
 
-  } catch (error) {
-    console.error('VAPI Booking webhook error:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Internal server error', result: 'Sorry, something went wrong.' },
       { status: 500, headers: corsHeaders }

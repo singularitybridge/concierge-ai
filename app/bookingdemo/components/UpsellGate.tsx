@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import {
-  X,
   Plus,
   Check,
   ChevronRight,
@@ -22,12 +21,9 @@ import {
   Package,
   ArrowRight,
   Gift,
-  Clock,
-  Users,
 } from 'lucide-react';
 import {
   useBookingStore,
-  GuestService,
   ServiceCategory,
   CartService,
   Property,

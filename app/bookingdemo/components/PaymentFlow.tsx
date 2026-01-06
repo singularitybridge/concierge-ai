@@ -1,13 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import {
-  CreditCard,
   Smartphone,
-  Building2,
   Store,
-  ChevronRight,
   Check,
   X,
   AlertCircle,

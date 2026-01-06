@@ -140,7 +140,7 @@ Be helpful, suggest relevant services based on the user's booking, and make the 
 // Suggestion Generator
 // ============================================
 
-function generateSuggestions(context: BookingContext, messageContent: string): QuickSuggestion[] {
+function generateSuggestions(context: BookingContext, _messageContent: string): QuickSuggestion[] {
   const suggestions: QuickSuggestion[] = [];
   const { currentStep, cart, searchParams } = context;
 
@@ -276,7 +276,7 @@ function extractPreferences(message: string, response: string): Record<string, u
 export async function POST(req: NextRequest) {
   try {
     const body: RequestBody = await req.json();
-    const { message, context, sessionId, conversationHistory } = body;
+    const { message, context, conversationHistory } = body;
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
@@ -287,7 +287,6 @@ export async function POST(req: NextRequest) {
 
     if (!apiKey) {
       // Fallback to rule-based responses if no API key
-      console.log('No Anthropic API key, using fallback responses');
       return NextResponse.json(getFallbackResponse(message, context));
     }
 
@@ -317,7 +316,6 @@ export async function POST(req: NextRequest) {
     });
 
     if (!response.ok) {
-      console.error('Anthropic API error:', response.status);
       return NextResponse.json(getFallbackResponse(message, context));
     }
 
@@ -348,9 +346,7 @@ export async function POST(req: NextRequest) {
     };
 
     return NextResponse.json(aiResponse);
-  } catch (error) {
-    console.error('AI Concierge error:', error);
-
+  } catch {
     // Return a friendly error response
     return NextResponse.json({
       message: "I'm having trouble connecting right now. Please try again in a moment, or feel free to browse the services yourself!",
@@ -369,7 +365,7 @@ export async function POST(req: NextRequest) {
 
 function getFallbackResponse(message: string, context: BookingContext): AIResponse {
   const lowerMessage = message.toLowerCase();
-  const { cart, searchParams, currentStep } = context;
+  const { cart, searchParams } = context;
 
   // Greeting
   if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey') || lowerMessage.includes('good morning') || lowerMessage.includes('good afternoon')) {

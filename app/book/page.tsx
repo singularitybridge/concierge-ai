@@ -15,20 +15,17 @@ import {
   Star,
   Bed,
   Bath,
-  Maximize,
   X,
   Loader2,
   CheckCircle2,
   User,
   Mail,
   Phone,
-  Globe,
   Building,
   CreditCard,
   ArrowRight,
   Minus,
   Plus,
-  Info,
 } from 'lucide-react';
 import { useRoombossApiStore, LOCATION_CODES, Hotel, RoomType } from '../store/roombossApiStore';
 
@@ -63,7 +60,7 @@ interface BookingResult {
 
 export default function BookingEngine() {
   const [currentStep, setCurrentStep] = useState<BookingStep>('search');
-  const [countryCode, setCountryCode] = useState('JP');
+  const [countryCode, _setCountryCode] = useState('JP');
   const [locationCode, setLocationCode] = useState('HAKUBA');
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');

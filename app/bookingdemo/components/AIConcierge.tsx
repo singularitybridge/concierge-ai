@@ -11,12 +11,8 @@ import {
   ChevronUp,
   Bot,
   User,
-  Sparkles,
   Volume2,
-  VolumeX,
-  RefreshCw,
   ShoppingCart,
-  ArrowRight,
   Loader2,
   Check,
   Plus,
@@ -102,7 +98,6 @@ export function AIConcierge() {
   useEffect(() => {
     const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY;
     if (!publicKey) {
-      console.warn('VAPI public key not configured');
       return;
     }
 
@@ -146,7 +141,6 @@ export function AIConcierge() {
     });
 
     vapiInstance.on('error', (error: any) => {
-      console.error('VAPI error:', error);
       setVoiceSession({ state: 'error', error: error.message });
     });
 
@@ -262,8 +256,7 @@ export function AIConcierge() {
       if (data.learnedPreferences) {
         updatePreferences(data.learnedPreferences);
       }
-    } catch (error) {
-      console.error('Error sending message:', error);
+    } catch {
       addMessage({
         role: 'assistant',
         type: 'error',
@@ -328,7 +321,6 @@ export function AIConcierge() {
     } else {
       const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
       if (!assistantId) {
-        console.error('VAPI assistant ID not configured');
         return;
       }
 
@@ -347,8 +339,7 @@ export function AIConcierge() {
             sessionId,
           },
         } as any);
-      } catch (error) {
-        console.error('Failed to start voice session:', error);
+      } catch {
         setVoiceSession({ state: 'error', error: 'Failed to start voice session' });
       }
     }

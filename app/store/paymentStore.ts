@@ -329,7 +329,7 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
 
   detectCardBrand,
 
-  processPayment: async (amount, bookingRef) => {
+  processPayment: async (_amount, bookingRef) => {
     const { selectedMethod, cardInfo, validateCard } = get();
 
     // Validate card if credit card payment
