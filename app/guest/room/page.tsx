@@ -244,23 +244,23 @@ export default function GuestRoomPage() {
                     {/* Top Section - Brand */}
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-[9px] text-amber-200/60 tracking-[0.25em] mb-0.5">ROOM</p>
-                        <h1 className="text-3xl font-light text-white tracking-wider drop-shadow-lg">{guestSession.room.number}</h1>
+                        <p className="text-[9px] text-amber-900/80 tracking-[0.25em] mb-0.5 drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)]">ROOM</p>
+                        <h1 className="text-3xl font-light text-amber-950 tracking-wider drop-shadow-[0_1px_2px_rgba(255,255,255,0.4)]">{guestSession.room.number}</h1>
                       </div>
                       <div className="text-right">
-                        <p className="text-amber-100 text-sm tracking-[0.2em] font-light drop-shadow">NISEKO</p>
-                        <p className="text-amber-200/70 text-[10px] tracking-[0.15em]">1898</p>
+                        <p className="text-amber-900 text-sm tracking-[0.2em] font-light drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)]">NISEKO</p>
+                        <p className="text-amber-800/80 text-[10px] tracking-[0.15em] drop-shadow-[0_1px_1px_rgba(255,255,255,0.2)]">1898</p>
                       </div>
                     </div>
 
                     {/* Center - Guest Name */}
                     <div className="flex-1 flex items-center justify-center">
                       <div className="text-center">
-                        <h2 className="text-lg text-white font-light tracking-[0.15em] drop-shadow-lg">{guestSession.name}</h2>
+                        <h2 className="text-lg text-amber-950 font-light tracking-[0.15em] drop-shadow-[0_1px_2px_rgba(255,255,255,0.4)]">{guestSession.name}</h2>
                         <div className="flex items-center justify-center gap-1 mt-1">
-                          <Star className="h-2.5 w-2.5 text-amber-300/80 fill-amber-300/80" />
-                          <p className="text-[9px] text-amber-200/70 tracking-[0.2em]">PREMIUM GUEST</p>
-                          <Star className="h-2.5 w-2.5 text-amber-300/80 fill-amber-300/80" />
+                          <Star className="h-2.5 w-2.5 text-amber-700 fill-amber-700 drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)]" />
+                          <p className="text-[9px] text-amber-800/90 tracking-[0.2em] drop-shadow-[0_1px_1px_rgba(255,255,255,0.2)]">PREMIUM GUEST</p>
+                          <Star className="h-2.5 w-2.5 text-amber-700 fill-amber-700 drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)]" />
                         </div>
                       </div>
                     </div>
@@ -272,15 +272,15 @@ export default function GuestRoomPage() {
                         className={`relative h-11 w-11 rounded-full flex items-center justify-center transition-all border ${
                           keyActive
                             ? 'bg-emerald-500/30 border-emerald-400/50'
-                            : 'bg-black/20 border-amber-400/30 hover:border-amber-300/50'
+                            : 'bg-amber-900/20 border-amber-700/50 hover:border-amber-600/60'
                         }`}
                       >
-                        <Key className={`h-4 w-4 transition-all ${keyActive ? 'text-emerald-300 rotate-45' : 'text-amber-200'}`} />
+                        <Key className={`h-4 w-4 transition-all drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)] ${keyActive ? 'text-emerald-300 rotate-45' : 'text-amber-900'}`} />
                         {keyActive && (
                           <span className="absolute inset-0 rounded-full ring-2 ring-emerald-400 animate-ping" />
                         )}
                       </button>
-                      <div className="flex items-center gap-1 text-[9px] text-amber-200/50">
+                      <div className="flex items-center gap-1 text-[9px] text-amber-900/80 drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)]">
                         <RotateCcw className="h-2.5 w-2.5" />
                         <span className="tracking-[0.15em]">DETAILS</span>
                       </div>
