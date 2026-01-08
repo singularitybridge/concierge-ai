@@ -7,7 +7,6 @@ import Link from 'next/link';
 import {
   Key,
   Wifi,
-  Phone,
   Utensils,
   Sparkles,
   Car,

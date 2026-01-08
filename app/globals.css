@@ -3,13 +3,6 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-
-  /* Custom Color Palette */
-  --color-gold: #F2AC57;
-  --color-mauve: #733858;
-  --color-wine: #260A1C;
-  --color-espresso: #401F03;
-  --color-copper: #592203;
 }
 
 @theme inline {

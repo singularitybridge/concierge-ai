@@ -12,10 +12,6 @@ import {
   ScanLine,
   Hotel,
   Lock,
-  Sparkles,
-  Phone,
-  MessageSquare,
-  Users,
 } from 'lucide-react';
 import { useGuestStore } from '@/lib/stores/guest-store';
 
