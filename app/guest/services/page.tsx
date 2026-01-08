@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Waves, UtensilsCrossed, Snowflake, Car, Coffee, Search } from 'lucide-react';
 import { GuestHeader } from '@/app/components/guest/GuestHeader';
 import { ServiceCard } from '@/app/components/guest/ServiceCard';
+import { FoodCard } from '@/app/components/guest/FoodCard';
 import { mockServices, serviceCategories, getPopularServices } from '@/lib/mock-data/services-data';
 import { ServiceCategory, GuestService } from '@/types/guest';
 
@@ -99,7 +100,7 @@ function ServicesContent() {
               placeholder="Search services..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 py-3 pl-12 pr-4 text-white placeholder-white/40 focus:outline-none focus:border-amber-400/50"
+              className="w-full bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 py-3 pl-12 pr-4 text-white placeholder-white/40 focus:outline-none focus:border-[#F2AC57]/50"
             />
           </div>
 
@@ -109,7 +110,7 @@ function ServicesContent() {
               onClick={() => handleCategoryClick(null)}
               className={`flex-shrink-0 px-4 py-2 rounded-full text-sm transition-all ${
                 !selectedCategory
-                  ? 'bg-amber-500/20 text-amber-400 border border-amber-400/30'
+                  ? 'bg-[#F2AC57]/20 text-[#F2AC57] border border-[#F2AC57]/30'
                   : 'bg-white/10 text-white/70 border border-white/10 hover:bg-white/15'
               }`}
             >
@@ -123,7 +124,7 @@ function ServicesContent() {
                   onClick={() => handleCategoryClick(cat.key)}
                   className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-all ${
                     selectedCategory === cat.key
-                      ? 'bg-amber-500/20 text-amber-400 border border-amber-400/30'
+                      ? 'bg-[#F2AC57]/20 text-[#F2AC57] border border-[#F2AC57]/30'
                       : 'bg-white/10 text-white/70 border border-white/10 hover:bg-white/15'
                   }`}
                 >
@@ -168,13 +169,21 @@ function ServicesContent() {
                 : 'All Services'}
             </h2>
             {filteredServices.length > 0 ? (
-              <div className="space-y-3">
+              <div className={selectedCategory === 'restaurant' ? 'space-y-4' : 'space-y-3'}>
                 {filteredServices.map((service) => (
-                  <ServiceCard
-                    key={service.id}
-                    service={service}
-                    onClick={() => handleServiceClick(service)}
-                  />
+                  service.category === 'restaurant' && service.image ? (
+                    <FoodCard
+                      key={service.id}
+                      service={service}
+                      onClick={() => handleServiceClick(service)}
+                    />
+                  ) : (
+                    <ServiceCard
+                      key={service.id}
+                      service={service}
+                      onClick={() => handleServiceClick(service)}
+                    />
+                  )
                 ))}
               </div>
             ) : (

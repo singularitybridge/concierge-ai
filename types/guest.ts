@@ -80,6 +80,10 @@ export interface GuestService {
   available?: boolean;
   icon: string; // Lucide icon name
   image?: string;
+  // Restaurant-specific fields
+  isChefRecommendation?: boolean;
+  status?: 'fresh' | 'limited' | 'seasonal' | 'signature';
+  tags?: string[];
 }
 
 export interface GuestNotification {
