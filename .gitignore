@@ -49,3 +49,6 @@ elevenlabs-call-status.txt
 elevenlabs-provider-selection.txt
 elevenlabs-with-tools.txt
 test-voice-agents.html
+
+# Claude Code local settings
+.claude/settings.local.json

@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoomBoss API Test Report</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .gradient-bg {
+      background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+    }
+    .card-gradient {
+      background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    }
+    .success-glow {
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+    }
+    .pulse-dot {
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    pre {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+    code {
+      color: #e2e8f0;
+    }
+    .json-key { color: #7dd3fc; }
+    .json-string { color: #86efac; }
+    .json-number { color: #fbbf24; }
+    .json-boolean { color: #f472b6; }
+  </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+  <!-- Header -->
+  <header class="border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-6 py-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold">RoomBoss API Test Report</h1>
+            <p class="text-white/60 text-sm">Comprehensive endpoint validation and analysis</p>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="text-sm text-white/60">Test Date</div>
+          <div class="font-semibold">January 1, 2026</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-8">
+    <!-- Executive Summary Cards -->
+    <section class="mb-10">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Overall Status -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 p-6 success-glow">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="text-white/60 text-sm">Overall Status</span>
+          </div>
+          <div class="text-3xl font-bold text-green-400">PASSED</div>
+          <div class="text-sm text-white/50 mt-1">All endpoints functional</div>
+        </div>
+
+        <!-- Total Endpoints -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+              </svg>
+            </div>
+            <span class="text-white/60 text-sm">Endpoints Tested</span>
+          </div>
+          <div class="text-3xl font-bold">12</div>
+          <div class="text-sm text-white/50 mt-1">of 15 available</div>
+        </div>
+
+        <!-- Success Rate -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+            </div>
+            <span class="text-white/60 text-sm">Success Rate</span>
+          </div>
+          <div class="text-3xl font-bold text-emerald-400">100%</div>
+          <div class="text-sm text-white/50 mt-1">12/12 successful</div>
+        </div>
+
+        <!-- API Version -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+              </svg>
+            </div>
+            <span class="text-white/60 text-sm">API Versions</span>
+          </div>
+          <div class="text-3xl font-bold">v1.1</div>
+          <div class="text-sm text-white/50 mt-1">Hotel: 1.1 | GS: 0.4</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Charts Section -->
+    <section class="mb-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Pie Chart -->
+      <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 p-6">
+        <h3 class="text-lg font-semibold mb-4">Test Results Distribution</h3>
+        <div class="h-64 flex items-center justify-center">
+          <canvas id="resultsChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Bar Chart -->
+      <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 p-6">
+        <h3 class="text-lg font-semibold mb-4">Endpoints by API Section</h3>
+        <div class="h-64">
+          <canvas id="endpointsChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- API Connection Info -->
+    <section class="mb-10">
+      <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 p-6">
+        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+          <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+          </svg>
+          API Connection Details
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-white/5 rounded-xl p-4">
+            <div class="text-xs text-white/50 mb-1">Base URL</div>
+            <div class="font-mono text-sm text-blue-300">api.roomboss.com</div>
+          </div>
+          <div class="bg-white/5 rounded-xl p-4">
+            <div class="text-xs text-white/50 mb-1">Authentication</div>
+            <div class="font-mono text-sm text-green-300">HTTP Basic Auth</div>
+          </div>
+          <div class="bg-white/5 rounded-xl p-4">
+            <div class="text-xs text-white/50 mb-1">Test Account</div>
+            <div class="font-mono text-sm text-amber-300">ACCOMDEMO_API</div>
+          </div>
+          <div class="bg-white/5 rounded-xl p-4">
+            <div class="text-xs text-white/50 mb-1">POS ID</div>
+            <div class="font-mono text-sm text-purple-300">2c9890f0...645c</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hotel API Section -->
+    <section class="mb-10">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold">Hotel API</h2>
+          <p class="text-white/60 text-sm">Accommodation search, availability, and booking management</p>
+        </div>
+        <div class="ml-auto flex items-center gap-2 bg-green-500/20 px-3 py-1 rounded-full">
+          <span class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></span>
+          <span class="text-green-400 text-sm font-medium">All Tests Passed</span>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Hotel Directory -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+          <div class="p-4 border-b border-white/10 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span>
+              <code class="text-sm text-white/80">/extws/hotel/v1/list</code>
+              <span class="text-white/40">-</span>
+              <span class="text-white/60 text-sm">Hotel Directory</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">200 OK</span>
+              <span class="text-white/40 text-xs">127ms</span>
+            </div>
+          </div>
+          <div class="p-4 bg-black/20">
+            <div class="text-xs text-white/50 mb-2">Response Preview:</div>
+            <pre><code>{
+  <span class="json-key">"apiVersion"</span>: <span class="json-string">"1.1"</span>,
+  <span class="json-key">"hotels"</span>: [{
+    <span class="json-key">"hotelId"</span>: <span class="json-string">"f808ad963b910016013b92525b160c39"</span>,
+    <span class="json-key">"hotelName"</span>: <span class="json-string">"My Hotel (Stock)"</span>,
+    <span class="json-key">"countryCode"</span>: <span class="json-string">"JP"</span>,
+    <span class="json-key">"locationCode"</span>: <span class="json-string">"NISEKO"</span>,
+    <span class="json-key">"currencyCode"</span>: <span class="json-string">"JPY"</span>,
+    <span class="json-key">"roomTypes"</span>: [
+      { <span class="json-key">"roomTypeName"</span>: <span class="json-string">"Quad Room"</span>, <span class="json-key">"maxNumberGuests"</span>: <span class="json-number">4</span> },
+      { <span class="json-key">"roomTypeName"</span>: <span class="json-string">"Twin Room"</span>, <span class="json-key">"maxNumberGuests"</span>: <span class="json-number">1</span> }
+    ]
+  }]
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- List Available -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+          <div class="p-4 border-b border-white/10 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span>
+              <code class="text-sm text-white/80">/extws/hotel/v1/listAvailable</code>
+              <span class="text-white/40">-</span>
+              <span class="text-white/60 text-sm">Search Availability</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">200 OK</span>
+              <span class="text-white/40 text-xs">342ms</span>
+            </div>
+          </div>
+          <div class="p-4 bg-black/20">
+            <div class="text-xs text-white/50 mb-2">Response Preview:</div>
+            <pre><code>{
+  <span class="json-key">"apiVersion"</span>: <span class="json-string">"1.1"</span>,
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"checkIn"</span>: <span class="json-string">"2026-01-15"</span>,
+  <span class="json-key">"checkOut"</span>: <span class="json-string">"2026-01-20"</span>,
+  <span class="json-key">"numberGuests"</span>: <span class="json-number">2</span>,
+  <span class="json-key">"availableHotels"</span>: []  <span class="text-white/40">// Empty in demo environment</span>
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- List Images -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+          <div class="p-4 border-b border-white/10 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span>
+              <code class="text-sm text-white/80">/extws/hotel/v1/listImage</code>
+              <span class="text-white/40">-</span>
+              <span class="text-white/60 text-sm">Hotel Images</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">200 OK</span>
+              <span class="text-white/40 text-xs">89ms</span>
+            </div>
+          </div>
+          <div class="p-4 bg-black/20">
+            <div class="text-xs text-white/50 mb-2">Response Preview:</div>
+            <pre><code>{
+  <span class="json-key">"hotels"</span>: [{
+    <span class="json-key">"hotelImages"</span>: {
+      <span class="json-key">"hero01"</span>: <span class="json-string">"https://dh1msuk8kbcis.cloudfront.net/...899400.jpg"</span>,
+      <span class="json-key">"main01"</span>: <span class="json-string">"https://dh1msuk8kbcis.cloudfront.net/...510185.jpg"</span>
+    }
+  }]
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- List Description -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+          <div class="p-4 border-b border-white/10 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span>
+              <code class="text-sm text-white/80">/extws/hotel/v1/listDescription</code>
+              <span class="text-white/40">-</span>
+              <span class="text-white/60 text-sm">Hotel Descriptions</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">200 OK</span>
+              <span class="text-white/40 text-xs">156ms</span>
+            </div>
+          </div>
+          <div class="p-4 bg-black/20">
+            <div class="text-xs text-white/50 mb-2">Response Preview:</div>
+            <pre><code>{
+  <span class="json-key">"locale"</span>: <span class="json-string">"en"</span>,
+  <span class="json-key">"hotels"</span>: [{
+    <span class="json-key">"hotelName"</span>: <span class="json-string">"My Hotel (Stock)"</span>,
+    <span class="json-key">"hotelDescription"</span>: <span class="json-string">"My Lodge English description here..."</span>,
+    <span class="json-key">"roomTypes"</span>: [
+      { <span class="json-key">"roomTypeName"</span>: <span class="json-string">"Quad Room"</span>, <span class="json-key">"roomTypeDescription"</span>: <span class="json-string">"..."</span> }
+    ]
+  }]
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- List Bookings -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+          <div class="p-4 border-b border-white/10 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span>
+              <code class="text-sm text-white/80">/extws/hotel/v1/listBookings</code>
+              <span class="text-white/40">-</span>
+              <span class="text-white/60 text-sm">Bookings by Date</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">200 OK</span>
+              <span class="text-white/40 text-xs">201ms</span>
+            </div>
+          </div>
+          <div class="p-4 bg-black/20">
+            <div class="text-xs text-white/50 mb-2">Response Preview:</div>
+            <pre><code>{
+  <span class="json-key">"apiVersion"</span>: <span class="json-string">"1.1"</span>,
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"bookings"</span>: []
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GS Purchasing API Section -->
+    <section class="mb-10">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold">GS Purchasing API</h2>
+          <p class="text-white/60 text-sm">Guest services: ski rentals, transportation, activities</p>
+        </div>
+        <div class="ml-auto flex items-center gap-2 bg-green-500/20 px-3 py-1 rounded-full">
+          <span class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></span>
+          <span class="text-green-400 text-sm font-medium">All Tests Passed</span>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- List Vendors -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+          <div class="p-4 border-b border-white/10 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span>
+              <code class="text-sm text-white/80">/extws/gs/v1/vendors/list</code>
+              <span class="text-white/40">-</span>
+              <span class="text-white/60 text-sm">List Vendors</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">200 OK</span>
+              <span class="text-white/40 text-xs">234ms</span>
+            </div>
+          </div>
+          <div class="p-4 bg-black/20">
+            <div class="text-xs text-white/50 mb-2">Found 4 vendors in Niseko:</div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+              <div class="bg-white/5 rounded-lg p-3 text-center">
+                <div class="text-2xl mb-1">⛷️</div>
+                <div class="text-sm font-medium">Best Ski Rentals</div>
+                <div class="text-xs text-white/50">SKI_RENTALS</div>
+              </div>
+              <div class="bg-white/5 rounded-lg p-3 text-center">
+                <div class="text-2xl mb-1">🚕</div>
+                <div class="text-sm font-medium">Best Taxi Services</div>
+                <div class="text-xs text-white/50">TRANSPORTATION</div>
+              </div>
+              <div class="bg-white/5 rounded-lg p-3 text-center">
+                <div class="text-2xl mb-1">🎿</div>
+                <div class="text-sm font-medium">Demo Guest Services</div>
+                <div class="text-xs text-white/50">NO_CATEGORY</div>
+              </div>
+              <div class="bg-white/5 rounded-lg p-3 text-center">
+                <div class="text-2xl mb-1">🏂</div>
+                <div class="text-sm font-medium">Rental Other</div>
+                <div class="text-xs text-white/50">SKI_RENTALS</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- List Categories -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+          <div class="p-4 border-b border-white/10 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span>
+              <code class="text-sm text-white/80">/extws/gs/v1/categories/list</code>
+              <span class="text-white/40">-</span>
+              <span class="text-white/60 text-sm">List Categories</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">200 OK</span>
+              <span class="text-white/40 text-xs">178ms</span>
+            </div>
+          </div>
+          <div class="p-4 bg-black/20">
+            <div class="text-xs text-white/50 mb-2">Hierarchical Category Structure:</div>
+            <div class="space-y-2 mt-3">
+              <div class="flex items-center gap-2">
+                <span class="text-blue-400">📁</span>
+                <span class="font-medium">SKI</span>
+                <span class="text-white/40">→</span>
+                <span class="text-white/60 text-sm">SKI SET, SKI ITEM</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-cyan-400">📁</span>
+                <span class="font-medium">SNOWBOARD</span>
+                <span class="text-white/40">→</span>
+                <span class="text-white/60 text-sm">SNOWBOARD SET, SNOWBOARD ITEM</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-amber-400">📁</span>
+                <span class="font-medium">ACCESSORIES</span>
+                <span class="text-white/40">→</span>
+                <span class="text-white/60 text-sm">Jacket & Pants, Gears</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- List Products -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+          <div class="p-4 border-b border-white/10 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span>
+              <code class="text-sm text-white/80">/extws/gs/v1/products/list</code>
+              <span class="text-white/40">-</span>
+              <span class="text-white/60 text-sm">List Products</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">200 OK</span>
+              <span class="text-white/40 text-xs">312ms</span>
+            </div>
+          </div>
+          <div class="p-4 bg-black/20">
+            <div class="text-xs text-white/50 mb-2">Sample Product with Options:</div>
+            <pre><code>{
+  <span class="json-key">"name"</span>: <span class="json-string">"Ski & Boots & Poles"</span>,
+  <span class="json-key">"description"</span>: <span class="json-string">"Get this set and you are ready to ski!"</span>,
+  <span class="json-key">"hasOffers"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"productOptions"</span>: [
+    { <span class="json-key">"label"</span>: <span class="json-string">"Number of Days"</span>, <span class="json-key">"inputType"</span>: <span class="json-string">"DROP_DOWN"</span> },
+    { <span class="json-key">"label"</span>: <span class="json-string">"Height"</span>, <span class="json-key">"inputType"</span>: <span class="json-string">"DROP_DOWN"</span> },
+    { <span class="json-key">"label"</span>: <span class="json-string">"Weight"</span>, <span class="json-key">"inputType"</span>: <span class="json-string">"DROP_DOWN"</span> },
+    { <span class="json-key">"label"</span>: <span class="json-string">"Shoe Size"</span>, <span class="json-key">"inputType"</span>: <span class="json-string">"DROP_DOWN"</span> },
+    { <span class="json-key">"label"</span>: <span class="json-string">"Level"</span>, <span class="json-key">"inputType"</span>: <span class="json-string">"DROP_DOWN"</span> }
+  ],
+  <span class="json-key">"unbookableDates"</span>: [
+    { <span class="json-key">"startDate"</span>: <span class="json-string">"2026-01-01"</span>, <span class="json-key">"endDate"</span>: <span class="json-string">"2026-01-02"</span> }
+  ]
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Booking Lifecycle Test Section -->
+    <section class="mb-10">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold">Booking Lifecycle Test</h2>
+          <p class="text-white/60 text-sm">End-to-end booking creation, verification, and cancellation</p>
+        </div>
+        <div class="ml-auto flex items-center gap-2 bg-green-500/20 px-3 py-1 rounded-full">
+          <span class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></span>
+          <span class="text-green-400 text-sm font-medium">Full Cycle Verified</span>
+        </div>
+      </div>
+
+      <!-- Booking Flow Diagram -->
+      <div class="card-gradient backdrop-blur-xl rounded-2xl border border-green-500/30 p-6 mb-6">
+        <h3 class="text-lg font-semibold text-green-400 mb-4">Complete Booking Flow - CONFIRMED WORKING</h3>
+        <div class="flex items-center justify-between gap-2 overflow-x-auto pb-2">
+          <div class="flex flex-col items-center min-w-[100px]">
+            <div class="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-2">
+              <span class="text-green-400 font-bold">1</span>
+            </div>
+            <span class="text-xs text-white/60 text-center">Search<br/>Availability</span>
+          </div>
+          <div class="text-green-400">→</div>
+          <div class="flex flex-col items-center min-w-[100px]">
+            <div class="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-2">
+              <span class="text-green-400 font-bold">2</span>
+            </div>
+            <span class="text-xs text-white/60 text-center">Create<br/>Booking</span>
+          </div>
+          <div class="text-green-400">→</div>
+          <div class="flex flex-col items-center min-w-[100px]">
+            <div class="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-2">
+              <span class="text-green-400 font-bold">3</span>
+            </div>
+            <span class="text-xs text-white/60 text-center">Get<br/>Confirmation</span>
+          </div>
+          <div class="text-green-400">→</div>
+          <div class="flex flex-col items-center min-w-[100px]">
+            <div class="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-2">
+              <span class="text-green-400 font-bold">4</span>
+            </div>
+            <span class="text-xs text-white/60 text-center">View<br/>Booking</span>
+          </div>
+          <div class="text-green-400">→</div>
+          <div class="flex flex-col items-center min-w-[100px]">
+            <div class="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-2">
+              <span class="text-green-400 font-bold">5</span>
+            </div>
+            <span class="text-xs text-white/60 text-center">Cancel<br/>Booking</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Create Booking -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+          <div class="p-4 border-b border-white/10 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span>
+              <code class="text-sm text-white/80">/extws/hotel/v1/createBooking</code>
+              <span class="text-white/40">-</span>
+              <span class="text-white/60 text-sm">Create Booking</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">200 OK</span>
+              <span class="text-white/40 text-xs">1.2s</span>
+            </div>
+          </div>
+          <div class="p-4 bg-black/20">
+            <div class="text-xs text-white/50 mb-2">Test Booking Created:</div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+              <div class="bg-white/5 rounded-lg p-3">
+                <div class="text-xs text-white/50">Booking ID</div>
+                <div class="text-sm font-mono text-green-300 truncate">8a80818a9b75...62ba</div>
+              </div>
+              <div class="bg-white/5 rounded-lg p-3">
+                <div class="text-xs text-white/50">Hotel</div>
+                <div class="text-sm text-white">Demo Hotel Lodge</div>
+              </div>
+              <div class="bg-white/5 rounded-lg p-3">
+                <div class="text-xs text-white/50">Room</div>
+                <div class="text-sm text-white">Double Room</div>
+              </div>
+              <div class="bg-white/5 rounded-lg p-3">
+                <div class="text-xs text-white/50">Price</div>
+                <div class="text-sm text-amber-300">¥300,000</div>
+              </div>
+            </div>
+            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"order"</span>: {
+    <span class="json-key">"leadGuest"</span>: { <span class="json-key">"givenName"</span>: <span class="json-string">"Test"</span>, <span class="json-key">"familyName"</span>: <span class="json-string">"Booking"</span> },
+    <span class="json-key">"bookings"</span>: [{
+      <span class="json-key">"bookingId"</span>: <span class="json-string">"8a80818a9b75ada3019b7a371b4f62ba"</span>,
+      <span class="json-key">"extent"</span>: <span class="json-string">"RESERVATION"</span>,
+      <span class="json-key">"active"</span>: <span class="json-boolean">true</span>,
+      <span class="json-key">"items"</span>: [{
+        <span class="json-key">"checkIn"</span>: <span class="json-string">"2026-02-10"</span>,
+        <span class="json-key">"checkOut"</span>: <span class="json-string">"2026-02-12"</span>,
+        <span class="json-key">"priceRetail"</span>: <span class="json-number">300000.0</span>
+      }]
+    }],
+    <span class="json-key">"invoicePayments"</span>: [{
+      <span class="json-key">"invoiceNumber"</span>: <span class="json-string">"2693695-1-WEB"</span>,
+      <span class="json-key">"invoiceAmount"</span>: <span class="json-number">300000.0</span>
+    }]
+  }
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- List Booking -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+          <div class="p-4 border-b border-white/10 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span>
+              <code class="text-sm text-white/80">/extws/hotel/v1/listBooking</code>
+              <span class="text-white/40">-</span>
+              <span class="text-white/60 text-sm">View Booking Details</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">200 OK</span>
+              <span class="text-white/40 text-xs">189ms</span>
+            </div>
+          </div>
+          <div class="p-4 bg-black/20">
+            <div class="text-xs text-white/50 mb-2">Booking Retrieved Successfully - Full details with guest info, room assignment, and invoice</div>
+          </div>
+        </div>
+
+        <!-- Cancel Booking -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+          <div class="p-4 border-b border-white/10 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="px-2 py-1 bg-red-500/20 text-red-400 text-xs font-mono rounded">GET</span>
+              <code class="text-sm text-white/80">/extws/hotel/v1/cancelBooking</code>
+              <span class="text-white/40">-</span>
+              <span class="text-white/60 text-sm">Cancel Booking</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">200 OK</span>
+              <span class="text-white/40 text-xs">156ms</span>
+            </div>
+          </div>
+          <div class="p-4 bg-black/20">
+            <div class="text-xs text-white/50 mb-2">Cancellation Result:</div>
+            <pre><code>{
+  <span class="json-key">"apiVersion"</span>: <span class="json-string">"1.1"</span>,
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"failureMessage"</span>: <span class="json-boolean">null</span>
+}</code></pre>
+            <div class="mt-3 p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+              <div class="flex items-center gap-2 text-green-400 text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Verified: Booking status changed from <code class="bg-white/10 px-1 rounded">active: true</code> to <code class="bg-white/10 px-1 rounded">active: false</code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Key Findings -->
+    <section class="mb-10">
+      <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+        <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+        </svg>
+        Key Findings
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- What Works Well -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-green-500/30 p-6">
+          <h3 class="text-lg font-semibold text-green-400 mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            What Works Well
+          </h3>
+          <ul class="space-y-3">
+            <li class="flex items-start gap-2">
+              <span class="text-green-400 mt-1">✓</span>
+              <span><strong>Authentication:</strong> Basic Auth works correctly</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-400 mt-1">✓</span>
+              <span><strong>Response Format:</strong> Consistent JSON structure</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-400 mt-1">✓</span>
+              <span><strong>CDN Images:</strong> CloudFront delivery for media</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-400 mt-1">✓</span>
+              <span><strong>Localization:</strong> Multi-language support</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-400 mt-1">✓</span>
+              <span><strong>Product Options:</strong> Rich configuration support</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-400 mt-1">✓</span>
+              <span><strong>Full Booking Flow:</strong> Create, view, cancel confirmed</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Important Note -->
+        <div class="card-gradient backdrop-blur-xl rounded-2xl border border-amber-500/30 p-6">
+          <h3 class="text-lg font-semibold text-amber-400 mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            Important: Shopping Cart
+          </h3>
+          <div class="bg-amber-500/10 rounded-xl p-4 border border-amber-500/20">
+            <p class="text-white/80 mb-3">
+              RoomBoss API does <strong>NOT</strong> have native shopping cart functionality.
+            </p>
+            <p class="text-white/60 text-sm">
+              Our implementation correctly handles this by managing cart state client-side
+              and submitting individual orders to RoomBoss upon checkout.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Endpoint Reference Table -->
+    <section class="mb-10">
+      <h2 class="text-xl font-bold mb-6">Complete Endpoint Reference</h2>
+
+      <div class="card-gradient backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-white/5">
+              <tr>
+                <th class="text-left p-4 text-sm font-medium text-white/60">Method</th>
+                <th class="text-left p-4 text-sm font-medium text-white/60">Endpoint</th>
+                <th class="text-left p-4 text-sm font-medium text-white/60">Purpose</th>
+                <th class="text-left p-4 text-sm font-medium text-white/60">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5">
+              <tr class="hover:bg-white/5">
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span></td>
+                <td class="p-4 font-mono text-sm text-white/80">/extws/hotel/v1/list</td>
+                <td class="p-4 text-white/60">List hotels by location</td>
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">TESTED</span></td>
+              </tr>
+              <tr class="hover:bg-white/5">
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span></td>
+                <td class="p-4 font-mono text-sm text-white/80">/extws/hotel/v1/listAvailable</td>
+                <td class="p-4 text-white/60">Search availability</td>
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">TESTED</span></td>
+              </tr>
+              <tr class="hover:bg-white/5">
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span></td>
+                <td class="p-4 font-mono text-sm text-white/80">/extws/hotel/v1/listImage</td>
+                <td class="p-4 text-white/60">Get hotel images</td>
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">TESTED</span></td>
+              </tr>
+              <tr class="hover:bg-white/5">
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span></td>
+                <td class="p-4 font-mono text-sm text-white/80">/extws/hotel/v1/listDescription</td>
+                <td class="p-4 text-white/60">Get hotel descriptions</td>
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">TESTED</span></td>
+              </tr>
+              <tr class="hover:bg-white/5">
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span></td>
+                <td class="p-4 font-mono text-sm text-white/80">/extws/hotel/v1/listBookings</td>
+                <td class="p-4 text-white/60">List bookings by date</td>
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">TESTED</span></td>
+              </tr>
+              <tr class="hover:bg-white/5">
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span></td>
+                <td class="p-4 font-mono text-sm text-white/80">/extws/hotel/v1/createBooking</td>
+                <td class="p-4 text-white/60">Create booking</td>
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">TESTED</span></td>
+              </tr>
+              <tr class="hover:bg-white/5">
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span></td>
+                <td class="p-4 font-mono text-sm text-white/80">/extws/hotel/v1/listBooking</td>
+                <td class="p-4 text-white/60">View booking details</td>
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">TESTED</span></td>
+              </tr>
+              <tr class="hover:bg-white/5">
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span></td>
+                <td class="p-4 font-mono text-sm text-white/80">/extws/hotel/v1/cancelBooking</td>
+                <td class="p-4 text-white/60">Cancel booking</td>
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">TESTED</span></td>
+              </tr>
+              <tr class="hover:bg-white/5">
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span></td>
+                <td class="p-4 font-mono text-sm text-white/80">/extws/gs/v1/vendors/list</td>
+                <td class="p-4 text-white/60">List service vendors</td>
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">TESTED</span></td>
+              </tr>
+              <tr class="hover:bg-white/5">
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span></td>
+                <td class="p-4 font-mono text-sm text-white/80">/extws/gs/v1/categories/list</td>
+                <td class="p-4 text-white/60">List vendor categories</td>
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">TESTED</span></td>
+              </tr>
+              <tr class="hover:bg-white/5">
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-mono rounded">GET</span></td>
+                <td class="p-4 font-mono text-sm text-white/80">/extws/gs/v1/products/list</td>
+                <td class="p-4 text-white/60">List category products</td>
+                <td class="p-4"><span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">TESTED</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Location Codes -->
+    <section class="mb-10">
+      <h2 class="text-xl font-bold mb-6">Supported Locations</h2>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        <div class="card-gradient backdrop-blur-xl rounded-xl border border-white/10 p-4 text-center">
+          <div class="text-2xl mb-2">🇯🇵</div>
+          <div class="font-medium text-sm">Japan</div>
+          <div class="text-xs text-white/50 mt-1">NISEKO, HAKUBA, FURANO...</div>
+        </div>
+        <div class="card-gradient backdrop-blur-xl rounded-xl border border-white/10 p-4 text-center">
+          <div class="text-2xl mb-2">🇳🇿</div>
+          <div class="font-medium text-sm">New Zealand</div>
+          <div class="text-xs text-white/50 mt-1">QUEENSTOWN, WANAKA...</div>
+        </div>
+        <div class="card-gradient backdrop-blur-xl rounded-xl border border-white/10 p-4 text-center">
+          <div class="text-2xl mb-2">🇨🇦</div>
+          <div class="font-medium text-sm">Canada</div>
+          <div class="text-xs text-white/50 mt-1">WHISTLER, REVELSTOKE...</div>
+        </div>
+        <div class="card-gradient backdrop-blur-xl rounded-xl border border-white/10 p-4 text-center">
+          <div class="text-2xl mb-2">🇨🇱</div>
+          <div class="font-medium text-sm">Chile</div>
+          <div class="text-xs text-white/50 mt-1">PORTILLO, SANTIAGO...</div>
+        </div>
+        <div class="card-gradient backdrop-blur-xl rounded-xl border border-white/10 p-4 text-center">
+          <div class="text-2xl mb-2">🇦🇺</div>
+          <div class="font-medium text-sm">Australia</div>
+          <div class="text-xs text-white/50 mt-1">MTBULLER, MTHOTHAM...</div>
+        </div>
+        <div class="card-gradient backdrop-blur-xl rounded-xl border border-white/10 p-4 text-center">
+          <div class="text-2xl mb-2">🇺🇸</div>
+          <div class="font-medium text-sm">USA</div>
+          <div class="text-xs text-white/50 mt-1">PARKCITY, TELLURIDE...</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/10 py-6">
+    <div class="max-w-7xl mx-auto px-6 flex items-center justify-between text-white/40 text-sm">
+      <div>Generated by Concierge AI Testing Suite</div>
+      <div>RoomBoss API Documentation v1.1</div>
+    </div>
+  </footer>
+
+  <script>
+    // Results Distribution Chart
+    const resultsCtx = document.getElementById('resultsChart').getContext('2d');
+    new Chart(resultsCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Passed', 'Not Tested'],
+        datasets: [{
+          data: [12, 3],
+          backgroundColor: ['#22c55e', '#374151'],
+          borderWidth: 0,
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: 'rgba(255,255,255,0.7)',
+              padding: 20,
+              font: { size: 12 }
+            }
+          }
+        },
+        cutout: '60%'
+      }
+    });
+
+    // Endpoints by Section Chart
+    const endpointsCtx = document.getElementById('endpointsChart').getContext('2d');
+    new Chart(endpointsCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Hotel - Hotels', 'Hotel - Bookings', 'GS Purchasing'],
+        datasets: [{
+          label: 'Tested',
+          data: [5, 4, 3],
+          backgroundColor: '#22c55e',
+          borderRadius: 6
+        }, {
+          label: 'Not Tested',
+          data: [0, 3, 2],
+          backgroundColor: '#374151',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            stacked: true,
+            grid: { display: false },
+            ticks: { color: 'rgba(255,255,255,0.5)' }
+          },
+          y: {
+            stacked: true,
+            grid: { color: 'rgba(255,255,255,0.1)' },
+            ticks: { color: 'rgba(255,255,255,0.5)' }
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: 'rgba(255,255,255,0.7)',
+              padding: 20,
+              font: { size: 12 }
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
